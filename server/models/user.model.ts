@@ -30,6 +30,11 @@ const UserSchema = new Schema(
       required: false,
       trim: true,
     },
+    role: {
+      type: Schema.Types.ObjectId,
+      ref: "Role",
+      required: true,
+    },
   },
   { timestamps: true }
 );

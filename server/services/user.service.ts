@@ -39,17 +39,25 @@ export async function createUser(input: CreateUserInput) {
 export async function verifyUser(username: string, password: string) {
   await connectDB();
 
-  const user = await UserModel.findOne({ username });
+  const user = await UserModel.findOne({ username }).populate({
+    path: "role",
+    populate: { path: "permissions" },
+  });
   if (!user) return null;
 
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) return null;
 
+  const role = user.role as any;
+
   return {
     id: String(user._id),
     username: user.username,
-    fullname: user.fullname,
-    email: user.email,
-    phone: user.phone,
+    role: {
+      id: String(role._id),
+      name: role.name,
+      isSuperAdmin: role.isSuperAdmin,
+      permissions: role.permissions.map((p: any) => p.key),
+    },
   };
 }
