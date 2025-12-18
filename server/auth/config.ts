@@ -22,9 +22,20 @@ export const authOptions: NextAuthOptions = {
         });
 
         const parsed = schema.safeParse(creds);
-        if (!parsed.success) return null;
+        if (!parsed.success) {
+          throw new Error("Invalid username or password");
+        }
 
-        return verifyUser(parsed.data.username, parsed.data.password);
+        const user = await verifyUser(
+          parsed.data.username,
+          parsed.data.password
+        );
+
+        if (!user) {
+          throw new Error("Invalid username or password");
+        }
+
+        return user;
       },
     }),
   ],
