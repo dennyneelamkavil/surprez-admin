@@ -27,7 +27,7 @@ const PERMISSION_ROUTES: Array<{
 
 const AUTH_PAGES = ["/auth/sign-in", "/auth/sign-up"];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Ignore static & internal routes
