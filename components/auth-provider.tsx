@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
 
       async logout() {
-        await signOut({ redirect: false });
+        await signOut({ redirect: true });
       },
     }),
     [session, status]

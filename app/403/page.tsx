@@ -1,21 +1,22 @@
-// app/not-found.tsx
+// app/403/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Home, ArrowLeft, FileQuestion } from "lucide-react";
+import { ShieldAlert, Home, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function NotFoundPage() {
+export default function ForbiddenPage() {
   const router = useRouter();
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-primary/5 to-accent/5 px-4 text-center">
-      <FileQuestion className="h-14 w-14 text-muted-foreground mb-4" />
-      <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-destructive/5 to-accent/5 px-4 text-center">
+      <ShieldAlert className="h-14 w-14 text-destructive mb-4" />
+      <h1 className="text-6xl font-bold text-primary mb-4">403</h1>
       <h2 className="text-2xl font-semibold text-foreground mb-2">
-        Page Not Found
+        Access Denied
       </h2>
       <p className="text-muted-foreground mb-8 max-w-md">
-        Oops! The page you’re looking for doesn’t exist or may have been moved.
+        You don’t have permission to access this page.
       </p>
 
       <div className="flex gap-4">
