@@ -141,3 +141,73 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Smooth spinning animation used by Loader */
+@keyframes spinSmooth {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spinSmooth {
+  animation: spinSmooth 1.5s linear infinite;
+}
+
+/* Loading dots animation */
+@keyframes loadingDots {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.dot-1 {
+  animation: loadingDots 1.4s infinite;
+}
+
+.dot-2 {
+  animation: loadingDots 1.4s infinite 0.2s;
+}
+
+.dot-3 {
+  animation: loadingDots 1.4s infinite 0.4s;
+}
+
+/* Hide scrollbars globally */
+html,
+body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
+  overflow: -moz-scrollbars-none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: transparent; /* Chrome, Safari, Opera */
+}
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: transparent; /* Chrome, Safari, Opera */
+}
+
+/* Remove number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}

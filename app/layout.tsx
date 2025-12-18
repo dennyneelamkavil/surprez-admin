@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Providers } from "@/components/client-providers";
+import { ToastContainer } from "react-toastify";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -30,6 +31,14 @@ export default function RootLayout({
       <body className={`font-sans antialiased`}>
         <Providers>{children}</Providers>
         <Analytics />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar
+          pauseOnFocusLoss={false}
+          pauseOnHover
+          draggable
+        />
       </body>
     </html>
   );
