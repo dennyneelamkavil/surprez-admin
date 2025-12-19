@@ -17,6 +17,7 @@ export default function SignInForm() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [fieldErrors, setFieldErrors] = useState({
     username: "",
     password: "",
@@ -33,16 +34,11 @@ export default function SignInForm() {
     setLoading(true);
     setFieldErrors({ username: "", password: "" });
 
-    const errors = {
-      username: "",
-      password: "",
-    };
-    if (!formData.username) {
-      errors.username = "Username is required";
-    }
-    if (!formData.password) {
-      errors.password = "Password is required";
-    }
+    const errors = { username: "", password: "" };
+
+    if (!formData.username) errors.username = "Username is required";
+    if (!formData.password) errors.password = "Password is required";
+
     if (errors.username || errors.password) {
       setFieldErrors(errors);
       setLoading(false);
@@ -68,7 +64,8 @@ export default function SignInForm() {
         isLoading: false,
         autoClose: 3000,
       });
-      router.push("/"); // dashboard
+
+      router.push("/");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -79,12 +76,13 @@ export default function SignInForm() {
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
+        {/* Header */}
         <div className="mb-5 sm:mb-8">
-          <h1 className="mb-2 font-semibold text-gray-800 text-title-sm sm:text-title-md">
+          <h1 className="mb-2 font-semibold text-gray-800 dark:text-white/90 text-title-sm sm:text-title-md">
             Sign In
           </h1>
-          <p className="text-sm text-gray-500">
-            Enter your username and password to sign in
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Enter your username and password to sign in!
           </p>
         </div>
 
@@ -135,21 +133,21 @@ export default function SignInForm() {
                   className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                 >
                   {showPassword ? (
-                    <EyeIcon className="fill-gray-500" />
+                    <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
                   ) : (
-                    <EyeCloseIcon className="fill-gray-500" />
+                    <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
                   )}
                 </span>
               </div>
             </div>
 
             {/* Remember me */}
-            <label className="flex items-center justify-between cursor-pointer">
-              <div className="flex items-center gap-3">
-                <Checkbox checked={isChecked} onChange={setIsChecked} />
-                <span className="text-sm text-gray-700">Keep me logged in</span>
-              </div>
-            </label>
+            <div className="flex items-center gap-3">
+              <Checkbox checked={isChecked} onChange={setIsChecked} />
+              <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
+                Keep me logged in
+              </span>
+            </div>
 
             {/* Error */}
             {error && (

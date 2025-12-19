@@ -3,7 +3,7 @@
 
 import type { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
-import { AuthProvider } from "./auth-provider";
+import { AuthProvider } from "./AuthProvider";
 
 export function Providers({ children }: { children: ReactNode }) {
   // You can pass `session={pageProps.session}` if you fetch the session on the server

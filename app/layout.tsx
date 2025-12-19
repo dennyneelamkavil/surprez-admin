@@ -4,8 +4,8 @@ import "./globals.css";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Metadata } from "next";
-import { ToastContainer } from "react-toastify";
-import { Providers } from "@/components/client-providers";
+import { Providers } from "@/components/ClientProviders";
+import ToastProvider from "@/components/ToastProvider";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -36,14 +36,7 @@ export default function RootLayout({
           <SidebarProvider>
             <Providers>{children}</Providers>
           </SidebarProvider>
-          <ToastContainer
-            position="bottom-right"
-            autoClose={5000}
-            hideProgressBar
-            pauseOnFocusLoss={false}
-            pauseOnHover
-            draggable
-          />
+          <ToastProvider />
         </ThemeProvider>
       </body>
     </html>
