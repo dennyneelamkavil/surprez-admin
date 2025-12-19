@@ -1,4 +1,4 @@
-import { authOptions } from "./config";
+import { authOptions } from "@/server/auth/config";
 import { getServerSession } from "next-auth";
 
 // export this helper so you can use `auth()` anywhere

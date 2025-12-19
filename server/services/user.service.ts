@@ -1,8 +1,8 @@
 import "server-only";
-import { connectDB } from "../db";
-import { UserModel } from "../models/user.model";
-import "../models/role.model";
-import "../models/permission.model";
+import { connectDB } from "@/server/db";
+import { UserModel } from "@/server/models/user.model";
+import "@/server/models/role.model";
+import "@/server/models/permission.model";
 import bcrypt from "bcryptjs";
 
 type CreateUserInput = {

@@ -1,9 +1,8 @@
-// components/Providers.tsx
 "use client";
 
 import type { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
-import { AuthProvider } from "./AuthProvider";
+import { AuthProvider } from "@/components/AuthProvider";
 
 export function Providers({ children }: { children: ReactNode }) {
   // You can pass `session={pageProps.session}` if you fetch the session on the server

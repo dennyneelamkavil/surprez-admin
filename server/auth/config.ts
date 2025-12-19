@@ -2,7 +2,7 @@ import "server-only";
 import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
-import { verifyUser } from "../services/user.service";
+import { verifyUser } from "@/server/services/user.service";
 import { Role } from "@/lib/types";
 
 export const authOptions: NextAuthOptions = {
