@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
+import { Outfit } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/client-providers";
-import { ToastContainer } from "react-toastify";
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+import { SidebarProvider } from "@/context/SidebarContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { Metadata } from "next";
+import { ToastContainer } from "react-toastify";
+import { Providers } from "@/components/client-providers";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Surprez - Admin Dashboard",
@@ -28,17 +31,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
-        <Providers>{children}</Providers>
-        <Analytics />
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar
-          pauseOnFocusLoss={false}
-          pauseOnHover
-          draggable
-        />
+      <body className={`${outfit.className} dark:bg-gray-900`}>
+        <ThemeProvider>
+          <SidebarProvider>
+            <Providers>{children}</Providers>
+          </SidebarProvider>
+          <ToastContainer
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar
+            pauseOnFocusLoss={false}
+            pauseOnHover
+            draggable
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -25,7 +25,7 @@ const PERMISSION_ROUTES: Array<{
   // },
 ];
 
-const AUTH_PAGES = ["/auth/sign-in", "/auth/sign-up"];
+const AUTH_PAGES = ["/signin", "/signup"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -54,7 +54,7 @@ export async function proxy(req: NextRequest) {
 
   // 2️⃣ Not logged-in user → protected page → login
   if (!isAuthenticated && !isAuthPage) {
-    return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+    return NextResponse.redirect(new URL("/signin", req.url));
   }
 
   // 3️⃣ Permission-based route protection

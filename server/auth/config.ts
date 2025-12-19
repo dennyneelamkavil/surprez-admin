@@ -3,6 +3,7 @@ import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { verifyUser } from "../services/user.service";
+import { Role } from "@/lib/types";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -51,14 +52,17 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.username = token.username;
-      session.user.role = token.role;
+      session.user = {
+        ...session.user,
+        id: token.id as string,
+        username: token.username as string,
+        role: token.role as Role,
+      };
       return session;
     },
   },
 
   pages: {
-    signIn: "/auth/sign-in",
+    signIn: "/signin",
   },
 };
