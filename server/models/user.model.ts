@@ -35,8 +35,14 @@ const UserSchema = new Schema(
       ref: "Role",
       required: true,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
+
+UserSchema.index({ username: 1, isActive: 1 });
 
 export const UserModel = models.User || model("User", UserSchema);

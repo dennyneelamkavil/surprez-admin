@@ -22,4 +22,6 @@ const RoleSchema = new Schema(
   { timestamps: true }
 );
 
+RoleSchema.index({ name: 1 });
+
 export const RoleModel = models.Role || model("Role", RoleSchema);
