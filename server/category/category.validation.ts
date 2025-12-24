@@ -1,0 +1,21 @@
+import "server-only";
+import { z } from "zod";
+
+export const CreateCategorySchema = z.object({
+  name: z.string().min(2),
+  slug: z.string().min(2),
+  image: z.string(),
+  description: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const UpdateCategorySchema = z.object({
+  name: z.string().min(2).optional(),
+  slug: z.string().min(2).optional(),
+  image: z.string().optional(),
+  description: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+
+export type CreateCategoryInput = z.infer<typeof CreateCategorySchema>;
+export type UpdateCategoryInput = z.infer<typeof UpdateCategorySchema>;
