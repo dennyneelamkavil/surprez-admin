@@ -7,7 +7,6 @@ const UserSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      index: true,
       trim: true,
     },
     password: {
@@ -42,5 +41,7 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
+
+UserSchema.index({ username: 1, isActive: 1 });
 
 export const UserModel = models.User || model("User", UserSchema);
