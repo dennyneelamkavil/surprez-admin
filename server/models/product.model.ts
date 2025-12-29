@@ -65,7 +65,4 @@ const ProductSchema = new Schema(
   { timestamps: true }
 );
 
-ProductSchema.index({ slug: 1 });
-ProductSchema.index({ subcategories: 1 });
-
 export const ProductModel = models.Product || model("Product", ProductSchema);

@@ -31,6 +31,4 @@ const ReviewSchema = new Schema(
   { timestamps: true }
 );
 
-ReviewSchema.index({ product: 1 });
-
 export const ReviewModel = models.Review || model("Review", ReviewSchema);
