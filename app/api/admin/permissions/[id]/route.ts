@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/server/auth/rbac";
 import {
   getPermissionById,
@@ -7,18 +7,23 @@ import {
 } from "@/server/permission/permission.service";
 import { UpdatePermissionSchema } from "@/server/permission/permission.validation";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   await requirePermission("permission:read");
-  return NextResponse.json(await getPermissionById(params.id));
+  return NextResponse.json(await getPermissionById(id));
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("permission:update");
 
-  const body = await req.json();
+  const body = await request.json();
   const parsed = UpdatePermissionSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -28,14 +33,15 @@ export async function PUT(
     );
   }
 
-  return NextResponse.json(await updatePermission(params.id, parsed.data));
+  return NextResponse.json(await updatePermission(id, parsed.data));
 }
 
 export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("permission:delete");
-  await deletePermission(params.id);
+  await deletePermission(id);
   return NextResponse.json({ success: true });
 }

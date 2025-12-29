@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/server/auth/rbac";
 import {
   getSubCategoryById,
@@ -7,18 +7,23 @@ import {
 } from "@/server/subcategory/subcategory.service";
 import { UpdateSubCategorySchema } from "@/server/subcategory/subcategory.validation";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   await requirePermission("subcategory:read");
-  return NextResponse.json(await getSubCategoryById(params.id));
+  return NextResponse.json(await getSubCategoryById(id));
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("subcategory:update");
 
-  const body = await req.json();
+  const body = await request.json();
   const parsed = UpdateSubCategorySchema.safeParse(body);
 
   if (!parsed.success) {
@@ -28,14 +33,15 @@ export async function PUT(
     );
   }
 
-  return NextResponse.json(await updateSubCategory(params.id, parsed.data));
+  return NextResponse.json(await updateSubCategory(id, parsed.data));
 }
 
 export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("subcategory:delete");
-  await deleteSubCategory(params.id);
+  await deleteSubCategory(id);
   return NextResponse.json({ success: true });
 }

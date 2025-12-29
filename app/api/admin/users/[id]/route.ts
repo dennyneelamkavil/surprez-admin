@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   getUserById,
   updateUser,
@@ -7,18 +7,23 @@ import {
 import { requirePermission } from "@/server/auth/rbac";
 import { UpdateUserSchema } from "@/server/user/user.validation";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   await requirePermission("user:read");
-  const user = await getUserById(params.id);
+  const user = await getUserById(id);
   return NextResponse.json(user);
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("user:update");
-  const body = await req.json();
+  const body = await request.json();
   const parsed = UpdateUserSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -28,15 +33,16 @@ export async function PUT(
     );
   }
 
-  const user = await updateUser(params.id, parsed.data);
+  const user = await updateUser(id, parsed.data);
   return NextResponse.json(user);
 }
 
 export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("user:delete");
-  await deleteUser(params.id);
+  await deleteUser(id);
   return NextResponse.json({ success: true });
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/server/auth/rbac";
 import {
   getProductById,
@@ -7,18 +7,23 @@ import {
 } from "@/server/product/product.service";
 import { UpdateProductSchema } from "@/server/product/product.validation";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   await requirePermission("product:read");
-  return NextResponse.json(await getProductById(params.id));
+  return NextResponse.json(await getProductById(id));
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("product:update");
 
-  const body = await req.json();
+  const body = await request.json();
   const parsed = UpdateProductSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -28,14 +33,15 @@ export async function PUT(
     );
   }
 
-  return NextResponse.json(await updateProduct(params.id, parsed.data));
+  return NextResponse.json(await updateProduct(id, parsed.data));
 }
 
 export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await requirePermission("product:delete");
-  await deleteProduct(params.id);
+  await deleteProduct(id);
   return NextResponse.json({ success: true });
 }
