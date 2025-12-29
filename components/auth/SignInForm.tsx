@@ -45,9 +45,8 @@ export default function SignInForm() {
       return;
     }
 
+    const toastId = toast.loading("Signing in...");
     try {
-      const toastId = toast.loading("Signing in...");
-
       const res = await signIn("credentials", {
         username: formData.username,
         password: formData.password,
@@ -67,6 +66,12 @@ export default function SignInForm() {
 
       router.push("/");
     } catch (err: any) {
+      toast.update(toastId, {
+        render: err.message || "Sign in failed",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
       setError(err.message);
     } finally {
       setLoading(false);
