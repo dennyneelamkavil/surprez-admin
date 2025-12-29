@@ -13,7 +13,5 @@ const PermissionSchema = new Schema(
   { timestamps: true }
 );
 
-PermissionSchema.index({ key: 1 });
-
 export const PermissionModel =
   models.Permission || model("Permission", PermissionSchema);
