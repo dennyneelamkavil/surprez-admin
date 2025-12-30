@@ -34,6 +34,7 @@ export async function verifyUser(username: string, password: string) {
       isSuperAdmin: role.isSuperAdmin,
       permissions: role.permissions.map((p: any) => p.key),
     },
+    fullname: user.fullname,
   };
 }
 

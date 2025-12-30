@@ -24,7 +24,7 @@ export default function UserDropdown() {
 
   if (!session?.user) return null;
 
-  const { username, role } = session.user;
+  const { username, role, fullname } = session.user;
 
   async function handleSignOut() {
     const toastId = toast.loading("Signing out...");
@@ -55,7 +55,7 @@ export default function UserDropdown() {
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">{username}</span>
+        <span className="block mr-1 font-medium text-theme-sm">{fullname}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -85,7 +85,7 @@ export default function UserDropdown() {
         {/* User info */}
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {username}
+            {`${fullname} (@${username})`}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
             {role.name}
