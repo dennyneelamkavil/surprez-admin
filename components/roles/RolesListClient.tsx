@@ -92,14 +92,16 @@ export default function RolesListClient() {
         <table className="w-full table-auto">
           <thead className="border-b dark:border-gray-800">
             <tr>
-              <th className="px-5 py-3 text-left text-sm font-medium">Name</th>
-              <th className="px-5 py-3 text-left text-sm font-medium">
+              <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                Name
+              </th>
+              <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
                 Super Admin
               </th>
               <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
                 Created
               </th>
-              <th className="px-5 py-3 text-right text-sm font-medium">
+              <th className="px-5 py-3 text-right text-sm font-medium text-gray-500 dark:text-gray-400">
                 Actions
               </th>
             </tr>
@@ -107,24 +109,32 @@ export default function RolesListClient() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-5 py-6 text-center">
+                <td
+                  colSpan={4}
+                  className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
+                >
                   Loading...
                 </td>
               </tr>
             ) : roles.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-5 py-6 text-center">
+                <td
+                  colSpan={4}
+                  className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
+                >
                   No roles found
                 </td>
               </tr>
             ) : (
               roles.map((role) => (
                 <tr key={role.id} className="border-b dark:border-gray-800">
-                  <td className="px-5 py-4 text-sm">{role.name}</td>
-                  <td className="px-5 py-4 text-sm">
+                  <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
+                    {role.name}
+                  </td>
+                  <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                     {role.isSuperAdmin ? "Yes" : "No"}
                   </td>
-                  <td className="px-5 py-4 text-sm">
+                  <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                     {new Date(role.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-5 py-4 text-right space-x-3">

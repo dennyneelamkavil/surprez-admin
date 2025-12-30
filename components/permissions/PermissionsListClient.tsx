@@ -120,13 +120,13 @@ export default function PermissionsListClient() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-6 text-center">
+                  <td colSpan={4} className="px-5 py-6 text-center text-gray-800 dark:text-white/90">
                     Loading...
                   </td>
                 </tr>
               ) : permissions.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-6 text-center">
+                  <td colSpan={4} className="px-5 py-6 text-center text-gray-800 dark:text-white/90">
                     No permissions found
                   </td>
                 </tr>
@@ -136,13 +136,13 @@ export default function PermissionsListClient() {
                     key={permission.id}
                     className="border-b border-gray-200 dark:border-gray-800"
                   >
-                    <td className="px-5 py-4 font-mono text-sm">
+                    <td className="px-5 py-4 font-mono text-sm text-gray-800 dark:text-white/90">
                       {permission.key}
                     </td>
-                    <td className="px-5 py-4 text-sm">
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {permission.description || "—"}
                     </td>
-                    <td className="px-5 py-4 text-sm">
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {new Date(permission.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-4 text-right space-x-3">
