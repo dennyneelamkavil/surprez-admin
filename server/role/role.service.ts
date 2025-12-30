@@ -29,6 +29,7 @@ export async function listRoles(params: {
   page?: number;
   limit?: number;
   search?: string;
+  all?: boolean;
 }) {
   await connectDB();
 
@@ -40,6 +41,18 @@ export async function listRoles(params: {
 
   if (params.search) {
     query.name = { $regex: params.search, $options: "i" };
+  }
+
+  if (params?.all) {
+    const roles = await RoleModel.find(query)
+      .populate("permissions")
+      .sort({ key: 1 })
+      .lean();
+
+    return {
+      roles: roles.map(mapRole),
+      pagination: null,
+    };
   }
 
   const [roles, total] = await Promise.all([

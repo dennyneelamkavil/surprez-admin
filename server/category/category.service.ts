@@ -30,6 +30,7 @@ export async function listCategories(params?: {
   page?: number;
   limit?: number;
   search?: string;
+  all?: boolean;
 }) {
   await connectDB();
 
@@ -41,6 +42,15 @@ export async function listCategories(params?: {
 
   if (params?.search) {
     query.name = { $regex: params.search, $options: "i" };
+  }
+
+  if (params?.all) {
+    const categories = await CategoryModel.find(query).sort({ key: 1 }).lean();
+
+    return {
+      categories: categories.map(mapCategory),
+      pagination: null,
+    };
   }
 
   const [categories, total] = await Promise.all([

@@ -23,6 +23,7 @@ export async function listPermissions(params: {
   page?: number;
   limit?: number;
   search?: string;
+  all?: boolean;
 }) {
   await connectDB();
 
@@ -34,6 +35,17 @@ export async function listPermissions(params: {
 
   if (params.search) {
     query.key = { $regex: params.search, $options: "i" };
+  }
+
+  if (params?.all) {
+    const permissions = await PermissionModel.find(query)
+      .sort({ key: 1 })
+      .lean();
+
+    return {
+      permissions: permissions.map(mapPermission),
+      pagination: null,
+    };
   }
 
   const [permissions, total] = await Promise.all([

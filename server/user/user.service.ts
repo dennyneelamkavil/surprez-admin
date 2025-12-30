@@ -64,6 +64,7 @@ export async function listUsers(params: {
   page?: number;
   limit?: number;
   search?: string;
+  all?: boolean;
 }) {
   await connectDB();
 
@@ -79,6 +80,21 @@ export async function listUsers(params: {
       { fullname: { $regex: params.search, $options: "i" } },
       { email: { $regex: params.search, $options: "i" } },
     ];
+  }
+
+  if (params?.all) {
+    const users = await UserModel.find(query)
+      .populate({
+        path: "role",
+        populate: { path: "permissions" },
+      })
+      .sort({ key: 1 })
+      .lean();
+
+    return {
+      users: users.map(mapUser),
+      pagination: null,
+    };
   }
 
   const [users, total] = await Promise.all([

@@ -39,6 +39,7 @@ export async function listSubCategories(params?: {
   page?: number;
   limit?: number;
   search?: string;
+  all?: boolean;
   categoryId?: string;
 }) {
   await connectDB();
@@ -57,7 +58,19 @@ export async function listSubCategories(params?: {
     query.category = params.categoryId;
   }
 
-  const [items, total] = await Promise.all([
+  if (params?.all) {
+    const subcategories = await SubCategoryModel.find(query)
+      .populate("category")
+      .sort({ key: 1 })
+      .lean();
+
+    return {
+      subcategories: subcategories.map(mapSubCategory),
+      pagination: null,
+    };
+  }
+
+  const [subcategories, total] = await Promise.all([
     SubCategoryModel.find(query)
       .populate("category")
       .sort({ createdAt: -1 })
@@ -68,7 +81,7 @@ export async function listSubCategories(params?: {
   ]);
 
   return {
-    subcategories: items.map(mapSubCategory),
+    subcategories: subcategories.map(mapSubCategory),
     pagination: {
       page,
       limit,

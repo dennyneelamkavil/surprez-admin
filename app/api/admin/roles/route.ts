@@ -25,10 +25,11 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
 
+  const all = searchParams.get("all") === "true";
   const page = Number(searchParams.get("page") ?? 1);
   const limit = Number(searchParams.get("limit") ?? 10);
   const search = searchParams.get("search") ?? undefined;
 
-  const roles = await listRoles({ page, limit, search });
+  const roles = await listRoles({ page, limit, search, all });
   return NextResponse.json(roles);
 }

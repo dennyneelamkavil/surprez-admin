@@ -38,6 +38,7 @@ export async function listProducts(params?: {
   page?: number;
   limit?: number;
   search?: string;
+  all?: boolean;
   subcategoryId?: string;
   isFeatured?: boolean;
 }) {
@@ -61,7 +62,19 @@ export async function listProducts(params?: {
     query.isFeatured = params.isFeatured;
   }
 
-  const [items, total] = await Promise.all([
+  if (params?.all) {
+    const products = await ProductModel.find(query)
+      .populate("subcategories")
+      .sort({ key: 1 })
+      .lean();
+
+    return {
+      products: products.map(mapProduct),
+      pagination: null,
+    };
+  }
+
+  const [products, total] = await Promise.all([
     ProductModel.find(query)
       .populate("subcategories")
       .sort({ createdAt: -1 })
@@ -72,7 +85,7 @@ export async function listProducts(params?: {
   ]);
 
   return {
-    products: items.map(mapProduct),
+    products: products.map(mapProduct),
     pagination: {
       page,
       limit,
