@@ -37,7 +37,7 @@ export async function listPermissions(params: {
   }
 
   const [permissions, total] = await Promise.all([
-    PermissionModel.find()
+    PermissionModel.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
