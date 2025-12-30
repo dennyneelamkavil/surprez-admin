@@ -5,7 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@/context/SidebarContext";
-import { Home, Shield, UserCircle, Users } from "lucide-react";
+import {
+  Boxes,
+  Home,
+  Layers,
+  Package,
+  ShieldCheck,
+  Tags,
+  UserCircle,
+  UserCog,
+  Users,
+} from "lucide-react";
 import { HorizontaLDots } from "@/icons";
 
 type NavItem = {
@@ -21,12 +31,32 @@ const navItems: NavItem[] = [
     path: "/",
   },
   {
+    icon: <Package />,
+    name: "Products",
+    path: "/products",
+  },
+  {
+    icon: <Tags />,
+    name: "Categories",
+    path: "/categories",
+  },
+  {
+    icon: <Layers />,
+    name: "SubCategories",
+    path: "/subcategories",
+  },
+  {
     icon: <Users />,
     name: "Users",
     path: "/users",
   },
   {
-    icon: <Shield />,
+    icon: <UserCog />,
+    name: "Roles",
+    path: "/roles",
+  },
+  {
+    icon: <ShieldCheck />,
     name: "Permissions",
     path: "/permissions",
   },
