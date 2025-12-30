@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { hasPermission } from "@/lib/authorization";
 import { useSidebar } from "@/context/SidebarContext";
 import {
   Boxes,
@@ -22,54 +24,84 @@ type NavItem = {
   name: string;
   icon: React.ReactNode;
   path: string;
+  permission?: string;
 };
 
-const navItems: NavItem[] = [
+type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+const homeNavItem: NavItem = {
+  icon: <Home />,
+  name: "Home",
+  path: "/",
+};
+
+const navGroups: NavGroup[] = [
   {
-    icon: <Home />,
-    name: "Home",
-    path: "/",
+    label: "Catalog",
+    items: [
+      {
+        icon: <Package />,
+        name: "Products",
+        path: "/products",
+        permission: "product:read",
+      },
+      {
+        icon: <Tags />,
+        name: "Categories",
+        path: "/categories",
+        permission: "category:read",
+      },
+      {
+        icon: <Layers />,
+        name: "SubCategories",
+        path: "/subcategories",
+        permission: "subcategory:read",
+      },
+    ],
   },
   {
-    icon: <Package />,
-    name: "Products",
-    path: "/products",
+    label: "Access Control",
+    items: [
+      {
+        icon: <Users />,
+        name: "Users",
+        path: "/users",
+        permission: "user:read",
+      },
+      {
+        icon: <UserCog />,
+        name: "Roles",
+        path: "/roles",
+        permission: "role:read",
+      },
+      {
+        icon: <ShieldCheck />,
+        name: "Permissions",
+        path: "/permissions",
+        permission: "permission:read",
+      },
+    ],
   },
   {
-    icon: <Tags />,
-    name: "Categories",
-    path: "/categories",
-  },
-  {
-    icon: <Layers />,
-    name: "SubCategories",
-    path: "/subcategories",
-  },
-  {
-    icon: <Users />,
-    name: "Users",
-    path: "/users",
-  },
-  {
-    icon: <UserCog />,
-    name: "Roles",
-    path: "/roles",
-  },
-  {
-    icon: <ShieldCheck />,
-    name: "Permissions",
-    path: "/permissions",
-  },
-  {
-    icon: <UserCircle />,
-    name: "User Profile",
-    path: "/profile",
+    label: "Account",
+    items: [
+      {
+        icon: <UserCircle />,
+        name: "Profile",
+        path: "/profile",
+      },
+    ],
   },
 ];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const role = session?.user?.role;
 
   // const isActive = (path: string) => path === pathname;
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
@@ -118,26 +150,60 @@ const AppSidebar: React.FC = () => {
         </Link>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+        <nav className="mb-6 space-y-6">
+          <ul className="flex flex-col gap-2">
+            <li>
+              <Link
+                href={homeNavItem.path}
+                className={`menu-item group ${
+                  isActive(homeNavItem.path)
+                    ? "menu-item-active"
+                    : "menu-item-inactive"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Dashboard"
-                ) : (
-                  <HorizontaLDots />
+                <span
+                  className={`${
+                    isActive(homeNavItem.path)
+                      ? "menu-item-icon-active"
+                      : "menu-item-icon-inactive"
+                  }`}
+                >
+                  {homeNavItem.icon}
+                </span>
+
+                {(isExpanded || isHovered || isMobileOpen) && (
+                  <span className="menu-item-text">{homeNavItem.name}</span>
                 )}
-              </h2>
-              <ul className="flex flex-col gap-4">
-                {navItems.map((nav, index) => (
-                  <li key={nav.name}>
-                    {nav.path && (
+              </Link>
+            </li>
+          </ul>
+          {navGroups.map((group) => {
+            // Filter items by permission
+            const visibleItems = group.items.filter(
+              (item) => !item.permission || hasPermission(role, item.permission)
+            );
+
+            if (visibleItems.length === 0) return null;
+
+            return (
+              <div key={group.label}>
+                {/* Group Header */}
+                <h2
+                  className={`mb-3 text-xs uppercase text-gray-400 ${
+                    !isExpanded && !isHovered ? "lg:text-center" : "px-2"
+                  }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    group.label
+                  ) : (
+                    <HorizontaLDots />
+                  )}
+                </h2>
+
+                {/* Items */}
+                <ul className="flex flex-col gap-2">
+                  {visibleItems.map((nav) => (
+                    <li key={nav.name}>
                       <Link
                         href={nav.path}
                         className={`menu-item group ${
@@ -155,16 +221,17 @@ const AppSidebar: React.FC = () => {
                         >
                           {nav.icon}
                         </span>
+
                         {(isExpanded || isHovered || isMobileOpen) && (
-                          <span className={`menu-item-text`}>{nav.name}</span>
+                          <span className="menu-item-text">{nav.name}</span>
                         )}
                       </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </nav>
       </div>
     </aside>
