@@ -6,17 +6,17 @@ import type {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from "@/server/category/category.validation";
+import { generateUniqueCategorySlug } from "@/server/utils/slug.util";
 
 /* ================= CREATE ================= */
 export async function createCategory(input: CreateCategoryInput) {
   await connectDB();
 
-  const exists = await CategoryModel.findOne({ slug: input.slug });
-  if (exists) throw new Error("Category with this slug already exists");
+  const slug = await generateUniqueCategorySlug(input.name);
 
   const category = await CategoryModel.create({
     name: input.name,
-    slug: input.slug,
+    slug,
     image: input.image,
     description: input.description,
     isActive: input.isActive ?? true,
@@ -89,7 +89,13 @@ export async function getCategoryById(id: string) {
 export async function updateCategory(id: string, input: UpdateCategoryInput) {
   await connectDB();
 
-  const category = await CategoryModel.findByIdAndUpdate(id, input, {
+  const updateData: any = { ...input };
+
+  if (input.name) {
+    updateData.slug = await generateUniqueCategorySlug(input.name, id);
+  }
+
+  const category = await CategoryModel.findByIdAndUpdate(id, updateData, {
     new: true,
   });
 
