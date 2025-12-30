@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@/context/SidebarContext";
-import { Home, UserCircle, Users } from "lucide-react";
+import { Home, Shield, UserCircle, Users } from "lucide-react";
 import { HorizontaLDots } from "@/icons";
 
 type NavItem = {
@@ -24,6 +24,11 @@ const navItems: NavItem[] = [
     icon: <Users />,
     name: "Users",
     path: "/users",
+  },
+  {
+    icon: <Shield />,
+    name: "Permissions",
+    path: "/permissions",
   },
   {
     icon: <UserCircle />,
