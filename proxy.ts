@@ -11,21 +11,32 @@ const PERMISSION_ROUTES: Array<{
   permission: string;
 }> = [
   {
+    path: /^\/permissions/,
+    permission: "permission:read",
+  },
+  {
+    path: /^\/roles/,
+    permission: "role:read",
+  },
+  {
     path: /^\/users/,
     permission: "user:read",
   },
-
-  // {
-  //   path: /^\/orders/,
-  //   permission: "order:read",
-  // },
-  // {
-  //   path: /^\/settings/,
-  //   permission: "settings:update",
-  // },
+  {
+    path: /^\/subcategories/,
+    permission: "subcategory:read",
+  },
+  {
+    path: /^\/categories/,
+    permission: "category:read",
+  },
+  {
+    path: /^\/products/,
+    permission: "product:read",
+  },
 ];
 
-const AUTH_PAGES = ["/signin", "/signup"];
+const AUTH_PAGES = ["/signin"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
