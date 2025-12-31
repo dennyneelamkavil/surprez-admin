@@ -103,8 +103,10 @@ const AppSidebar: React.FC = () => {
   const { data: session } = useSession();
   const role = session?.user?.role;
 
-  // const isActive = (path: string) => path === pathname;
-  const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback(
+    (path: string) => pathname === path || pathname.startsWith(`${path}/`),
+    [pathname]
+  );
 
   return (
     <aside
