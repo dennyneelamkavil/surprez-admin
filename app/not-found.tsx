@@ -1,5 +1,5 @@
-import NotFoundClient from "@/components/error/NotFoundClient";
 import { Metadata } from "next";
+import NotFoundClient from "@/components/error/NotFoundClient";
 
 export const metadata: Metadata = {
   title: "404 – Page Not Found | Surprez Admin",

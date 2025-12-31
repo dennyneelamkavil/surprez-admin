@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import RoleFormClient from "@/components/roles/RoleFormClient";
+import RoleFormClient from "../../components/RoleFormClient";
 
 export const metadata: Metadata = {
   title: "Edit Role | Surprez Admin",

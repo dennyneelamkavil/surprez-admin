@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import SubCategoryFormClient from "@/components/subcategories/SubCategoryFormClient";
+import SubCategoryFormClient from "../../components/SubCategoryFormClient";
 
 export const metadata: Metadata = {
   title: "Edit SubCategory | Surprez Admin",

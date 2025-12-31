@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Switch from "../form/switch/Switch";
-import Checkbox from "../form/input/Checkbox";
+import Switch from "../../../../components/form/switch/Switch";
+import Checkbox from "../../../../components/form/input/Checkbox";
 
 type Permission = {
   id: string;

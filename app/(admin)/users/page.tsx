@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import UsersListClient from "@/components/users/UsersListClient";
+import UsersListClient from "./components/UsersListClient";
 
 export const metadata: Metadata = {
   title: "Users | Surprez Admin",

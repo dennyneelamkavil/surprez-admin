@@ -1,5 +1,5 @@
-import Error403Client from "@/components/error/Error403Client";
 import { Metadata } from "next";
+import Error403Client from "@/components/error/Error403Client";
 
 export const metadata: Metadata = {
   title: "403 – Access Denied | Surprez Admin",

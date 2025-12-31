@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import UserFormClient from "@/components/users/UserFormClient";
+import UserFormClient from "../../components/UserFormClient";
 
 export const metadata: Metadata = {
   title: "Edit User | Surprez Admin",

@@ -1,5 +1,5 @@
-import SignInForm from "@/components/auth/SignInForm";
 import { Metadata } from "next";
+import SignInForm from "./components/SignInForm";
 
 export const metadata: Metadata = {
   title: "Next.js SignIn Page | Surprez - Next.js Dashboard Template",

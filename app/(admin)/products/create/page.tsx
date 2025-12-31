@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ProductFormClient from "@/components/products/ProductFormClient";
+import ProductFormClient from "../components/ProductFormClient";
 
 export const metadata: Metadata = {
   title: "Create Product | Surprez Admin",

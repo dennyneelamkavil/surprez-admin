@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import RolesListClient from "@/components/roles/RolesListClient";
+import RolesListClient from "./components/RolesListClient";
 
 export const metadata: Metadata = {
   title: "Roles | Surprez Admin",

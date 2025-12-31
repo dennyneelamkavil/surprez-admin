@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import PermissionFormClient from "@/components/permissions/PermissionFormClient";
+import PermissionFormClient from "../components/PermissionFormClient";
 
 export const metadata: Metadata = {
   title: "Create Permission | Surprez Admin",
