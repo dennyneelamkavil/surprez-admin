@@ -98,7 +98,13 @@ const navGroups: NavGroup[] = [
 ];
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const {
+    isExpanded,
+    isMobileOpen,
+    isHovered,
+    setIsHovered,
+    toggleMobileSidebar,
+  } = useSidebar();
   const pathname = usePathname();
   const { data: session } = useSession();
   const role = session?.user?.role;
@@ -128,7 +134,11 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/" className="flex items-center gap-3">
+        <Link
+          href="/"
+          onClick={toggleMobileSidebar}
+          className="flex items-center gap-3"
+        >
           {/* Logo */}
           <Image
             src="/logo.png"
@@ -157,6 +167,7 @@ const AppSidebar: React.FC = () => {
             <li>
               <Link
                 href={homeNavItem.path}
+                onClick={toggleMobileSidebar}
                 className={`menu-item group ${
                   isActive(homeNavItem.path)
                     ? "menu-item-active"
@@ -208,6 +219,7 @@ const AppSidebar: React.FC = () => {
                     <li key={nav.name}>
                       <Link
                         href={nav.path}
+                        onClick={toggleMobileSidebar}
                         className={`menu-item group ${
                           isActive(nav.path)
                             ? "menu-item-active"
