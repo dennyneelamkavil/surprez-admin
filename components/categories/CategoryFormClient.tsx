@@ -64,7 +64,6 @@ export default function CategoryFormClient({ mode, id }: Props) {
 
       if (!res.ok) {
         const data = await res.json();
-        console.log(data);
         throw new Error(data?.error ?? "Save failed");
       }
 
