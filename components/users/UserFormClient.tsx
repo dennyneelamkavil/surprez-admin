@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeCloseIcon, EyeIcon } from "@/icons";
 
 type Props = {
   mode: "create" | "edit";
@@ -214,9 +214,9 @@ export default function UserFormClient({ mode, id }: Props) {
                   className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                 >
                   {showPassword ? (
-                    <EyeIcon className="h-5 w-5" />
+                    <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
                   ) : (
-                    <EyeOffIcon className="h-5 w-5" />
+                    <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
                   )}
                 </button>
               </div>
