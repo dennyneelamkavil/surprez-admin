@@ -3,7 +3,6 @@ import { z } from "zod";
 
 export const CreateProductSchema = z.object({
   name: z.string().min(2),
-  slug: z.string().min(2),
   coverImage: z.string(),
   images: z.array(z.string()).optional(),
   videos: z.array(z.string()).optional(),

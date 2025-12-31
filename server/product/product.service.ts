@@ -7,13 +7,13 @@ import type {
   CreateProductInput,
   UpdateProductInput,
 } from "@/server/product/product.validation";
+import { generateUniqueProductSlug } from "../utils/slug.util";
 
 /* ================= CREATE ================= */
 export async function createProduct(input: CreateProductInput) {
   await connectDB();
 
-  const exists = await ProductModel.findOne({ slug: input.slug });
-  if (exists) throw new Error("Product with this slug already exists");
+  const slug = await generateUniqueProductSlug(input.name);
 
   if (input.subcategories?.length) {
     const count = await SubCategoryModel.countDocuments({
@@ -26,6 +26,7 @@ export async function createProduct(input: CreateProductInput) {
 
   const product = await ProductModel.create({
     ...input,
+    slug,
     isActive: input.isActive ?? true,
     isFeatured: input.isFeatured ?? false,
   });
@@ -120,7 +121,13 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     }
   }
 
-  const product = await ProductModel.findByIdAndUpdate(id, input, {
+  const updateData: any = { ...input };
+
+  if (input.name) {
+    updateData.slug = await generateUniqueProductSlug(input.name, id);
+  }
+
+  const product = await ProductModel.findByIdAndUpdate(id, updateData, {
     new: true,
   }).populate("subcategories");
 
