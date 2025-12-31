@@ -7,6 +7,7 @@ import type {
   CreateSubCategoryInput,
   UpdateSubCategoryInput,
 } from "@/server/subcategory/subcategory.validation";
+import { generateUniqueSubCategorySlug } from "@/server/utils/slug.util";
 
 /* ================= CREATE ================= */
 export async function createSubCategory(input: CreateSubCategoryInput) {
@@ -17,14 +18,11 @@ export async function createSubCategory(input: CreateSubCategoryInput) {
   });
   if (!categoryExists) throw new Error("Category not found");
 
-  const exists = await SubCategoryModel.findOne({
-    slug: input.slug,
-  });
-  if (exists) throw new Error("SubCategory with this slug already exists");
+  const slug = await generateUniqueSubCategorySlug(input.name);
 
   const subCategory = await SubCategoryModel.create({
     name: input.name,
-    slug: input.slug,
+    slug,
     image: input.image,
     category: input.category,
     description: input.description,
@@ -117,7 +115,13 @@ export async function updateSubCategory(
     if (!categoryExists) throw new Error("Category not found");
   }
 
-  const subCategory = await SubCategoryModel.findByIdAndUpdate(id, input, {
+  const updateData: any = { ...input };
+
+  if (input.name) {
+    updateData.slug = await generateUniqueSubCategorySlug(input.name, id);
+  }
+
+  const subCategory = await SubCategoryModel.findByIdAndUpdate(id, updateData, {
     new: true,
   }).populate("category");
 
