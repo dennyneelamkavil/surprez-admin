@@ -14,19 +14,19 @@ export default function Error403Client() {
       <GridShape />
       <div className="mx-auto w-full max-w-[242px] text-center sm:max-w-[472px]">
         <h1 className="mb-8 font-bold text-gray-800 text-title-md dark:text-white/90 xl:text-title-xl">
-          ACCESS DENIED
+          Acess Denied
         </h1>
 
         <Image
-          src="/images/error/404.svg"
-          alt="404"
+          src="/images/error/403.svg"
+          alt="403"
           className="dark:hidden"
           width={472}
           height={152}
         />
         <Image
-          src="/images/error/404-dark.svg"
-          alt="404"
+          src="/images/error/403-dark.svg"
+          alt="403"
           className="hidden dark:block"
           width={472}
           height={152}

@@ -14,7 +14,7 @@ export default function NotFoundClient() {
       <GridShape />
       <div className="mx-auto w-full max-w-[242px] text-center sm:max-w-[472px]">
         <h1 className="mb-8 font-bold text-gray-800 text-title-md dark:text-white/90 xl:text-title-xl">
-          ERROR
+          Page Not Found
         </h1>
 
         <Image
