@@ -1,11 +1,4 @@
 import type { Metadata } from "next";
-import { EcommerceMetrics } from "@/components/ecommerce/EcommerceMetrics";
-import React from "react";
-import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
-import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "@/components/ecommerce/StatisticsChart";
-import RecentOrders from "@/components/ecommerce/RecentOrders";
-import DemographicCard from "@/components/ecommerce/DemographicCard";
 
 export const metadata: Metadata = {
   title: "Surprez - Admin Dashboard",
@@ -16,30 +9,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Ecommerce() {
+export default function Home() {
   return (
-    <div className="grid grid-cols-12 gap-4 md:gap-6">
-      <div className="col-span-12 space-y-6 xl:col-span-7">
-        <EcommerceMetrics />
-
-        <MonthlySalesChart />
-      </div>
-
-      <div className="col-span-12 xl:col-span-5">
-        <MonthlyTarget />
-      </div>
-
-      <div className="col-span-12">
-        <StatisticsChart />
-      </div>
-
-      <div className="col-span-12 xl:col-span-5">
-        <DemographicCard />
-      </div>
-
-      <div className="col-span-12 xl:col-span-7">
-        <RecentOrders />
-      </div>
+    <div className="flex h-[60vh] flex-col items-center justify-center gap-2">
+      <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
+        Dashboard
+      </h1>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Analytics and reports will appear here
+      </p>
     </div>
   );
 }
