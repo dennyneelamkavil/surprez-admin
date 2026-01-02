@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
@@ -10,6 +9,7 @@ import FormField from "@/components/form/FormField";
 import MultiSelect from "@/components/form/MultiSelect";
 import Switch from "@/components/form/switch/Switch";
 import Button from "@/components/ui/button/Button";
+import FormHeader from "@/components/form/FormHeader";
 
 type SubCategory = {
   id: string;
@@ -115,18 +115,10 @@ export default function ProductFormClient({ mode, id }: Props) {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-          {mode === "create" ? "Create Product" : "Edit Product"}
-        </h1>
-
-        <Link
-          href="/products"
-          className="text-sm text-brand-500 hover:underline"
-        >
-          Back to list
-        </Link>
-      </div>
+      <FormHeader
+        title={mode === "create" ? "Create Product" : "Edit Product"}
+        backHref="/products"
+      />
 
       {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
@@ -196,12 +188,13 @@ export default function ProductFormClient({ mode, id }: Props) {
                   : "Update Product"}
               </Button>
 
-              <Link
-                href="/products"
-                className="text-sm text-gray-600 hover:underline dark:text-gray-400"
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.push("/products")}
               >
                 Cancel
-              </Link>
+              </Button>
             </div>
           </form>
         )}

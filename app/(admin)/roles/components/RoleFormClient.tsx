@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import Input from "@/components/form/input/InputField";
 import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import Switch from "@/components/form/switch/Switch";
 import Checkbox from "@/components/form/input/Checkbox";
+import FormHeader from "@/components/form/FormHeader";
 
 type Permission = {
   id: string;
@@ -111,15 +111,10 @@ export default function RoleFormClient({ mode, id }: Props) {
   return (
     <div className="max-w-3xl space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold dark:text-white">
-          {mode === "create" ? "Create Role" : "Edit Role"}
-        </h1>
-
-        <Link href="/roles" className="text-sm text-brand-500 hover:underline">
-          Back to list
-        </Link>
-      </div>
+      <FormHeader
+        title={mode === "create" ? "Create Role" : "Edit Role"}
+        backHref="/roles"
+      />
 
       {/* Card */}
       <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
@@ -237,12 +232,13 @@ export default function RoleFormClient({ mode, id }: Props) {
                   : "Update Role"}
               </Button>
 
-              <Link
-                href="/roles"
-                className="text-sm text-gray-600 hover:underline dark:text-gray-400"
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.push("/roles")}
               >
                 Cancel
-              </Link>
+              </Button>
             </div>
           </form>
         )}

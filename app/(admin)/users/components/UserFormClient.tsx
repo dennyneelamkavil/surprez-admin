@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
+import FormHeader from "@/components/form/FormHeader";
 
 type Props = {
   mode: "create" | "edit";
@@ -123,15 +123,10 @@ export default function UserFormClient({ mode, id }: Props) {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-          {mode === "create" ? "Create User" : "Edit User"}
-        </h1>
-
-        <Link href="/users" className="text-sm text-brand-500 hover:underline">
-          Back to list
-        </Link>
-      </div>
+      <FormHeader
+        title={mode === "create" ? "Create User" : "Edit User"}
+        backHref="/users"
+      />
 
       {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
@@ -226,12 +221,13 @@ export default function UserFormClient({ mode, id }: Props) {
                   : "Update User"}
               </Button>
 
-              <Link
-                href="/users"
-                className="text-sm text-gray-600 hover:underline dark:text-gray-400"
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.push("/users")}
               >
                 Cancel
-              </Link>
+              </Button>
             </div>
           </form>
         )}
