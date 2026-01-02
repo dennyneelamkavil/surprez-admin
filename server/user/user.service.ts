@@ -66,6 +66,7 @@ export async function listUsers(params: {
   limit?: number;
   search?: string;
   all?: boolean;
+  roleId?: string;
 }) {
   await connectDB();
 
@@ -81,6 +82,10 @@ export async function listUsers(params: {
       { fullname: { $regex: params.search, $options: "i" } },
       { email: { $regex: params.search, $options: "i" } },
     ];
+  }
+
+  if (params?.roleId) {
+    query.role = params.roleId;
   }
 
   if (params?.all) {

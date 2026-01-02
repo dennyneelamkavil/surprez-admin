@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
+import Input from "@/components/form/input/InputField";
 
 type Category = {
   id: string;
@@ -87,15 +88,13 @@ export default function CategoriesListClient() {
 
       {/* Search */}
       <div className="max-w-sm">
-        <input
-          type="text"
+        <Input
           placeholder="Search categories..."
           value={search}
           onChange={(e) => {
             setPage(1);
             setSearch(e.target.value);
           }}
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
         />
       </div>
 

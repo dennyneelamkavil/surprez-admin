@@ -4,6 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
+import Input from "@/components/form/input/InputField";
+import Select from "@/components/form/Select";
+
+type Category = {
+  id: string;
+  name: string;
+};
 
 type SubCategory = {
   id: string;
@@ -24,6 +31,8 @@ type PaginationMeta = {
 };
 
 export default function SubCategoriesListClient() {
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -33,11 +42,19 @@ export default function SubCategoriesListClient() {
     totalPages: 1,
   });
 
+  async function fetchCategories() {
+    const res = await fetch("/api/admin/categories?all=true", {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    setCategories(data.categories ?? data);
+  }
+
   const fetchSubCategories = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/admin/subcategories?page=${page}&limit=10&search=${search}`,
+        `/api/admin/subcategories?page=${page}&limit=10&search=${search}&categoryId=${category}`,
         { cache: "no-store" }
       );
 
@@ -56,7 +73,7 @@ export default function SubCategoriesListClient() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, category]);
 
   async function handleDelete(id: string) {
     const ok = confirm("Are you sure you want to delete this subcategory?");
@@ -71,7 +88,14 @@ export default function SubCategoriesListClient() {
 
   useEffect(() => {
     fetchSubCategories();
+    fetchCategories();
   }, [fetchSubCategories]);
+
+  function clearFilters() {
+    setSearch("");
+    setCategory("");
+    setPage(1);
+  }
 
   return (
     <div className="space-y-6">
@@ -89,18 +113,47 @@ export default function SubCategoriesListClient() {
         </Link>
       </div>
 
-      {/* Search */}
-      <div className="max-w-sm">
-        <input
-          type="text"
-          placeholder="Search subcategories..."
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-        />
+      {/* Filters */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        {/* Search */}
+        <div className="w-full sm:max-w-xs">
+          <Input
+            placeholder="Search subcategories..."
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
+          />
+        </div>
+
+        {/* Role filter */}
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={categories.map((cat) => ({
+              value: cat.id,
+              label: cat.name,
+            }))}
+            value={category}
+            placeholder="Select a category"
+            onChange={(value) => {
+              setPage(1);
+              setCategory(value);
+            }}
+          />
+        </div>
+
+        {/* Clear filters */}
+        <button
+          type="button"
+          onClick={clearFilters}
+          disabled={!search && !category}
+          className="h-11 rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-600
+          hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60
+          dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/5"
+        >
+          Clear
+        </button>
       </div>
 
       {/* Card */}

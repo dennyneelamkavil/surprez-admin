@@ -3,6 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
+import Input from "@/components/form/input/InputField";
+import Select from "@/components/form/Select";
+
+type Role = {
+  id: string;
+  name: string;
+};
 
 type User = {
   id: string;
@@ -20,6 +27,8 @@ type PaginationMeta = {
 };
 
 export default function UsersListClient() {
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [role, setRole] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -29,11 +38,19 @@ export default function UsersListClient() {
     totalPages: 1,
   });
 
+  async function fetchRoles() {
+    const res = await fetch("/api/admin/roles?all=true", {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    setRoles(data.roles ?? data);
+  }
+
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/admin/users?page=${page}&limit=10&search=${search}`,
+        `/api/admin/users?page=${page}&limit=10&search=${search}&roleId=${role}`,
         { cache: "no-store" }
       );
 
@@ -52,7 +69,7 @@ export default function UsersListClient() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, role]);
 
   async function handleDelete(id: string) {
     const ok = confirm("Are you sure you want to delete this user?");
@@ -67,7 +84,14 @@ export default function UsersListClient() {
 
   useEffect(() => {
     fetchUsers();
+    fetchRoles();
   }, [fetchUsers]);
+
+  function clearFilters() {
+    setSearch("");
+    setRole("");
+    setPage(1);
+  }
 
   return (
     <div className="space-y-6">
@@ -85,18 +109,47 @@ export default function UsersListClient() {
         </Link>
       </div>
 
-      {/* Search */}
-      <div className="max-w-sm">
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-        />
+      {/* Filters */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        {/* Search */}
+        <div className="w-full sm:max-w-xs">
+          <Input
+            placeholder="Search users..."
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
+          />
+        </div>
+
+        {/* Role filter */}
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={roles.map((r) => ({
+              value: r.id,
+              label: r.name,
+            }))}
+            value={role}
+            placeholder="Select a role"
+            onChange={(value) => {
+              setPage(1);
+              setRole(value);
+            }}
+          />
+        </div>
+
+        {/* Clear filters */}
+        <button
+          type="button"
+          onClick={clearFilters}
+          disabled={!search && !role}
+          className="h-11 rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-600
+          hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60
+          dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/5"
+        >
+          Clear
+        </button>
       </div>
 
       {/* Card */}
@@ -129,13 +182,19 @@ export default function UsersListClient() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-6 text-center text-gray-800 dark:text-white/90">
+                  <td
+                    colSpan={6}
+                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
+                  >
                     Loading...
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-6 text-center text-gray-800 dark:text-white/90">
+                  <td
+                    colSpan={6}
+                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
+                  >
                     No users found
                   </td>
                 </tr>
@@ -148,7 +207,9 @@ export default function UsersListClient() {
                     <td className="px-5 py-4 font-mono text-sm text-gray-800 dark:text-white/90">
                       {user.username}
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">{user.fullname}</td>
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
+                      {user.fullname}
+                    </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {user.role?.name ?? "-"}
                     </td>

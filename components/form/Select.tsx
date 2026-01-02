@@ -119,7 +119,7 @@ const Select: React.FC<SelectProps> = ({
       {/* Select Trigger */}
       <div
         onClick={() => !disabled && setIsOpen((p) => !p)}
-        className={`h-11 w-full cursor-pointer rounded-lg border px-4 py-2.5 text-sm shadow-sm flex items-center justify-between transition-all
+        className={`h-11 w-full cursor-pointer rounded-lg border px-4 py-2.5 text-sm flex items-center justify-between transition-all
         ${error ? "border-red-500" : "border-gray-300"}
         ${disabled ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white"}
         dark:border-gray-700 dark:bg-gray-900`}

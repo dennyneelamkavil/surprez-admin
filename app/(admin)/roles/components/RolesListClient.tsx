@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
+import Input from "@/components/form/input/InputField";
 
 type Role = {
   id: string;
@@ -76,15 +77,13 @@ export default function RolesListClient() {
       </div>
 
       <div className="max-w-sm">
-        <input
-          type="text"
+        <Input
           placeholder="Search roles..."
           value={search}
           onChange={(e) => {
             setPage(1);
             setSearch(e.target.value);
           }}
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
         />
       </div>
 

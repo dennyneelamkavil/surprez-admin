@@ -4,6 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
+import Input from "@/components/form/input/InputField";
+import Select from "@/components/form/Select";
+
+type SubCategory = {
+  id: string;
+  name: string;
+};
 
 type Product = {
   id: string;
@@ -27,6 +34,9 @@ type PaginationMeta = {
 };
 
 export default function ProductsListClient() {
+  const [subcats, setSubcats] = useState<SubCategory[]>([]);
+  const [subcategory, setSubcategory] = useState("");
+  const [isFeatured, setIsFeatured] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -36,11 +46,19 @@ export default function ProductsListClient() {
     totalPages: 1,
   });
 
+  async function fetchSubCategories() {
+    const res = await fetch("/api/admin/subcategories?all=true", {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    setSubcats(data.subcategories ?? data);
+  }
+
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/admin/products?page=${page}&limit=10&search=${search}`,
+        `/api/admin/products?page=${page}&limit=10&search=${search}&subcategoryId=${subcategory}&isFeatured=${isFeatured}`,
         { cache: "no-store" }
       );
 
@@ -59,7 +77,7 @@ export default function ProductsListClient() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, subcategory, isFeatured]);
 
   async function handleDelete(id: string) {
     const ok = confirm("Are you sure you want to delete this product?");
@@ -74,7 +92,15 @@ export default function ProductsListClient() {
 
   useEffect(() => {
     fetchProducts();
+    fetchSubCategories();
   }, [fetchProducts]);
+
+  function clearFilters() {
+    setSearch("");
+    setSubcategory("");
+    setIsFeatured("");
+    setPage(1);
+  }
 
   return (
     <div className="space-y-6">
@@ -92,18 +118,63 @@ export default function ProductsListClient() {
         </Link>
       </div>
 
-      {/* Search */}
-      <div className="max-w-sm">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-        />
+      {/* Filters */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        {/* Search */}
+        <div className="w-full sm:max-w-xs">
+          <Input
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
+          />
+        </div>
+
+        {/* Role filter */}
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={subcats.map((cat) => ({
+              value: cat.id,
+              label: cat.name,
+            }))}
+            value={subcategory}
+            placeholder="Select a subcategory"
+            onChange={(value) => {
+              setPage(1);
+              setSubcategory(value);
+            }}
+          />
+        </div>
+
+        {/* Featured filter */}
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={[
+              { value: "true", label: "Featured" },
+              { value: "false", label: "Not Featured" },
+            ]}
+            value={isFeatured}
+            placeholder="Select featured status"
+            onChange={(value) => {
+              setPage(1);
+              setIsFeatured(value);
+            }}
+          />
+        </div>
+
+        {/* Clear filters */}
+        <button
+          type="button"
+          onClick={clearFilters}
+          disabled={!search && !subcategory && !isFeatured}
+          className="h-11 rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-600
+          hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60
+          dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/5"
+        >
+          Clear
+        </button>
       </div>
 
       {/* Card */}

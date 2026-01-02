@@ -28,7 +28,8 @@ export async function GET(req: Request) {
   const page = Number(searchParams.get("page") ?? 1);
   const limit = Number(searchParams.get("limit") ?? 10);
   const search = searchParams.get("search") ?? undefined;
+  const roleId = searchParams.get("roleId") ?? undefined;
 
-  const users = await listUsers({ page, limit, search, all });
+  const users = await listUsers({ page, limit, search, all, roleId });
   return NextResponse.json(users);
 }

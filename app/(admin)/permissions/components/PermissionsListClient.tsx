@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
+import Input from "@/components/form/input/InputField";
 
 type Permission = {
   id: string;
@@ -84,15 +85,13 @@ export default function PermissionsListClient() {
 
       {/* Search */}
       <div className="max-w-sm">
-        <input
-          type="text"
+        <Input
           placeholder="Search permissions..."
           value={search}
           onChange={(e) => {
             setPage(1);
             setSearch(e.target.value);
           }}
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
         />
       </div>
 
@@ -120,13 +119,19 @@ export default function PermissionsListClient() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-6 text-center text-gray-800 dark:text-white/90">
+                  <td
+                    colSpan={4}
+                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
+                  >
                     Loading...
                   </td>
                 </tr>
               ) : permissions.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-6 text-center text-gray-800 dark:text-white/90">
+                  <td
+                    colSpan={4}
+                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
+                  >
                     No permissions found
                   </td>
                 </tr>
