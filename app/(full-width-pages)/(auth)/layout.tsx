@@ -24,6 +24,10 @@ export default function AuthLayout({
                 <Link href="/" className="block mb-4">
                   <Image width={231} height={48} src="/logo.png" alt="Logo" />
                 </Link>
+                <p className="text-center text-gray-400 dark:text-white/60">
+                  Manage products, orders, users, and store operations from one
+                  place.
+                </p>
               </div>
             </div>
           </div>
