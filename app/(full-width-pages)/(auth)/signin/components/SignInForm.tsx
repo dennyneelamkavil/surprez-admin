@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import FormField from "@/components/form/FormField";
 
 export default function SignInForm() {
   const router = useRouter();
@@ -93,12 +94,9 @@ export default function SignInForm() {
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
-            {/* Username */}
-            <div>
-              <Label>
-                Username <span className="text-error-500">*</span>
-              </Label>
+            <FormField label="Username" required htmlFor="username">
               <Input
+                id="username"
                 placeholder="yourusername"
                 value={formData.username}
                 onChange={(e) => {
@@ -115,15 +113,12 @@ export default function SignInForm() {
                 error={!!fieldErrors.username}
                 hint={fieldErrors.username}
               />
-            </div>
+            </FormField>
 
-            {/* Password */}
-            <div>
-              <Label>
-                Password <span className="text-error-500">*</span>
-              </Label>
+            <FormField label="Password" required htmlFor="password">
               <div className="relative">
                 <Input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={formData.password}
@@ -148,7 +143,7 @@ export default function SignInForm() {
                   )}
                 </span>
               </div>
-            </div>
+            </FormField>
 
             {/* Remember me */}
             <div className="flex items-center gap-3">
