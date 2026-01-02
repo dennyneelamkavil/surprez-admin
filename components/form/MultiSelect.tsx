@@ -115,7 +115,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
       {/* Multi-Select Trigger Container */}
       <div
         onClick={() => !disabled && setIsOpen((p) => !p)}
-        className={`min-h-11 w-full rounded-lg border px-3 py-2 shadow-sm flex items-start justify-between gap-2 cursor-pointer transition-all
+        className={`min-h-11 w-full rounded-lg border px-3 py-2 flex items-start justify-between gap-2 cursor-pointer transition-all
           ${disabled ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white"}
           ${
             error
