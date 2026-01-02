@@ -6,6 +6,7 @@ import Pagination from "@/components/pagination/Pagination";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
 import ListActions from "@/components/common/ListActions";
+import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 type Permission = {
   id: string;
@@ -115,14 +116,7 @@ export default function PermissionsListClient() {
 
             <tbody>
               {loading ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
-                  >
-                    Loading...
-                  </td>
-                </tr>
+                <TableSkeleton columns={4} />
               ) : permissions.length === 0 ? (
                 <tr>
                   <td

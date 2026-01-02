@@ -7,6 +7,7 @@ import Select from "@/components/form/Select";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
 import ListActions from "@/components/common/ListActions";
+import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 type Role = {
   id: string;
@@ -160,14 +161,7 @@ export default function UsersListClient() {
 
             <tbody>
               {loading ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
-                  >
-                    Loading...
-                  </td>
-                </tr>
+                <TableSkeleton columns={6} />
               ) : users.length === 0 ? (
                 <tr>
                   <td

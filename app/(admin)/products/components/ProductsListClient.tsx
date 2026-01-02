@@ -8,6 +8,7 @@ import Select from "@/components/form/Select";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
 import ListActions from "@/components/common/ListActions";
+import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 type SubCategory = {
   id: string;
@@ -188,14 +189,7 @@ export default function ProductsListClient() {
 
             <tbody>
               {loading ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
-                  >
-                    Loading...
-                  </td>
-                </tr>
+                <TableSkeleton columns={7} />
               ) : products.length === 0 ? (
                 <tr>
                   <td

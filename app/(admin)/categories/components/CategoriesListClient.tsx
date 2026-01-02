@@ -7,6 +7,7 @@ import Image from "next/image";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
 import ListActions from "@/components/common/ListActions";
+import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 type Category = {
   id: string;
@@ -121,14 +122,7 @@ export default function CategoriesListClient() {
 
             <tbody>
               {loading ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
-                  >
-                    Loading...
-                  </td>
-                </tr>
+                <TableSkeleton columns={5} />
               ) : categories.length === 0 ? (
                 <tr>
                   <td
