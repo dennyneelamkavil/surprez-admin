@@ -6,6 +6,7 @@ import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
+import Button from "@/components/ui/button/Button";
 
 type Category = {
   id: string;
@@ -144,16 +145,15 @@ export default function SubCategoriesListClient() {
         </div>
 
         {/* Clear filters */}
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={clearFilters}
           disabled={!search && !category}
-          className="h-11 rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-600
-          hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60
-          dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/5"
         >
           Clear
-        </button>
+        </Button>
       </div>
 
       {/* Card */}
