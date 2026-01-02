@@ -3,8 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Switch from "../../../../components/form/switch/Switch";
-import Checkbox from "../../../../components/form/input/Checkbox";
+
+import Input from "@/components/form/input/InputField";
+import FormField from "@/components/form/FormField";
+import Button from "@/components/ui/button/Button";
+import Switch from "@/components/form/switch/Switch";
+import Checkbox from "@/components/form/input/Checkbox";
 
 type Permission = {
   id: string;
@@ -106,6 +110,7 @@ export default function RoleFormClient({ mode, id }: Props) {
 
   return (
     <div className="max-w-3xl space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold dark:text-white">
           {mode === "create" ? "Create Role" : "Edit Role"}
@@ -116,6 +121,7 @@ export default function RoleFormClient({ mode, id }: Props) {
         </Link>
       </div>
 
+      {/* Card */}
       <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
           <div className="text-sm">Loading...</div>
@@ -127,29 +133,30 @@ export default function RoleFormClient({ mode, id }: Props) {
               </div>
             )}
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Role name
-              </label>
-              <input
+            <FormField label="Role name" required htmlFor="name">
+              <Input
+                id="name"
+                placeholder="admin"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="admin"
+                required
               />
-            </div>
+            </FormField>
 
-            <Checkbox
-              checked={isSuperAdmin}
-              onChange={setIsSuperAdmin}
-              label="Super Admin (bypass permissions)"
-            />
+            <FormField label="Super Admin">
+              <Checkbox
+                checked={isSuperAdmin}
+                onChange={setIsSuperAdmin}
+                label="Super Admin (bypass permissions)"
+              />
+            </FormField>
 
             {!isSuperAdmin && (
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Permissions
                 </label>
+
                 <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
                   <table className="w-full table-auto">
                     <thead className="bg-gray-50 dark:bg-gray-900">
@@ -220,18 +227,15 @@ export default function RoleFormClient({ mode, id }: Props) {
               </div>
             )}
 
+            {/* Actions */}
             <div className="flex items-center gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-60"
-              >
+              <Button type="submit" disabled={saving}>
                 {saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create Role"
                   : "Update Role"}
-              </button>
+              </Button>
 
               <Link
                 href="/roles"

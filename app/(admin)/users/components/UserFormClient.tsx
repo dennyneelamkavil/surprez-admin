@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 
+import Input from "@/components/form/input/InputField";
+import Select from "@/components/form/Select";
+import FormField from "@/components/form/FormField";
+import Button from "@/components/ui/button/Button";
+
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -101,12 +106,19 @@ export default function UserFormClient({ mode, id }: Props) {
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-      .toLowerCase() // force lowercase
-      .replace(/\s+/g, "") // remove spaces
-      .replace(/[^a-z0-9_]/g, ""); // allow only a-z, 0-9 and _
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[^a-z0-9_]/g, "");
 
     setUsername(value);
   };
+
+  const roleOptions = roles.map((r) => ({
+    value: r.id,
+    label: r.name,
+  }));
+
+  const isSuperAdminEdit = mode === "edit" && username === "superadmin";
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -133,84 +145,66 @@ export default function UserFormClient({ mode, id }: Props) {
               </div>
             )}
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Username
-              </label>
-              <input
-                type="text"
+            <FormField label="Username" required htmlFor="username">
+              <Input
+                id="username"
+                placeholder="johndoe"
                 value={username}
                 onChange={handleUsernameChange}
                 required
-                disabled={mode === "edit" && username === "superadmin"}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="johndoe"
+                disabled={isSuperAdminEdit}
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Role
-              </label>
-              <select
+            <FormField label="Role" required>
+              <Select
+                options={roleOptions}
                 value={role}
-                onChange={(e) => setRole(e.target.value)}
-                required
-                disabled={mode === "edit" && username === "superadmin"}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="">Select role</option>
-                {roles.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                placeholder="Select role"
+                onChange={setRole}
+                disabled={isSuperAdminEdit}
+              />
+            </FormField>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Full Name
-              </label>
-              <input
-                type="text"
+            <FormField label="Full Name" required htmlFor="fullname">
+              <Input
+                id="fullname"
+                placeholder="John Doe"
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="John Doe"
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email
-              </label>
-              <input
-                type="text"
+            <FormField label="Email" required htmlFor="email">
+              <Input
+                id="email"
+                placeholder="john@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="john@example.com"
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password {mode === "edit" && "(leave blank to keep current)"}
-              </label>
+            <FormField
+              label={`Password ${
+                mode === "edit" ? "(leave blank to keep current)" : ""
+              }`}
+              htmlFor="password"
+            >
               <div className="relative">
-                <input
+                <Input
+                  id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required={mode === "create"}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                  placeholder="Enter password"
                 />
+
                 <button
-                  onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                  onClick={() => setShowPassword((p) => !p)}
                   className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                 >
                   {showPassword ? (
@@ -220,20 +214,17 @@ export default function UserFormClient({ mode, id }: Props) {
                   )}
                 </button>
               </div>
-            </div>
+            </FormField>
 
+            {/* Actions */}
             <div className="flex items-center gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-60"
-              >
+              <Button type="submit" disabled={saving}>
                 {saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create User"
                   : "Update User"}
-              </button>
+              </Button>
 
               <Link
                 href="/users"

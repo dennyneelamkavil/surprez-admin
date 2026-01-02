@@ -4,6 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import Input from "@/components/form/input/InputField";
+import TextArea from "@/components/form/input/TextArea";
+import FormField from "@/components/form/FormField";
+import Button from "@/components/ui/button/Button";
+
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -75,9 +80,9 @@ export default function PermissionFormClient({ mode, id }: Props) {
 
   const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-      .toLowerCase() // force lowercase
-      .replace(/\s+/g, "") // remove spaces
-      .replace(/[^a-z:]/g, ""); // allow only a-z and :
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[^a-z:]/g, "");
 
     setKey(value);
   };
@@ -110,20 +115,17 @@ export default function PermissionFormClient({ mode, id }: Props) {
               </div>
             )}
 
-            {/* Key */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Permission Key
-              </label>
-              <input
-                type="text"
+            {/* Permission Key */}
+            <FormField label="Permission Key" required htmlFor="key">
+              <Input
+                id="key"
+                placeholder="user:create"
                 value={key}
                 onChange={handleKeyChange}
                 required
                 disabled={mode === "edit"}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="user:create"
               />
+
               {mode === "create" && (
                 <div className="mt-2 rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
                   <p className="font-medium">How permission keys work:</p>
@@ -141,40 +143,33 @@ export default function PermissionFormClient({ mode, id }: Props) {
                   </ul>
                 </div>
               )}
+
               {mode === "edit" && (
                 <p className="mt-1 text-xs text-gray-500">
                   Permission key cannot be changed
                 </p>
               )}
-            </div>
+            </FormField>
 
             {/* Description */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Description
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            <FormField label="Description" htmlFor="description">
+              <TextArea
                 placeholder="What this permission allows"
+                rows={3}
+                value={description}
+                onChange={setDescription}
               />
-            </div>
+            </FormField>
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-60"
-              >
+              <Button type="submit" disabled={saving}>
                 {saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create Permission"
                   : "Update Permission"}
-              </button>
+              </Button>
 
               <Link
                 href="/permissions"

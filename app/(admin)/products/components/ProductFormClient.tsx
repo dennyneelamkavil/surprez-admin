@@ -4,6 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import Input from "@/components/form/input/InputField";
+import TextArea from "@/components/form/input/TextArea";
+import FormField from "@/components/form/FormField";
+import MultiSelect from "@/components/form/MultiSelect";
+import Switch from "@/components/form/switch/Switch";
+import Button from "@/components/ui/button/Button";
+
 type SubCategory = {
   id: string;
   name: string;
@@ -100,6 +107,11 @@ export default function ProductFormClient({ mode, id }: Props) {
     if (mode === "edit") fetchProduct();
   }, [mode, fetchProduct]);
 
+  const subCategoryOptions = subcats.map((sub) => ({
+    value: sub.id,
+    label: sub.name,
+  }));
+
   return (
     <div className="max-w-2xl space-y-6">
       {/* Header */}
@@ -128,79 +140,61 @@ export default function ProductFormClient({ mode, id }: Props) {
               </div>
             )}
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Product Name
-              </label>
-              <input
-                type="text"
+            <FormField label="Product Name" required htmlFor="name">
+              <Input
+                id="name"
+                placeholder="Dolls, Action Figures, etc."
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="Dolls, Action Figures, etc."
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                SubCategories
-              </label>
-              <select
+            <FormField label="SubCategories" required>
+              <MultiSelect
+                options={subCategoryOptions}
                 value={subcategories}
-                onChange={(e) => setSubcategories(e.target.value.split(","))}
-                multiple
-                required
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="">Select subcategories</option>
-                {subcats.map((sub) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                onChange={setSubcategories}
+                placeholder="Select subcategories"
+              />
+            </FormField>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Cover Image
-              </label>
-              <input
-                type="text"
+            <FormField label="Cover Image" required htmlFor="coverImage">
+              <Input
+                id="coverImage"
+                placeholder="Image URL"
                 value={coverImage}
                 onChange={(e) => setCoverImage(e.target.value)}
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Description
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            <FormField label="Description" htmlFor="description">
+              <TextArea
                 placeholder="A brief description about this product."
+                rows={3}
+                value={description}
+                onChange={setDescription}
               />
-            </div>
+            </FormField>
+
+            <FormField label="Featured">
+              <Switch
+                label="Mark as featured product"
+                defaultChecked={isFeatured}
+                onChange={setIsFeatured}
+              />
+            </FormField>
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-60"
-              >
+              <Button type="submit" disabled={saving}>
                 {saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create Product"
                   : "Update Product"}
-              </button>
+              </Button>
 
               <Link
                 href="/products"
