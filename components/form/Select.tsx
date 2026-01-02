@@ -5,7 +5,7 @@ interface SelectOption {
   label: string;
 }
 
-interface SingleSelectProps {
+interface SelectProps {
   options: SelectOption[];
   value?: string;
   placeholder?: string;
@@ -15,7 +15,7 @@ interface SingleSelectProps {
   hint?: string;
 }
 
-const Select: React.FC<SingleSelectProps> = ({
+const Select: React.FC<SelectProps> = ({
   options,
   value = "",
   placeholder = "Select option",
