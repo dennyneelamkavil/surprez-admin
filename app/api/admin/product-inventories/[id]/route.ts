@@ -12,7 +12,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  await requirePermission("product-inventory:read");
+  await requirePermission("productinventory:read");
   return NextResponse.json(await getProductInventoryById(id));
 }
 
@@ -21,7 +21,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  await requirePermission("product-inventory:update");
+  await requirePermission("productinventory:update");
 
   const body = await request.json();
   const parsed = UpdateProductInventorySchema.safeParse(body);
@@ -41,7 +41,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  await requirePermission("product-inventory:delete");
+  await requirePermission("productinventory:delete");
   await deleteProductInventory(id);
   return NextResponse.json({ success: true });
 }

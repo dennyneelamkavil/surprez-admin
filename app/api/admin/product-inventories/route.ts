@@ -7,7 +7,7 @@ import {
 import { CreateProductInventorySchema } from "@/server/product-inventory/product-inventory.validation";
 
 export async function POST(req: Request) {
-  await requirePermission("product-inventory:create");
+  await requirePermission("productinventory:create");
 
   const body = await req.json();
   const parsed = CreateProductInventorySchema.safeParse(body);
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  await requirePermission("product-inventory:read");
+  await requirePermission("productinventory:read");
 
   const { searchParams } = new URL(req.url);
   const productId = searchParams.get("productId") ?? undefined;
