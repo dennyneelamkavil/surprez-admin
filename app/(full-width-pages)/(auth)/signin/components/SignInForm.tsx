@@ -103,9 +103,13 @@ export default function SignInForm() {
                 value={formData.username}
                 onChange={(e) => {
                   setFieldErrors((prev) => ({ ...prev, username: "" }));
+                  const value = e.target.value
+                    .toLowerCase() // force lowercase
+                    .replace(/\s+/g, "") // remove spaces
+                    .replace(/[^a-z0-9_]/g, ""); // allow only a-z, 0-9 and _
                   setFormData((prev) => ({
                     ...prev,
-                    username: e.target.value,
+                    username: value,
                   }));
                 }}
                 error={!!fieldErrors.username}
