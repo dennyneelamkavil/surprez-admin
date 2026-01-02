@@ -40,6 +40,11 @@ export default function UserDropdown() {
     });
   }
 
+  function handleThemeToggle() {
+    toggleTheme();
+    closeDropdown();
+  }
+
   return (
     <div className="relative">
       {/* Trigger */}
@@ -134,7 +139,7 @@ export default function UserDropdown() {
 
         {/* Theme Toggle */}
         <button
-          onClick={toggleTheme}
+          onClick={handleThemeToggle}
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium rounded-lg group text-theme-sm
             text-gray-700 hover:bg-gray-100 hover:text-gray-700
             dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"

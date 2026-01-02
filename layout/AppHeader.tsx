@@ -1,5 +1,6 @@
 "use client";
 
+import Breadcrumbs from "@/components/header/Breadcrumbs";
 import UserDropdown from "@/components/header/UserDropdown";
 import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
@@ -122,6 +123,7 @@ const AppHeader: React.FC = () => {
           <UserDropdown />
         </div>
       </div>
+      <Breadcrumbs />
     </header>
   );
 };
