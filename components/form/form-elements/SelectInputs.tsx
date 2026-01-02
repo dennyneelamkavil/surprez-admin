@@ -20,11 +20,11 @@ export default function SelectInputs() {
   };
 
   const multiOptions = [
-    { value: "1", text: "Option 1", selected: false },
-    { value: "2", text: "Option 2", selected: false },
-    { value: "3", text: "Option 3", selected: false },
-    { value: "4", text: "Option 4", selected: false },
-    { value: "5", text: "Option 5", selected: false },
+    { value: "1", label: "Option 1" },
+    { value: "2", label: "Option 2" },
+    { value: "3", label: "Option 3" },
+    { value: "4", label: "Option 4" },
+    { value: "5", label: "Option 5" },
   ];
 
   return (
@@ -32,23 +32,21 @@ export default function SelectInputs() {
       <div className="space-y-6">
         <div>
           <Label>Select Input</Label>
-         <div className="relative">
-           <Select
-            options={options}
-            placeholder="Select Option"
-            onChange={handleSelectChange}
-            className="dark:bg-dark-900"
-          />
-          <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <ChevronDownIcon/>
+          <div className="relative">
+            <Select
+              options={options}
+              placeholder="Select Option"
+              onChange={handleSelectChange}
+            />
+            <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+              <ChevronDownIcon />
             </span>
-         </div>
+          </div>
         </div>
         <div className="relative">
           <MultiSelect
-            label="Multiple Select Options"
             options={multiOptions}
-            defaultSelected={["1", "3"]}
+            value={selectedValues}
             onChange={(values) => setSelectedValues(values)}
           />
           <p className="sr-only">

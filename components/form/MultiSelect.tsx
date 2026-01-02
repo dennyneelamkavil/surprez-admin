@@ -1,164 +1,227 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-interface Option {
+interface SelectOption {
   value: string;
-  text: string;
-  selected: boolean;
+  label: string;
 }
 
 interface MultiSelectProps {
-  label: string;
-  options: Option[];
-  defaultSelected?: string[];
-  onChange?: (selected: string[]) => void;
+  options: SelectOption[];
+  value?: string[];
+  onChange: (values: string[]) => void;
+  placeholder?: string;
   disabled?: boolean;
 }
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
-  label,
   options,
-  defaultSelected = [],
+  value = [],
   onChange,
+  placeholder = "Select options",
   disabled = false,
 }) => {
-  const [selectedOptions, setSelectedOptions] =
-    useState<string[]>(defaultSelected);
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [highlighted, setHighlighted] = useState(0);
 
-  const toggleDropdown = () => {
-    if (disabled) return;
-    setIsOpen((prev) => !prev);
-  };
+  const ref = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (optionValue: string) => {
-    const newSelectedOptions = selectedOptions.includes(optionValue)
-      ? selectedOptions.filter((value) => value !== optionValue)
-      : [...selectedOptions, optionValue];
-
-    setSelectedOptions(newSelectedOptions);
-    if (onChange) onChange(newSelectedOptions);
-  };
-
-  const removeOption = (index: number, value: string) => {
-    const newSelectedOptions = selectedOptions.filter((opt) => opt !== value);
-    setSelectedOptions(newSelectedOptions);
-    if (onChange) onChange(newSelectedOptions);
-  };
-
-  const selectedValuesText = selectedOptions.map(
-    (value) => options.find((option) => option.value === value)?.text || ""
+  const filteredOptions = options.filter((o) =>
+    o.label.toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
-    <div className="w-full">
-      <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        {label}
-      </label>
+  // Focus search input when dropdown opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        setSearch("");
+        searchInputRef.current?.focus();
+      }, 0);
+    }
+  }, [isOpen]);
 
-      <div className="relative z-20 inline-block w-full">
-        <div className="relative flex flex-col items-center">
-          <div onClick={toggleDropdown}  className="w-full">
-            <div className="mb-2 flex h-11 rounded-lg border border-gray-300 py-1.5 pl-3 pr-3 shadow-theme-xs outline-hidden transition focus:border-brand-300 focus:shadow-focus-ring dark:border-gray-700 dark:bg-gray-900 dark:focus:border-brand-300">
-              <div className="flex flex-wrap flex-auto gap-2">
-                {selectedValuesText.length > 0 ? (
-                  selectedValuesText.map((text, index) => (
-                    <div
-                      key={index}
-                      className="group flex items-center justify-center rounded-full border-[0.7px] border-transparent bg-gray-100 py-1 pl-2.5 pr-2 text-sm text-gray-800 hover:border-gray-200 dark:bg-gray-800 dark:text-white/90 dark:hover:border-gray-800"
-                    >
-                      <span className="flex-initial max-w-full">{text}</span>
-                      <div className="flex flex-row-reverse flex-auto">
-                        <div
-                          onClick={() =>
-                            removeOption(index, selectedOptions[index])
-                          }
-                          className="pl-2 text-gray-500 cursor-pointer group-hover:text-gray-400 dark:text-gray-400"
-                        >
-                          <svg
-                            className="fill-current"
-                            role="button"
-                            width="14"
-                            height="14"
-                            viewBox="0 0 14 14"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M3.40717 4.46881C3.11428 4.17591 3.11428 3.70104 3.40717 3.40815C3.70006 3.11525 4.17494 3.11525 4.46783 3.40815L6.99943 5.93975L9.53095 3.40822C9.82385 3.11533 10.2987 3.11533 10.5916 3.40822C10.8845 3.70112 10.8845 4.17599 10.5916 4.46888L8.06009 7.00041L10.5916 9.53193C10.8845 9.82482 10.8845 10.2997 10.5916 10.5926C10.2987 10.8855 9.82385 10.8855 9.53095 10.5926L6.99943 8.06107L4.46783 10.5927C4.17494 10.8856 3.70006 10.8856 3.40717 10.5927C3.11428 10.2998 3.11428 9.8249 3.40717 9.53201L5.93877 7.00041L3.40717 4.46881Z"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <input
-                    placeholder="Select option"
-                    className="w-full h-full p-1 pr-2 text-sm bg-transparent border-0 outline-hidden appearance-none placeholder:text-gray-800 focus:border-0 focus:outline-hidden focus:ring-0 dark:placeholder:text-white/90"
-                    readOnly
-                    value="Select option"
-                  />
-                )}
-              </div>
-              <div className="flex items-center py-1 pl-1 pr-1 w-7">
+  // Handle outside clicks
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Sync scroll with keyboard highlight
+  useEffect(() => {
+    if (isOpen && listRef.current) {
+      const highlightedElement = listRef.current.children[
+        highlighted
+      ] as HTMLElement;
+      if (highlightedElement) {
+        highlightedElement.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [highlighted, isOpen]);
+
+  const toggle = (val: string) => {
+    const newValue = value.includes(val)
+      ? value.filter((v) => v !== val)
+      : [...value, val];
+    onChange(newValue);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+
+    if (!isOpen) {
+      if (e.key === "Enter" || e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlighted((i) => (i < filteredOptions.length - 1 ? i + 1 : i));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlighted((i) => (i > 0 ? i - 1 : 0));
+        break;
+      case "Enter":
+        e.preventDefault();
+        const option = filteredOptions[highlighted];
+        if (option) {
+          toggle(option.value);
+        }
+        break;
+      case "Escape":
+      case "Tab":
+        setIsOpen(false);
+        break;
+    }
+  };
+
+  return (
+    <div ref={ref} className="relative w-full" onKeyDown={handleKeyDown}>
+      {/* Multi-Select Trigger Container */}
+      <div
+        onClick={() => !disabled && setIsOpen((p) => !p)}
+        className={`min-h-11 w-full rounded-lg border px-3 py-2 shadow-sm flex items-start justify-between gap-2 cursor-pointer transition-all
+          ${disabled ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white"}
+          ${
+            isOpen
+              ? "ring-2 ring-blue-500/20 border-blue-500"
+              : "border-gray-300"
+          }
+          dark:border-gray-700 dark:bg-gray-900`}
+      >
+        {/* Left Side: Tags and Placeholder */}
+        <div className="flex flex-wrap gap-2 flex-1">
+          {value.length === 0 && (
+            <span className="text-gray-400 text-sm py-1">{placeholder}</span>
+          )}
+
+          {value.map((val) => {
+            const opt = options.find((o) => o.value === val);
+            return (
+              <span
+                key={val}
+                className="flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+              >
+                {opt?.label}
                 <button
                   type="button"
-                  onClick={toggleDropdown} 
-                  className="w-5 h-5 text-gray-700 outline-hidden cursor-pointer focus:outline-hidden dark:text-gray-400"
+                  className="hover:text-blue-900 dark:hover:text-blue-200"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggle(val);
+                  }}
                 >
-                  <svg
-                    className={`stroke-current ${isOpen ? "rotate-180" : ""}`}
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M4.79175 7.39551L10.0001 12.6038L15.2084 7.39551"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  ✕
                 </button>
-              </div>
-            </div>
-          </div>
+              </span>
+            );
+          })}
+        </div>
 
-          {isOpen && (
-            <div
-              className="absolute left-0 z-40 w-full overflow-y-auto bg-white rounded-lg shadow-sm top-full max-h-select dark:bg-gray-900"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-col">
-                {options.map((option, index) => (
-                  <div key={index}>
-                    <div
-                      className={`hover:bg-primary/5 w-full cursor-pointer rounded-t border-b border-gray-200 dark:border-gray-800`}
-                      onClick={() => handleSelect(option.value)}
-                    >
-                      <div
-                        className={`relative flex w-full items-center p-2 pl-2 ${
-                          selectedOptions.includes(option.value)
-                            ? "bg-primary/10"
-                            : ""
-                        }`}
-                      >
-                        <div className="mx-2 leading-6 text-gray-800 dark:text-white/90">
-                          {option.text}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* Right Side: Arrow Icon */}
+        <div className="flex items-center h-7">
+          {" "}
+          {/* h-7 aligns it with the first row of tags */}
+          <svg
+            className={`h-4 w-4 text-gray-400 transition-transform ${
+              isOpen ? "rotate-180" : ""
+            }`}
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path d="M5 7l5 5 5-5" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
         </div>
       </div>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
+          <input
+            ref={searchInputRef}
+            className="w-full border-b border-gray-100 px-3 py-2 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setHighlighted(0);
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          <div ref={listRef} className="max-h-60 overflow-y-auto">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((opt, i) => {
+                const isSelected = value.includes(opt.value);
+                return (
+                  <div
+                    key={opt.value}
+                    onClick={() => toggle(opt.value)}
+                    onMouseEnter={() => setHighlighted(i)}
+                    className={`flex items-center justify-between px-3 py-2 cursor-pointer text-sm transition-colors
+                    ${
+                      highlighted === i
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {isSelected && (
+                      <svg
+                        className="h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="px-3 py-4 text-center text-sm text-gray-400">
+                No results found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
