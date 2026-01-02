@@ -135,6 +135,7 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                autoFocus
               />
             </FormField>
 

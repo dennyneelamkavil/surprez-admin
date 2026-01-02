@@ -149,6 +149,7 @@ export default function UserFormClient({ mode, id }: Props) {
                 onChange={handleUsernameChange}
                 required
                 disabled={isSuperAdminEdit}
+                autoFocus
               />
             </FormField>
 

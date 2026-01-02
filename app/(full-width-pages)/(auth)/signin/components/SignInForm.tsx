@@ -111,6 +111,7 @@ export default function SignInForm() {
                 }}
                 error={!!fieldErrors.username}
                 hint={fieldErrors.username}
+                autoFocus
               />
             </FormField>
 

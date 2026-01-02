@@ -117,6 +117,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
                 onChange={handleKeyChange}
                 required
                 disabled={mode === "edit"}
+                autoFocus
               />
 
               {mode === "create" && (
