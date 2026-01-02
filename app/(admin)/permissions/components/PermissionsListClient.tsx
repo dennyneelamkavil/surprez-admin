@@ -1,11 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
-import ListHeader from "@/components/common/ListHeader";
-import ListFilters from "@/components/common/ListFilters";
-import ListActions from "@/components/common/ListActions";
+import { ListHeader, ListFilters, ListActions } from "@/components/listing";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 type Permission = {
