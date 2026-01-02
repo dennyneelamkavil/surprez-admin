@@ -77,12 +77,12 @@ const navGroups: NavGroup[] = [
         path: "/roles",
         permission: "role:read",
       },
-      {
-        icon: <ShieldCheck />,
-        name: "Permissions",
-        path: "/permissions",
-        permission: "permission:read",
-      },
+      // {
+      //   icon: <ShieldCheck />,
+      //   name: "Permissions",
+      //   path: "/permissions",
+      //   permission: "permission:read",
+      // },
     ],
   },
   {
