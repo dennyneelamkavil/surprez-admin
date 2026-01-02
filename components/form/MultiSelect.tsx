@@ -11,6 +11,8 @@ interface MultiSelectProps {
   onChange: (values: string[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  error?: boolean;
+  hint?: string;
 }
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
@@ -19,6 +21,8 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   onChange,
   placeholder = "Select options",
   disabled = false,
+  error = false,
+  hint,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -114,7 +118,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         className={`min-h-11 w-full rounded-lg border px-3 py-2 shadow-sm flex items-start justify-between gap-2 cursor-pointer transition-all
           ${disabled ? "opacity-60 cursor-not-allowed bg-gray-50" : "bg-white"}
           ${
-            isOpen
+            error
+              ? "border-red-500"
+              : isOpen
               ? "ring-2 ring-blue-500/20 border-blue-500"
               : "border-gray-300"
           }
@@ -221,6 +227,16 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {hint && (
+        <p
+          className={`mt-1.5 text-xs ${
+            error ? "text-red-500" : "text-gray-500"
+          }`}
+        >
+          {hint}
+        </p>
       )}
     </div>
   );
