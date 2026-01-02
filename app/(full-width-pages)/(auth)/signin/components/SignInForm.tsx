@@ -146,12 +146,12 @@ export default function SignInForm() {
             </FormField>
 
             {/* Remember me */}
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <Checkbox checked={isChecked} onChange={setIsChecked} />
               <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
                 Keep me logged in
               </span>
-            </div>
+            </div> */}
 
             {/* Error */}
             {error && (
