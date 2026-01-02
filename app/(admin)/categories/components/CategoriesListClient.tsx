@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
-import Input from "@/components/form/input/InputField";
 import ListHeader from "@/components/common/ListHeader";
+import ListFilters from "@/components/common/ListFilters";
 
 type Category = {
   id: string;
@@ -80,17 +80,18 @@ export default function CategoriesListClient() {
         actionHref="/categories/create"
       />
 
-      {/* Search */}
-      <div className="max-w-sm">
-        <Input
-          placeholder="Search categories..."
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-        />
-      </div>
+      <ListFilters
+        search={search}
+        onSearchChange={(v) => {
+          setPage(1);
+          setSearch(v);
+        }}
+        onClear={() => {
+          setSearch("");
+          setPage(1);
+        }}
+        disableClear={!search}
+      />
 
       {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">

@@ -4,10 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
-import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
-import Button from "@/components/ui/button/Button";
 import ListHeader from "@/components/common/ListHeader";
+import ListFilters from "@/components/common/ListFilters";
 
 type Category = {
   id: string;
@@ -108,21 +107,15 @@ export default function SubCategoriesListClient() {
         actionHref="/subcategories/create"
       />
 
-      {/* Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-        {/* Search */}
-        <div className="w-full sm:max-w-xs">
-          <Input
-            placeholder="Search subcategories..."
-            value={search}
-            onChange={(e) => {
-              setPage(1);
-              setSearch(e.target.value);
-            }}
-          />
-        </div>
-
-        {/* Role filter */}
+      <ListFilters
+        search={search}
+        onSearchChange={(value) => {
+          setPage(1);
+          setSearch(value);
+        }}
+        onClear={clearFilters}
+        disableClear={!search && !category}
+      >
         <div className="w-full sm:max-w-xs">
           <Select
             options={categories.map((cat) => ({
@@ -137,18 +130,7 @@ export default function SubCategoriesListClient() {
             }}
           />
         </div>
-
-        {/* Clear filters */}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={clearFilters}
-          disabled={!search && !category}
-        >
-          Clear
-        </Button>
-      </div>
+      </ListFilters>
 
       {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">

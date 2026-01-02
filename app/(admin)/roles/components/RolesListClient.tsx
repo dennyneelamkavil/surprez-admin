@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
-import Input from "@/components/form/input/InputField";
 import ListHeader from "@/components/common/ListHeader";
+import ListFilters from "@/components/common/ListFilters";
 
 type Role = {
   id: string;
@@ -73,16 +73,18 @@ export default function RolesListClient() {
         actionHref="/roles/create"
       />
 
-      <div className="max-w-sm">
-        <Input
-          placeholder="Search roles..."
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-        />
-      </div>
+      <ListFilters
+        search={search}
+        onSearchChange={(v) => {
+          setPage(1);
+          setSearch(v);
+        }}
+        onClear={() => {
+          setSearch("");
+          setPage(1);
+        }}
+        disableClear={!search}
+      />
 
       <div className="rounded-lg border bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         <table className="w-full table-auto">
