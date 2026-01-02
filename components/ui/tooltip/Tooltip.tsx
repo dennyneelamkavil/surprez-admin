@@ -5,16 +5,18 @@ import { ReactNode } from "react";
 type TooltipProps = {
   content: string;
   children: ReactNode;
+  disabled?: boolean;
 };
 
-export default function Tooltip({ content, children }: TooltipProps) {
+export default function Tooltip({ content, children, disabled }: TooltipProps) {
   return (
     <div className="relative group inline-flex">
       {children}
 
-      <span
-        role="tooltip"
-        className="
+      {!disabled && (
+        <span
+          role="tooltip"
+          className="
           pointer-events-none
           absolute bottom-full left-1/2 mb-2 -translate-x-1/2
           whitespace-nowrap
@@ -23,9 +25,10 @@ export default function Tooltip({ content, children }: TooltipProps) {
           group-hover:opacity-100
           dark:bg-gray-700
         "
-      >
-        {content}
-      </span>
+        >
+          {content}
+        </span>
+      )}
     </div>
   );
 }
