@@ -6,6 +6,7 @@ import Pagination from "@/components/pagination/Pagination";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import Button from "@/components/ui/button/Button";
+import ListHeader from "@/components/common/ListHeader";
 
 type Role = {
   id: string;
@@ -97,18 +98,11 @@ export default function UsersListClient() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-          Users
-        </h1>
-
-        <Link
-          href="/users/create"
-          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
-        >
-          Create User
-        </Link>
-      </div>
+      <ListHeader
+        title="Users"
+        actionLabel="Create User"
+        actionHref="/users/create"
+      />
 
       {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">

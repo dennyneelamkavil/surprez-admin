@@ -5,6 +5,7 @@ import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
 import Input from "@/components/form/input/InputField";
+import ListHeader from "@/components/common/ListHeader";
 
 type Category = {
   id: string;
@@ -73,18 +74,11 @@ export default function CategoriesListClient() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-          Categories
-        </h1>
-
-        <Link
-          href="/categories/create"
-          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
-        >
-          Create Category
-        </Link>
-      </div>
+      <ListHeader
+        title="Categories"
+        actionLabel="Create Category"
+        actionHref="/categories/create"
+      />
 
       {/* Search */}
       <div className="max-w-sm">

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import Input from "@/components/form/input/InputField";
+import ListHeader from "@/components/common/ListHeader";
 
 type Role = {
   id: string;
@@ -66,15 +67,11 @@ export default function RolesListClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold dark:text-white">Roles</h1>
-        <Link
-          href="/roles/create"
-          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
-        >
-          Create Role
-        </Link>
-      </div>
+      <ListHeader
+        title="Roles"
+        actionLabel="Create Role"
+        actionHref="/roles/create"
+      />
 
       <div className="max-w-sm">
         <Input
