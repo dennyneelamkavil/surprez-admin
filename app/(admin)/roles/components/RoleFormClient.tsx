@@ -9,6 +9,7 @@ import Button from "@/components/ui/button/Button";
 import Switch from "@/components/form/switch/Switch";
 import Checkbox from "@/components/form/input/Checkbox";
 import FormHeader from "@/components/form/FormHeader";
+import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 type Permission = {
   id: string;
@@ -119,7 +120,7 @@ export default function RoleFormClient({ mode, id }: Props) {
       {/* Card */}
       <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
-          <div className="text-sm">Loading...</div>
+          <FormSkeleton />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (

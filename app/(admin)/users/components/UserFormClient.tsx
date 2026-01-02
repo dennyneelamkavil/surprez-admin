@@ -9,6 +9,7 @@ import Select from "@/components/form/Select";
 import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
+import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 type Props = {
   mode: "create" | "edit";
@@ -131,7 +132,7 @@ export default function UserFormClient({ mode, id }: Props) {
       {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
-          <div className="text-sm">Loading...</div>
+          <FormSkeleton />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
