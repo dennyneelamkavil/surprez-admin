@@ -5,9 +5,12 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Next.js Profile | Surprez - Next.js Dashboard Template",
-  description:
-    "This is Next.js Profile page for Surprez - Next.js Tailwind CSS Admin Dashboard Template",
+  title: "Profile | Surprez Admin",
+  description: "Manage profile information and settings",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function Profile() {
