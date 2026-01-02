@@ -5,6 +5,7 @@ import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
+import ListActions from "@/components/common/ListActions";
 
 type Role = {
   id: string;
@@ -71,6 +72,7 @@ export default function RolesListClient() {
         title="Roles"
         actionLabel="Create Role"
         actionHref="/roles/create"
+        createPermission="role:create"
       />
 
       <ListFilters
@@ -135,26 +137,18 @@ export default function RolesListClient() {
                   <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                     {new Date(role.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-5 py-4 text-right space-x-3">
-                    {role.name !== "superadmin" ? (
-                      <>
-                        <Link
-                          href={`/roles/${role.id}/edit`}
-                          className="text-brand-500 hover:underline text-sm"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(role.id)}
-                          className="text-red-500 hover:underline text-sm"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    ) : (
-                      <span className="text-gray-400 italic">
-                        System role (cannot edit or delete)
+                  <td className="px-5 py-4 text-right">
+                    {role.name === "superadmin" ? (
+                      <span className="text-sm italic text-gray-400">
+                        System role
                       </span>
+                    ) : (
+                      <ListActions
+                        editHref={`/roles/${role.id}/edit`}
+                        onDelete={() => handleDelete(role.id)}
+                        editPermission="role:update"
+                        deletePermission="role:delete"
+                      />
                     )}
                   </td>
                 </tr>

@@ -6,6 +6,7 @@ import Pagination from "@/components/pagination/Pagination";
 import Select from "@/components/form/Select";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
+import ListActions from "@/components/common/ListActions";
 
 type Role = {
   id: string;
@@ -101,6 +102,7 @@ export default function UsersListClient() {
         title="Users"
         actionLabel="Create User"
         actionHref="/users/create"
+        createPermission="user:create"
       />
 
       <ListFilters
@@ -196,24 +198,14 @@ export default function UsersListClient() {
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-right space-x-3">
-                      <Link
-                        href={`/users/${user.id}/edit`}
-                        className="text-sm font-medium text-brand-500 hover:underline"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        disabled={user.username === "superadmin"}
-                        className={`text-sm font-medium text-red-500 ${
-                          user.username === "superadmin"
-                            ? ""
-                            : "hover:underline"
-                        } disabled:opacity-70`}
-                      >
-                        Delete
-                      </button>
+                    <td className="px-5 py-4 text-right">
+                      <ListActions
+                        editHref={`/users/${user.id}/edit`}
+                        onDelete={() => handleDelete(user.id)}
+                        editPermission="user:update"
+                        deletePermission="user:delete"
+                        disableDelete={user.username === "superadmin"}
+                      />
                     </td>
                   </tr>
                 ))

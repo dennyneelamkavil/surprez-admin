@@ -5,6 +5,7 @@ import Link from "next/link";
 import Pagination from "@/components/pagination/Pagination";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
+import ListActions from "@/components/common/ListActions";
 
 type Permission = {
   id: string;
@@ -75,6 +76,7 @@ export default function PermissionsListClient() {
         title="Permissions"
         actionLabel="Create Permission"
         actionHref="/permissions/create"
+        createPermission="permission:create"
       />
 
       <ListFilters
@@ -145,19 +147,13 @@ export default function PermissionsListClient() {
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {new Date(permission.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-right space-x-3">
-                      <Link
-                        href={`/permissions/${permission.id}/edit`}
-                        className="text-sm font-medium text-brand-500 hover:underline"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(permission.id)}
-                        className="text-sm font-medium text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
+                    <td className="px-5 py-4 text-right">
+                      <ListActions
+                        editHref={`/permissions/${permission.id}/edit`}
+                        onDelete={() => handleDelete(permission.id)}
+                        editPermission="permission:update"
+                        deletePermission="permission:delete"
+                      />
                     </td>
                   </tr>
                 ))

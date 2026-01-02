@@ -7,6 +7,7 @@ import Image from "next/image";
 import Select from "@/components/form/Select";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
+import ListActions from "@/components/common/ListActions";
 
 type Category = {
   id: string;
@@ -105,6 +106,7 @@ export default function SubCategoriesListClient() {
         title="SubCategories"
         actionLabel="Create SubCategory"
         actionHref="/subcategories/create"
+        createPermission="subcategory:create"
       />
 
       <ListFilters
@@ -206,19 +208,13 @@ export default function SubCategoriesListClient() {
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {new Date(subCat.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-right space-x-3">
-                      <Link
-                        href={`/subcategories/${subCat.id}/edit`}
-                        className="text-sm font-medium text-brand-500 hover:underline"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(subCat.id)}
-                        className="text-sm font-medium text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
+                    <td className="px-5 py-4 text-right">
+                      <ListActions
+                        editHref={`/subcategories/${subCat.id}/edit`}
+                        onDelete={() => handleDelete(subCat.id)}
+                        editPermission="subcategory:update"
+                        deletePermission="subcategory:delete"
+                      />
                     </td>
                   </tr>
                 ))

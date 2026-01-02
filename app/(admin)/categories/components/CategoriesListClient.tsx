@@ -6,6 +6,7 @@ import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
+import ListActions from "@/components/common/ListActions";
 
 type Category = {
   id: string;
@@ -78,6 +79,7 @@ export default function CategoriesListClient() {
         title="Categories"
         actionLabel="Create Category"
         actionHref="/categories/create"
+        createPermission="category:create"
       />
 
       <ListFilters
@@ -161,19 +163,13 @@ export default function CategoriesListClient() {
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {new Date(category.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-right space-x-3">
-                      <Link
-                        href={`/categories/${category.id}/edit`}
-                        className="text-sm font-medium text-brand-500 hover:underline"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(category.id)}
-                        className="text-sm font-medium text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
+                    <td className="px-5 py-4 text-right">
+                      <ListActions
+                        editHref={`/categories/${category.id}/edit`}
+                        onDelete={() => handleDelete(category.id)}
+                        editPermission="category:update"
+                        deletePermission="category:delete"
+                      />
                     </td>
                   </tr>
                 ))

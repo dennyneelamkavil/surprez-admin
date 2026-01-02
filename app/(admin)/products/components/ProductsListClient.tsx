@@ -7,6 +7,7 @@ import Image from "next/image";
 import Select from "@/components/form/Select";
 import ListHeader from "@/components/common/ListHeader";
 import ListFilters from "@/components/common/ListFilters";
+import ListActions from "@/components/common/ListActions";
 
 type SubCategory = {
   id: string;
@@ -110,6 +111,7 @@ export default function ProductsListClient() {
         title="Products"
         actionLabel="Create Product"
         actionHref="/products/create"
+        createPermission="product:create"
       />
 
       <ListFilters
@@ -250,19 +252,13 @@ export default function ProductsListClient() {
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       {new Date(product.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-right space-x-3">
-                      <Link
-                        href={`/products/${product.id}/edit`}
-                        className="text-sm font-medium text-brand-500 hover:underline"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                        className="text-sm font-medium text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
+                    <td className="px-5 py-4 text-right">
+                      <ListActions
+                        editHref={`/products/${product.id}/edit`}
+                        onDelete={() => handleDelete(product.id)}
+                        editPermission="product:update"
+                        deletePermission="product:delete"
+                      />
                     </td>
                   </tr>
                 ))

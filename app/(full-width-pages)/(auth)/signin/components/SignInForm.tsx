@@ -2,7 +2,6 @@
 
 import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 import React, { useState } from "react";
@@ -159,7 +158,12 @@ export default function SignInForm() {
             )}
 
             {/* Submit */}
-            <Button className="w-full" size="sm" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full"
+              size="sm"
+              disabled={loading}
+            >
               {loading ? "Signing in..." : "Sign in"}
             </Button>
           </div>
