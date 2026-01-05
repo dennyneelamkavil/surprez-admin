@@ -18,9 +18,9 @@ export default function ListHeader({
   createPermission,
 }: ListHeaderProps) {
   const ActionButton = (
-    <Button variant="primary">
-      <Link href={actionHref}>{actionLabel}</Link>
-    </Button>
+    <Link href={actionHref}>
+      <Button variant="primary">{actionLabel}</Button>
+    </Link>
   );
 
   return (
