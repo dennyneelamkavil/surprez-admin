@@ -4,18 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Pagination from "@/components/pagination/Pagination";
 import { ListHeader, ListFilters, ListActions } from "@/components/listing";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
-
-type Permission = {
-  id: string;
-  key: string;
-  description?: string;
-  createdAt: string;
-};
-
-type PaginationMeta = {
-  page: number;
-  totalPages: number;
-};
+import type { Permission, PaginationMeta } from "@/lib/types";
 
 export default function PermissionsListClient() {
   const [permissions, setPermissions] = useState<Permission[]>([]);

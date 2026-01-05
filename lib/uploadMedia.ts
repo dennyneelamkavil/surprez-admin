@@ -1,9 +1,4 @@
-export type MediaFolder =
-  | "categories"
-  | "subcategories"
-  | "products/covers"
-  | "products/images"
-  | "products/videos";
+import type { MediaFolder } from "@/lib/types";
 
 export async function uploadMedia(file: File, folder: MediaFolder) {
   const formData = new FormData();

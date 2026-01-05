@@ -5,29 +5,10 @@ import Pagination from "@/components/pagination/Pagination";
 import Select from "@/components/form/Select";
 import { ListHeader, ListFilters, ListActions } from "@/components/listing";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
-
-type Role = {
-  id: string;
-  name: string;
-};
-
-type User = {
-  id: string;
-  username: string;
-  fullname: string;
-  email?: string;
-  role?: { name: string };
-  isActive: boolean;
-  createdAt: string;
-};
-
-type PaginationMeta = {
-  page: number;
-  totalPages: number;
-};
+import type { User, RoleBase, PaginationMeta } from "@/lib/types";
 
 export default function UsersListClient() {
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [roles, setRoles] = useState<RoleBase[]>([]);
   const [role, setRole] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);

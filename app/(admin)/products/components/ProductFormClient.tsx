@@ -12,13 +12,8 @@ import Switch from "@/components/form/switch/Switch";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
-import { Media } from "@/lib/types";
+import type { Media, SubCategoryBase } from "@/lib/types";
 import { uploadMedia } from "@/lib/uploadMedia";
-
-type SubCategory = {
-  id: string;
-  name: string;
-};
 
 type Props = {
   mode: "create" | "edit";
@@ -35,7 +30,7 @@ export default function ProductFormClient({ mode, id }: Props) {
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
-  const [subcats, setSubcats] = useState<SubCategory[]>([]);
+  const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

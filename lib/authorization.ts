@@ -1,7 +1,10 @@
-import { Role } from "@/lib/types";
+import type { RoleWithPermissionKeys } from "@/lib/types";
 
-export function hasPermission(role: Role | undefined, permission: string) {
+export function hasPermission(
+  role: RoleWithPermissionKeys | undefined,
+  permission: string
+) {
   if (!role) return false;
   if (role.isSuperAdmin) return true;
-  return role.permissions?.includes(permission) ?? false;
+  return role.permissions.includes(permission);
 }

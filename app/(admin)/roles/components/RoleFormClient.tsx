@@ -10,11 +10,7 @@ import Switch from "@/components/form/switch/Switch";
 import Checkbox from "@/components/form/input/Checkbox";
 import FormHeader from "@/components/form/FormHeader";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
-
-type Permission = {
-  id: string;
-  key: string;
-};
+import type { PermissionBase } from "@/lib/types";
 
 type Props = {
   mode: "create" | "edit";
@@ -25,7 +21,7 @@ export default function RoleFormClient({ mode, id }: Props) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [permissions, setPermissions] = useState<PermissionBase[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
@@ -107,7 +103,7 @@ export default function RoleFormClient({ mode, id }: Props) {
     acc[module][action] = perm;
 
     return acc;
-  }, {} as Record<string, Record<string, Permission>>);
+  }, {} as Record<string, Record<string, PermissionBase>>);
 
   return (
     <div className="max-w-3xl space-y-6">

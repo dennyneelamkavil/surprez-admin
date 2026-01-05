@@ -5,24 +5,7 @@ import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
 import { ListHeader, ListFilters, ListActions } from "@/components/listing";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
-
-type Category = {
-  id: string;
-  name: string;
-  slug: string;
-  image: {
-    url: string;
-    publicId: string;
-    resourceType: "image" | "video";
-  };
-  isActive: boolean;
-  createdAt: string;
-};
-
-type PaginationMeta = {
-  page: number;
-  totalPages: number;
-};
+import type { Category, PaginationMeta } from "@/lib/types";
 
 export default function CategoriesListClient() {
   const [categories, setCategories] = useState<Category[]>([]);

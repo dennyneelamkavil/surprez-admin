@@ -3,7 +3,7 @@ import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { verifyUser } from "@/server/user/user.service";
-import { Role } from "@/lib/types";
+import type { RoleWithPermissionKeys } from "@/lib/types";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -57,7 +57,7 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: token.id as string,
         username: token.username as string,
-        role: token.role as Role,
+        role: token.role as RoleWithPermissionKeys,
         fullname: token.fullname as string,
       };
       return session;

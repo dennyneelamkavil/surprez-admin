@@ -10,7 +10,7 @@ import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
-import { Media } from "@/lib/types";
+import type { Media } from "@/lib/types";
 import { uploadMedia } from "@/lib/uploadMedia";
 
 type Props = {

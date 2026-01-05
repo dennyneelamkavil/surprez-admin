@@ -11,13 +11,8 @@ import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
-import { Media } from "@/lib/types";
+import type { Media, CategoryBase } from "@/lib/types";
 import { uploadMedia } from "@/lib/uploadMedia";
-
-type Category = {
-  id: string;
-  name: string;
-};
 
 type Props = {
   mode: "create" | "edit";
@@ -31,7 +26,7 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
   const [image, setImage] = useState<Media | null>(null);
   const [uploading, setUploading] = useState(false);
   const [description, setDescription] = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryBase[]>([]);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

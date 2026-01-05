@@ -6,39 +6,10 @@ import Image from "next/image";
 import Select from "@/components/form/Select";
 import { ListHeader, ListFilters, ListActions } from "@/components/listing";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
-
-type SubCategory = {
-  id: string;
-  name: string;
-};
-
-type Product = {
-  id: string;
-  name: string;
-  slug: string;
-  coverImage: {
-    url: string;
-    publicId: string;
-    resourceType: "image" | "video";
-  };
-  isActive: boolean;
-  isFeatured: boolean;
-  subcategories: [
-    {
-      id: string;
-      name: string;
-    }
-  ];
-  createdAt: string;
-};
-
-type PaginationMeta = {
-  page: number;
-  totalPages: number;
-};
+import type { Product, SubCategoryBase, PaginationMeta } from "@/lib/types";
 
 export default function ProductsListClient() {
-  const [subcats, setSubcats] = useState<SubCategory[]>([]);
+  const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
   const [subcategory, setSubcategory] = useState("");
   const [isFeatured, setIsFeatured] = useState("");
   const [products, setProducts] = useState<Product[]>([]);

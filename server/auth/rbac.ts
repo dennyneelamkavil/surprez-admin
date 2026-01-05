@@ -3,19 +3,20 @@ import { getServerSession } from "next-auth";
 import { headers } from "next/headers";
 import jwt from "jsonwebtoken";
 import { authOptions } from "@/server/auth/config";
-import { Role } from "@/lib/types";
+import type { RoleWithPermissionKeys } from "@/lib/types";
+import { hasPermission } from "@/lib/authorization";
 
 type JwtPayload = {
   sub: string;
   username: string;
-  role: Role;
+  role: RoleWithPermissionKeys;
 };
 
 export async function requirePermission(permission: string) {
   // 1️⃣ Try NextAuth session (browser)
   const session = await getServerSession(authOptions);
 
-  let role: Role | undefined;
+  let role: RoleWithPermissionKeys | undefined;
 
   if (session?.user?.role) {
     role = session.user.role;
@@ -40,15 +41,8 @@ export async function requirePermission(permission: string) {
     throw new Error("Unauthorized");
   }
 
-  // 4️⃣ Super admin bypass
-  if (role.isSuperAdmin) {
-    return;
-  }
-
-  // 5️⃣ Permission check
-  const hasPermission = role.permissions?.includes(permission);
-
-  if (!hasPermission) {
+  // 4️⃣ Permission check (includes super-admin bypass)
+  if (!hasPermission(role, permission)) {
     throw new Error("Forbidden");
   }
 }

@@ -10,15 +10,11 @@ import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
+import type { RoleBase } from "@/lib/types";
 
 type Props = {
   mode: "create" | "edit";
   id?: string;
-};
-
-type Role = {
-  id: string;
-  name: string;
 };
 
 export default function UserFormClient({ mode, id }: Props) {
@@ -28,7 +24,7 @@ export default function UserFormClient({ mode, id }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [roles, setRoles] = useState<RoleBase[]>([]);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

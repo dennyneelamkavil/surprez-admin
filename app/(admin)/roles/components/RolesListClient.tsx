@@ -4,18 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Pagination from "@/components/pagination/Pagination";
 import { ListHeader, ListFilters, ListActions } from "@/components/listing";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
-
-type Role = {
-  id: string;
-  name: string;
-  isSuperAdmin: boolean;
-  createdAt: string;
-};
-
-type PaginationMeta = {
-  page: number;
-  totalPages: number;
-};
+import type { Role, PaginationMeta } from "@/lib/types";
 
 export default function RolesListClient() {
   const [roles, setRoles] = useState<Role[]>([]);
