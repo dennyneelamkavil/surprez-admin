@@ -2,9 +2,12 @@ import type { RoleWithPermissionKeys } from "@/lib/types";
 
 export function hasPermission(
   role: RoleWithPermissionKeys | undefined,
-  permission: string
+  permissions: string | string[]
 ) {
   if (!role) return false;
   if (role.isSuperAdmin) return true;
-  return role.permissions.includes(permission);
+
+  const required = Array.isArray(permissions) ? permissions : [permissions];
+
+  return required.some((p) => role.permissions.includes(p));
 }

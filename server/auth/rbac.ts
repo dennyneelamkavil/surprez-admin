@@ -12,7 +12,7 @@ type JwtPayload = {
   role: RoleWithPermissionKeys;
 };
 
-export async function requirePermission(permission: string) {
+export async function requirePermission(permissions: string | string[]) {
   // 1️⃣ Try NextAuth session (browser)
   const session = await getServerSession(authOptions);
 
@@ -42,7 +42,7 @@ export async function requirePermission(permission: string) {
   }
 
   // 4️⃣ Permission check (includes super-admin bypass)
-  if (!hasPermission(role, permission)) {
+  if (!hasPermission(role, permissions)) {
     throw new Error("Forbidden");
   }
 }
