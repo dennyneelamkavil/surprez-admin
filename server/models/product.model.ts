@@ -1,5 +1,6 @@
 import "server-only";
 import { Schema, model, models } from "mongoose";
+import { MediaSchema } from "@/server/media/media.schema";
 
 const ProductSchema = new Schema(
   {
@@ -15,11 +16,11 @@ const ProductSchema = new Schema(
       index: true,
     },
     coverImage: {
-      type: String,
+      type: MediaSchema,
       required: true,
     },
-    images: [String],
-    videos: [String],
+    images: [MediaSchema],
+    videos: [MediaSchema],
     subcategories: [
       {
         type: Schema.Types.ObjectId,

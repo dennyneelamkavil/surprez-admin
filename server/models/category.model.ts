@@ -1,5 +1,6 @@
 import "server-only";
 import { Schema, model, models } from "mongoose";
+import { MediaSchema } from "@/server/media/media.schema";
 
 const CategorySchema = new Schema(
   {
@@ -15,7 +16,7 @@ const CategorySchema = new Schema(
       index: true,
     },
     image: {
-      type: String,
+      type: MediaSchema,
       required: true,
     },
     description: {
