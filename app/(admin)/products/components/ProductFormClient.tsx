@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
@@ -11,6 +12,8 @@ import Switch from "@/components/form/switch/Switch";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
+import { Media } from "@/lib/types";
+import { uploadMedia } from "@/lib/uploadMedia";
 
 type SubCategory = {
   id: string;
@@ -25,8 +28,10 @@ type Props = {
 export default function ProductFormClient({ mode, id }: Props) {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [coverImage, setCoverImage] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [coverImage, setCoverImage] = useState<Media | null>(null);
+  const [images, setImages] = useState<Media[]>([]);
+  const [videos, setVideos] = useState<Media[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
@@ -83,6 +88,7 @@ export default function ProductFormClient({ mode, id }: Props) {
             name,
             coverImage,
             images,
+            videos,
             subcategories,
             description,
             isFeatured,
@@ -154,13 +160,37 @@ export default function ProductFormClient({ mode, id }: Props) {
             </FormField>
 
             <FormField label="Cover Image" required htmlFor="coverImage">
-              <Input
-                id="coverImage"
-                placeholder="Image URL"
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                required
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  try {
+                    setUploading(true);
+                    const media = await uploadMedia(file, "products/covers");
+                    setCoverImage(media);
+                  } catch (err: any) {
+                    setError(err.message);
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
               />
+              {uploading && (
+                <p className="text-sm text-gray-500">Uploading image...</p>
+              )}
+
+              {coverImage && (
+                <Image
+                  src={coverImage.url}
+                  alt="Product Cover Image Preview"
+                  width={50}
+                  height={50}
+                  className="rounded object-cover"
+                />
+              )}
             </FormField>
 
             <FormField label="Description" htmlFor="description">
@@ -180,9 +210,67 @@ export default function ProductFormClient({ mode, id }: Props) {
               />
             </FormField>
 
+            <FormField label="Product Images" htmlFor="images">
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  try {
+                    setUploading(true);
+                    const uploaded = await Promise.all(
+                      Array.from(e.target.files || []).map((file) =>
+                        uploadMedia(file, "products/images")
+                      )
+                    );
+                    setImages((prev) => [...prev, ...uploaded]);
+                  } catch (err: any) {
+                    setError(err.message);
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+              />
+              {uploading && (
+                <p className="text-sm text-gray-500">Uploading images...</p>
+              )}
+            </FormField>
+
+            <FormField label="Product Videos" htmlFor="videos">
+              <input
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  try {
+                    setUploading(true);
+                    const uploaded = await Promise.all(
+                      Array.from(e.target.files || []).map((file) =>
+                        uploadMedia(file, "products/videos")
+                      )
+                    );
+                    setVideos((prev) => [...prev, ...uploaded]);
+                  } catch (err: any) {
+                    setError(err.message);
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+              />
+              {uploading && (
+                <p className="text-sm text-gray-500">Uploading videos...</p>
+              )}
+            </FormField>
+
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving || uploading}>
                 {saving
                   ? "Saving..."
                   : mode === "create"

@@ -16,7 +16,11 @@ type SubCategory = {
   id: string;
   name: string;
   slug: string;
-  image: string;
+  image: {
+    url: string;
+    publicId: string;
+    resourceType: "image" | "video";
+  };
   isActive: boolean;
   category: {
     id: string;
@@ -185,8 +189,7 @@ export default function SubCategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       <Image
-                        // src={subCat.image}
-                        src={"/logo.png"}
+                        src={subCat.image.url}
                         alt={subCat.name}
                         width={50}
                         height={50}

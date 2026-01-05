@@ -1,11 +1,12 @@
 import "server-only";
 import { z } from "zod";
+import { MediaValidation } from "@/server/media/media.validation";
 
 export const CreateProductSchema = z.object({
   name: z.string().min(2),
-  coverImage: z.string(),
-  images: z.array(z.string()).optional(),
-  videos: z.array(z.string()).optional(),
+  coverImage: MediaValidation,
+  images: z.array(MediaValidation).optional(),
+  videos: z.array(MediaValidation).optional(),
   subcategories: z.array(z.string()).optional(),
   description: z.string().optional(),
   attributes: z.record(z.string(), z.any()).optional(),
@@ -16,9 +17,9 @@ export const CreateProductSchema = z.object({
 export const UpdateProductSchema = z.object({
   name: z.string().min(2).optional(),
   slug: z.string().min(2).optional(),
-  coverImage: z.string().optional(),
-  images: z.array(z.string()).optional(),
-  videos: z.array(z.string()).optional(),
+  coverImage: MediaValidation.optional(),
+  images: z.array(MediaValidation).optional(),
+  videos: z.array(MediaValidation).optional(),
   subcategories: z.array(z.string()).optional(),
   description: z.string().optional(),
   attributes: z.record(z.string(), z.any()).optional(),

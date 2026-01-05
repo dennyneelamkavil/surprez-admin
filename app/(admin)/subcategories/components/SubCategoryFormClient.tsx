@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
@@ -10,6 +11,8 @@ import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
+import { Media } from "@/lib/types";
+import { uploadMedia } from "@/lib/uploadMedia";
 
 type Category = {
   id: string;
@@ -25,7 +28,8 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState<Media | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [description, setDescription] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(mode === "edit");
@@ -149,13 +153,37 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
             </FormField>
 
             <FormField label="Image" required htmlFor="image">
-              <Input
-                id="image"
-                placeholder="Image URL"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                required
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  try {
+                    setUploading(true);
+                    const media = await uploadMedia(file, "subcategories");
+                    setImage(media);
+                  } catch (err: any) {
+                    setError(err.message);
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
               />
+              {uploading && (
+                <p className="text-sm text-gray-500">Uploading image...</p>
+              )}
+
+              {image && (
+                <Image
+                  src={image.url}
+                  alt="SubCategory Image Preview"
+                  width={50}
+                  height={50}
+                  className="rounded object-cover"
+                />
+              )}
             </FormField>
 
             <FormField label="Description" htmlFor="description">
@@ -169,7 +197,7 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving || uploading}>
                 {saving
                   ? "Saving..."
                   : mode === "create"

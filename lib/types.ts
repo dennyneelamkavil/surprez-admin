@@ -4,3 +4,9 @@ export interface Role {
   isSuperAdmin: boolean;
   permissions: string[];
 }
+
+export interface Media {
+  url: string;
+  publicId: string;
+  resourceType: "image" | "video";
+}

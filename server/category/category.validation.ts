@@ -1,9 +1,10 @@
 import "server-only";
 import { z } from "zod";
+import { MediaValidation } from "@/server/media/media.validation";
 
 export const CreateCategorySchema = z.object({
   name: z.string().min(2),
-  image: z.string(),
+  image: MediaValidation,
   description: z.string().optional(),
   isActive: z.boolean().optional(),
 });
@@ -11,7 +12,7 @@ export const CreateCategorySchema = z.object({
 export const UpdateCategorySchema = z.object({
   name: z.string().min(2).optional(),
   slug: z.string().min(2).optional(),
-  image: z.string().optional(),
+  image: MediaValidation.optional(),
   description: z.string().optional(),
   isActive: z.boolean().optional(),
 });

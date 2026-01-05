@@ -10,7 +10,11 @@ type Category = {
   id: string;
   name: string;
   slug: string;
-  image: string;
+  image: {
+    url: string;
+    publicId: string;
+    resourceType: "image" | "video";
+  };
   isActive: boolean;
   createdAt: string;
 };
@@ -140,8 +144,7 @@ export default function CategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       <Image
-                        // src={category.image}
-                        src={"/logo.png"}
+                        src={category.image.url}
                         alt={category.name}
                         width={50}
                         height={50}

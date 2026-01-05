@@ -7,7 +7,8 @@ import type {
   CreateProductInput,
   UpdateProductInput,
 } from "@/server/product/product.validation";
-import { generateUniqueProductSlug } from "../utils/slug.util";
+import { generateUniqueProductSlug } from "@/server/utils/slug.util";
+import { deleteFromCloudinary } from "@/server/media/media.provider";
 
 /* ================= CREATE ================= */
 export async function createProduct(input: CreateProductInput) {
@@ -112,6 +113,9 @@ export async function getProductById(id: string) {
 export async function updateProduct(id: string, input: UpdateProductInput) {
   await connectDB();
 
+  const existing = await ProductModel.findById(id);
+  if (!existing) throw new Error("Product not found");
+
   if (input.subcategories?.length) {
     const count = await SubCategoryModel.countDocuments({
       _id: { $in: input.subcategories },
@@ -127,12 +131,40 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     updateData.slug = await generateUniqueProductSlug(input.name, id);
   }
 
-  const product = await ProductModel.findByIdAndUpdate(id, updateData, {
+  const updated = await ProductModel.findByIdAndUpdate(id, updateData, {
     new: true,
   }).populate("subcategories");
 
-  if (!product) throw new Error("Product not found");
-  return mapProduct(product);
+  if (input.coverImage && existing.coverImage?.publicId) {
+    await deleteFromCloudinary(
+      existing.coverImage.publicId,
+      existing.coverImage.resourceType
+    );
+  }
+
+  if (input.images) {
+    const oldIds = existing.images.map((i: { publicId: string }) => i.publicId);
+    const newIds = input.images.map((i: { publicId: string }) => i.publicId);
+
+    const removed = oldIds.filter((id: string) => !newIds.includes(id));
+
+    for (const publicId of removed) {
+      await deleteFromCloudinary(publicId, "image");
+    }
+  }
+
+  if (input.videos) {
+    const oldIds = existing.videos.map((v: { publicId: string }) => v.publicId);
+    const newIds = input.videos.map((v: { publicId: string }) => v.publicId);
+
+    const removed = oldIds.filter((id: string) => !newIds.includes(id));
+
+    for (const publicId of removed) {
+      await deleteFromCloudinary(publicId, "video");
+    }
+  }
+
+  return mapProduct(updated);
 }
 
 /* ================= SOFT DELETE ================= */
@@ -146,5 +178,19 @@ export async function deleteProduct(id: string) {
   );
 
   if (!product) throw new Error("Product not found");
+
+  for (const img of product.images) {
+    await deleteFromCloudinary(img.publicId, "image");
+  }
+
+  for (const vid of product.videos) {
+    await deleteFromCloudinary(vid.publicId, "video");
+  }
+
+  await deleteFromCloudinary(
+    product.coverImage.publicId,
+    product.coverImage.resourceType
+  );
+
   return { success: true };
 }

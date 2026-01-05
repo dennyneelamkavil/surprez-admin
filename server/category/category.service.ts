@@ -7,6 +7,7 @@ import type {
   UpdateCategoryInput,
 } from "@/server/category/category.validation";
 import { generateUniqueCategorySlug } from "@/server/utils/slug.util";
+import { deleteFromCloudinary } from "@/server/media/media.provider";
 
 /* ================= CREATE ================= */
 export async function createCategory(input: CreateCategoryInput) {
@@ -89,18 +90,27 @@ export async function getCategoryById(id: string) {
 export async function updateCategory(id: string, input: UpdateCategoryInput) {
   await connectDB();
 
+  const existing = await CategoryModel.findById(id);
+  if (!existing) throw new Error("Category not found");
+
   const updateData: any = { ...input };
 
   if (input.name) {
     updateData.slug = await generateUniqueCategorySlug(input.name, id);
   }
 
-  const category = await CategoryModel.findByIdAndUpdate(id, updateData, {
+  const updated = await CategoryModel.findByIdAndUpdate(id, updateData, {
     new: true,
   });
 
-  if (!category) throw new Error("Category not found");
-  return mapCategory(category);
+  if (input.image && existing.image?.publicId) {
+    await deleteFromCloudinary(
+      existing.image.publicId,
+      existing.image.resourceType
+    );
+  }
+
+  return mapCategory(updated);
 }
 
 /* ================= SOFT DELETE ================= */
@@ -114,5 +124,13 @@ export async function deleteCategory(id: string) {
   );
 
   if (!category) throw new Error("Category not found");
+
+  if (category?.image?.publicId) {
+    await deleteFromCloudinary(
+      category.image.publicId,
+      category.image.resourceType
+    );
+  }
+
   return { success: true };
 }

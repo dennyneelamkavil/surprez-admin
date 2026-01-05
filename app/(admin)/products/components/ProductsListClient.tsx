@@ -16,7 +16,11 @@ type Product = {
   id: string;
   name: string;
   slug: string;
-  coverImage: string;
+  coverImage: {
+    url: string;
+    publicId: string;
+    resourceType: "image" | "video";
+  };
   isActive: boolean;
   isFeatured: boolean;
   subcategories: [
@@ -226,8 +230,7 @@ export default function ProductsListClient() {
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                       <Image
-                        // src={product.coverImage}
-                        src={"/logo.png"}
+                        src={product.coverImage.url}
                         alt={product.name}
                         width={50}
                         height={50}
