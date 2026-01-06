@@ -3,13 +3,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
-import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
+import FormField from "@/components/form/FormField";
+import Input from "@/components/form/input/InputField";
+import TextArea from "@/components/form/input/TextArea";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
+import { useFieldErrors } from "@/hooks/useFieldErrors";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
+
+type Fields = "key";
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -22,6 +26,10 @@ export default function PermissionFormClient({ mode, id }: Props) {
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
+    useFieldErrors<Fields>();
+  useScrollToTop(error || fieldErrors);
 
   const fetchPermission = useCallback(async () => {
     if (!id) return;
@@ -47,6 +55,13 @@ export default function PermissionFormClient({ mode, id }: Props) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    clearAllFieldErrors();
+
+    if (!key) {
+      setFieldError("key", "Permission key is required");
+      setSaving(false);
+      return;
+    }
 
     try {
       const res = await fetch(
@@ -88,6 +103,8 @@ export default function PermissionFormClient({ mode, id }: Props) {
     setKey(value);
   };
 
+  const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
+
   return (
     <div className="max-w-2xl space-y-6">
       {/* Header */}
@@ -103,7 +120,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-500/10">
+              <div className="rounded-md bg-red-50 px-4 py-2 my-2 text-sm text-red-600 dark:bg-red-500/10">
                 {error}
               </div>
             )}
@@ -114,8 +131,13 @@ export default function PermissionFormClient({ mode, id }: Props) {
                 id="key"
                 placeholder="user:create"
                 value={key}
-                onChange={handleKeyChange}
-                required
+                onChange={(e) => {
+                  clearFieldError("key");
+                  setError(null);
+                  handleKeyChange(e);
+                }}
+                error={!!fieldErrors.key}
+                hint={fieldErrors.key}
                 disabled={mode === "edit"}
                 autoFocus
               />
@@ -157,7 +179,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving || hasErrors}>
                 {saving
                   ? "Saving..."
                   : mode === "create"

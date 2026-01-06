@@ -4,17 +4,27 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
-import FormField from "@/components/form/FormField";
-import MultiSelect from "@/components/form/MultiSelect";
-import Switch from "@/components/form/switch/Switch";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
+import FormField from "@/components/form/FormField";
+import Input from "@/components/form/input/InputField";
+import TextArea from "@/components/form/input/TextArea";
+import FileInput from "@/components/form/input/FileInput";
+import MultiSelect from "@/components/form/MultiSelect";
+import Switch from "@/components/form/switch/Switch";
+import AttributeEditor from "@/components/form/AttributeEditor";
+import Dropzone from "@/components/form/form-elements/DropZone";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
-import type { Media, SubCategoryBase } from "@/lib/types";
-import { uploadMedia } from "@/lib/uploadMedia";
 
+import { useFieldErrors } from "@/hooks/useFieldErrors";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
+
+import { uploadMedia } from "@/lib/uploadMedia";
+import { formatSlug } from "@/lib/utils";
+import type { Media, SubCategoryBase } from "@/lib/types";
+import type { AttributeRow } from "@/components/form/AttributeEditor";
+
+type Fields = "name" | "slug" | "coverImage" | "subcategories";
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -29,11 +39,18 @@ export default function ProductFormClient({ mode, id }: Props) {
   const [uploading, setUploading] = useState(false);
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [description, setDescription] = useState("");
+  const [attributes, setAttributes] = useState<AttributeRow[]>([]);
+  const [slug, setSlug] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
+    useFieldErrors<Fields>();
+  useScrollToTop(error || fieldErrors);
 
   async function fetchSubCategories() {
     const res = await fetch("/api/admin/subcategories?all=true", {
@@ -54,11 +71,21 @@ export default function ProductFormClient({ mode, id }: Props) {
       if (!res.ok) throw new Error("Failed to load product");
       const data = await res.json();
       setName(data.name);
+      setSlug(data.slug);
       setCoverImage(data.coverImage);
       setImages(data.images);
+      setVideos(data.videos);
       setSubcategories(data.subcategories.map((sub: any) => sub.id));
       setDescription(data.description ?? "");
       setIsFeatured(data.isFeatured);
+      setAttributes(
+        Object.entries(data.attributes).map(([key, val]) => ({
+          id: crypto.randomUUID(),
+          key,
+          value: Array.isArray(val) ? val.join(", ") : String(val),
+        }))
+      );
+      setIsActive(data.isActive);
     } catch {
       setError("Failed to load product");
     } finally {
@@ -70,6 +97,42 @@ export default function ProductFormClient({ mode, id }: Props) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    clearAllFieldErrors();
+
+    let hasError = false;
+    if (!name) {
+      setFieldError("name", "Name is required");
+      hasError = true;
+    }
+    if (!subcategories.length) {
+      setFieldError("subcategories", "SubCategories is required");
+      hasError = true;
+    }
+    if (mode === "edit" && !slug) {
+      setFieldError("slug", "Slug is required");
+      hasError = true;
+    }
+    if (!coverImage) {
+      setFieldError("coverImage", "Cover Image is required");
+      hasError = true;
+    }
+    if (hasError) {
+      setSaving(false);
+      return;
+    }
+
+    const attributesPayload = attributes.reduce<Record<string, any>>(
+      (acc, { key, value }) => {
+        if (!key) return acc;
+
+        acc[key] = value.includes(",")
+          ? value.split(",").map((v) => v.trim())
+          : value;
+
+        return acc;
+      },
+      {}
+    );
 
     try {
       const res = await fetch(
@@ -81,12 +144,15 @@ export default function ProductFormClient({ mode, id }: Props) {
           },
           body: JSON.stringify({
             name,
+            slug,
             coverImage,
             images,
             videos,
             subcategories,
             description,
             isFeatured,
+            attributes: attributesPayload,
+            isActive,
           }),
         }
       );
@@ -114,6 +180,13 @@ export default function ProductFormClient({ mode, id }: Props) {
     label: sub.name,
   }));
 
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = formatSlug(e.target.value);
+    setSlug(value);
+  };
+
+  const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
+
   return (
     <div className="max-w-2xl space-y-6">
       {/* Header */}
@@ -129,7 +202,7 @@ export default function ProductFormClient({ mode, id }: Props) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-500/10">
+              <div className="rounded-md bg-red-50 px-4 py-2 my-2 text-sm text-red-600 dark:bg-red-500/10">
                 {error}
               </div>
             )}
@@ -139,35 +212,68 @@ export default function ProductFormClient({ mode, id }: Props) {
                 id="name"
                 placeholder="Dolls, Action Figures, etc."
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                onChange={(e) => {
+                  clearFieldError("name");
+                  setError(null);
+                  setName(e.target.value);
+                }}
+                error={!!fieldErrors.name}
+                hint={fieldErrors.name}
                 autoFocus
               />
             </FormField>
+
+            {mode === "edit" && (
+              <FormField label="Slug" required htmlFor="slug">
+                <Input
+                  id="slug"
+                  placeholder="toys"
+                  value={slug}
+                  onChange={(e) => {
+                    clearFieldError("slug");
+                    setError(null);
+                    handleSlugChange(e);
+                  }}
+                  error={!!fieldErrors.slug}
+                  hint={fieldErrors.slug}
+                />
+              </FormField>
+            )}
 
             <FormField label="SubCategories" required>
               <MultiSelect
                 options={subCategoryOptions}
                 value={subcategories}
-                onChange={setSubcategories}
                 placeholder="Select subcategories"
+                onChange={(e) => {
+                  clearFieldError("subcategories");
+                  setError(null);
+                  setSubcategories(e);
+                }}
+                error={!!fieldErrors.subcategories}
+                hint={fieldErrors.subcategories}
               />
             </FormField>
 
             <FormField label="Cover Image" required htmlFor="coverImage">
-              <input
-                type="file"
+              <FileInput
+                id="coverImage"
                 accept="image/*"
+                error={!!fieldErrors.coverImage}
+                hint={fieldErrors.coverImage}
+                disabled={uploading}
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
 
                   try {
                     setUploading(true);
+                    clearFieldError("coverImage");
+                    setError(null);
                     const media = await uploadMedia(file, "products/covers");
                     setCoverImage(media);
                   } catch (err: any) {
-                    setError(err.message);
+                    setFieldError("coverImage", err.message ?? "Upload failed");
                   } finally {
                     setUploading(false);
                   }
@@ -197,6 +303,10 @@ export default function ProductFormClient({ mode, id }: Props) {
               />
             </FormField>
 
+            <FormField label="Attributes">
+              <AttributeEditor value={attributes} onChange={setAttributes} />
+            </FormField>
+
             <FormField label="Featured">
               <Switch
                 label="Mark as featured product"
@@ -206,20 +316,20 @@ export default function ProductFormClient({ mode, id }: Props) {
             </FormField>
 
             <FormField label="Product Images" htmlFor="images">
-              <input
-                type="file"
-                accept="image/*"
+              <Dropzone
+                title="Drop product images here or Browse"
+                description="PNG, JPG, WebP, etc supported"
                 multiple
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-
+                accept={{
+                  "image/png": [],
+                  "image/jpeg": [],
+                  "image/webp": [],
+                }}
+                onFiles={async (files) => {
                   try {
                     setUploading(true);
                     const uploaded = await Promise.all(
-                      Array.from(e.target.files || []).map((file) =>
-                        uploadMedia(file, "products/images")
-                      )
+                      files.map((file) => uploadMedia(file, "products/images"))
                     );
                     setImages((prev) => [...prev, ...uploaded]);
                   } catch (err: any) {
@@ -235,20 +345,16 @@ export default function ProductFormClient({ mode, id }: Props) {
             </FormField>
 
             <FormField label="Product Videos" htmlFor="videos">
-              <input
-                type="file"
-                accept="video/*"
+              <Dropzone
+                title="Drop product videos here or Browse"
+                description="MP4, WebM, MKV, etc supported"
                 multiple
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-
+                accept={{ "video/*": [] }}
+                onFiles={async (files) => {
                   try {
                     setUploading(true);
                     const uploaded = await Promise.all(
-                      Array.from(e.target.files || []).map((file) =>
-                        uploadMedia(file, "products/videos")
-                      )
+                      files.map((file) => uploadMedia(file, "products/videos"))
                     );
                     setVideos((prev) => [...prev, ...uploaded]);
                   } catch (err: any) {
@@ -263,9 +369,17 @@ export default function ProductFormClient({ mode, id }: Props) {
               )}
             </FormField>
 
+            <FormField label="SubCategory Status">
+              <Switch
+                label={isActive ? "Active" : "Inactive"}
+                defaultChecked={isActive}
+                onChange={setIsActive}
+              />
+            </FormField>
+
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving || uploading}>
+              <Button type="submit" disabled={saving || uploading || hasErrors}>
                 {saving
                   ? "Saving..."
                   : mode === "create"

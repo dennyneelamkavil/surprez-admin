@@ -3,15 +3,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import Input from "@/components/form/input/InputField";
-import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
-import Switch from "@/components/form/switch/Switch";
-import Checkbox from "@/components/form/input/Checkbox";
 import FormHeader from "@/components/form/FormHeader";
+import FormField from "@/components/form/FormField";
+import Input from "@/components/form/input/InputField";
+import Checkbox from "@/components/form/input/Checkbox";
+import Switch from "@/components/form/switch/Switch";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
+
+import { useFieldErrors } from "@/hooks/useFieldErrors";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
+
 import type { PermissionBase } from "@/lib/types";
 
+type Fields = "name";
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -26,6 +31,10 @@ export default function RoleFormClient({ mode, id }: Props) {
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
+    useFieldErrors<Fields>();
+  useScrollToTop(error || fieldErrors);
 
   async function fetchPermissions() {
     const res = await fetch("/api/admin/permissions?all=true", {
@@ -59,6 +68,21 @@ export default function RoleFormClient({ mode, id }: Props) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    clearAllFieldErrors();
+
+    let hasError = false;
+    if (!name) {
+      setFieldError("name", "Role name is required");
+      hasError = true;
+    }
+    if (!isSuperAdmin && selected.length === 0) {
+      setError("Select at least one permission or enable Super Admin");
+      hasError = true;
+    }
+    if (hasError) {
+      setSaving(false);
+      return;
+    }
 
     try {
       const res = await fetch(
@@ -105,6 +129,8 @@ export default function RoleFormClient({ mode, id }: Props) {
     return acc;
   }, {} as Record<string, Record<string, PermissionBase>>);
 
+  const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
+
   return (
     <div className="max-w-3xl space-y-6">
       {/* Header */}
@@ -120,7 +146,7 @@ export default function RoleFormClient({ mode, id }: Props) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-500/10">
+              <div className="rounded-md bg-red-50 px-4 py-2 my-2 text-sm text-red-600 dark:bg-red-500/10">
                 {error}
               </div>
             )}
@@ -130,8 +156,13 @@ export default function RoleFormClient({ mode, id }: Props) {
                 id="name"
                 placeholder="admin"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                onChange={(e) => {
+                  clearFieldError("name");
+                  setError(null);
+                  setName(e.target.value);
+                }}
+                error={!!fieldErrors.name}
+                hint={fieldErrors.name}
                 autoFocus
               />
             </FormField>
@@ -139,7 +170,10 @@ export default function RoleFormClient({ mode, id }: Props) {
             <FormField label="Super Admin">
               <Checkbox
                 checked={isSuperAdmin}
-                onChange={setIsSuperAdmin}
+                onChange={(checked) => {
+                  setIsSuperAdmin(checked);
+                  setError(null);
+                }}
                 label="Super Admin (bypass permissions)"
               />
             </FormField>
@@ -194,15 +228,18 @@ export default function RoleFormClient({ mode, id }: Props) {
                                       <Switch
                                         label=""
                                         defaultChecked={isChecked}
-                                        onChange={(checked) =>
-                                          setSelected((prev) =>
-                                            checked
+                                        onChange={(checked) => {
+                                          setSelected((prev) => {
+                                            const next = checked
                                               ? [...prev, permission.id]
                                               : prev.filter(
                                                   (id) => id !== permission.id
-                                                )
-                                          )
-                                        }
+                                                );
+
+                                            return next;
+                                          });
+                                          setError(null);
+                                        }}
                                       />
                                     </div>
                                   ) : (
@@ -222,7 +259,7 @@ export default function RoleFormClient({ mode, id }: Props) {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving || hasErrors}>
                 {saving
                   ? "Saving..."
                   : mode === "create"

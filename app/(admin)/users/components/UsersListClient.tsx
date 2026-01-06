@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Pagination from "@/components/pagination/Pagination";
+
+import { ListActions, ListFilters, ListHeader } from "@/components/listing";
 import Select from "@/components/form/Select";
-import { ListHeader, ListFilters, ListActions } from "@/components/listing";
+import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
+
 import type { User, RoleBase, PaginationMeta } from "@/lib/types";
 
 export default function UsersListClient() {

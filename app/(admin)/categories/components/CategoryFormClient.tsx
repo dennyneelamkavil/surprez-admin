@@ -4,15 +4,23 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
-import FormField from "@/components/form/FormField";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
+import FormField from "@/components/form/FormField";
+import Input from "@/components/form/input/InputField";
+import TextArea from "@/components/form/input/TextArea";
+import FileInput from "@/components/form/input/FileInput";
+import Switch from "@/components/form/switch/Switch";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
-import type { Media } from "@/lib/types";
-import { uploadMedia } from "@/lib/uploadMedia";
 
+import { useFieldErrors } from "@/hooks/useFieldErrors";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
+
+import { uploadMedia } from "@/lib/uploadMedia";
+import { formatSlug } from "@/lib/utils";
+import type { Media } from "@/lib/types";
+
+type Fields = "name" | "slug" | "image";
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -24,9 +32,15 @@ export default function CategoryFormClient({ mode, id }: Props) {
   const [image, setImage] = useState<Media | null>(null);
   const [uploading, setUploading] = useState(false);
   const [description, setDescription] = useState("");
+  const [slug, setSlug] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
+    useFieldErrors<Fields>();
+  useScrollToTop(error || fieldErrors);
 
   const fetchCategory = useCallback(async () => {
     if (!id) return;
@@ -40,8 +54,10 @@ export default function CategoryFormClient({ mode, id }: Props) {
 
       const data = await res.json();
       setName(data.name);
+      setSlug(data.slug);
       setImage(data.image);
       setDescription(data.description ?? "");
+      setIsActive(data.isActive);
     } catch {
       setError("Failed to load category");
     } finally {
@@ -53,6 +69,25 @@ export default function CategoryFormClient({ mode, id }: Props) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    clearAllFieldErrors();
+
+    let hasError = false;
+    if (!name) {
+      setFieldError("name", "Name is required");
+      hasError = true;
+    }
+    if (mode === "edit" && !slug) {
+      setFieldError("slug", "Slug is required");
+      hasError = true;
+    }
+    if (!image) {
+      setFieldError("image", "Image is required");
+      hasError = true;
+    }
+    if (hasError) {
+      setSaving(false);
+      return;
+    }
 
     try {
       const res = await fetch(
@@ -66,8 +101,10 @@ export default function CategoryFormClient({ mode, id }: Props) {
           },
           body: JSON.stringify({
             name,
+            slug,
             image,
             description,
+            isActive,
           }),
         }
       );
@@ -89,6 +126,13 @@ export default function CategoryFormClient({ mode, id }: Props) {
     if (mode === "edit") fetchCategory();
   }, [mode, fetchCategory]);
 
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = formatSlug(e.target.value);
+    setSlug(value);
+  };
+
+  const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
+
   return (
     <div className="max-w-2xl space-y-6">
       {/* Header */}
@@ -104,7 +148,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-500/10">
+              <div className="rounded-md bg-red-50 px-4 py-2 my-2 text-sm text-red-600 dark:bg-red-500/10">
                 {error}
               </div>
             )}
@@ -114,26 +158,53 @@ export default function CategoryFormClient({ mode, id }: Props) {
                 id="name"
                 placeholder="Toys"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                onChange={(e) => {
+                  clearFieldError("name");
+                  setError(null);
+                  setName(e.target.value);
+                }}
+                error={!!fieldErrors.name}
+                hint={fieldErrors.name}
                 autoFocus
               />
             </FormField>
 
+            {mode === "edit" && (
+              <FormField label="Slug" required htmlFor="slug">
+                <Input
+                  id="slug"
+                  placeholder="toys"
+                  value={slug}
+                  onChange={(e) => {
+                    clearFieldError("slug");
+                    setError(null);
+                    handleSlugChange(e);
+                  }}
+                  error={!!fieldErrors.slug}
+                  hint={fieldErrors.slug}
+                />
+              </FormField>
+            )}
+
             <FormField label="Image" required htmlFor="image">
-              <input
-                type="file"
+              <FileInput
+                id="image"
                 accept="image/*"
+                error={!!fieldErrors.image}
+                hint={fieldErrors.image}
+                disabled={uploading}
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
 
                   try {
                     setUploading(true);
+                    clearFieldError("image");
+                    setError(null);
                     const media = await uploadMedia(file, "categories");
                     setImage(media);
                   } catch (err: any) {
-                    setError(err.message);
+                    setFieldError("image", err.message ?? "Upload failed");
                   } finally {
                     setUploading(false);
                   }
@@ -163,9 +234,17 @@ export default function CategoryFormClient({ mode, id }: Props) {
               />
             </FormField>
 
+            <FormField label="Category Status">
+              <Switch
+                label={isActive ? "Active" : "Inactive"}
+                defaultChecked={isActive}
+                onChange={setIsActive}
+              />
+            </FormField>
+
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving || uploading}>
+              <Button type="submit" disabled={saving || uploading || hasErrors}>
                 {saving
                   ? "Saving..."
                   : mode === "create"

@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Pagination from "@/components/pagination/Pagination";
 import Image from "next/image";
-import { ListHeader, ListFilters, ListActions } from "@/components/listing";
+
+import { ListActions, ListFilters, ListHeader } from "@/components/listing";
+import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
+
 import type { Category, PaginationMeta } from "@/lib/types";
 
 export default function CategoriesListClient() {

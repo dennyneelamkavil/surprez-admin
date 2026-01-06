@@ -1,27 +1,32 @@
 "use client";
 
-import Checkbox from "@/components/form/input/Checkbox";
-import Input from "@/components/form/input/InputField";
-import Button from "@/components/ui/button/Button";
-import { EyeCloseIcon, EyeIcon } from "@/icons";
 import React, { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
+
+import { EyeCloseIcon, EyeIcon } from "@/icons";
+
+import Button from "@/components/ui/button/Button";
 import FormField from "@/components/form/FormField";
+import Input from "@/components/form/input/InputField";
+import Checkbox from "@/components/form/input/Checkbox";
+
+import { useFieldErrors } from "@/hooks/useFieldErrors";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
+
+type Fields = "username" | "password";
 
 export default function SignInForm() {
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [fieldErrors, setFieldErrors] = useState({
-    username: "",
-    password: "",
-  });
+  const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
+    useFieldErrors<Fields>();
+  useScrollToTop(error || fieldErrors);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -32,15 +37,19 @@ export default function SignInForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    setFieldErrors({ username: "", password: "" });
+    clearAllFieldErrors();
 
-    const errors = { username: "", password: "" };
+    let hasError = false;
 
-    if (!formData.username) errors.username = "Username is required";
-    if (!formData.password) errors.password = "Password is required";
-
-    if (errors.username || errors.password) {
-      setFieldErrors(errors);
+    if (!formData.username) {
+      setFieldError("username", "Username is required");
+      hasError = true;
+    }
+    if (!formData.password) {
+      setFieldError("password", "Password is required");
+      hasError = true;
+    }
+    if (hasError) {
       setLoading(false);
       return;
     }
@@ -78,6 +87,8 @@ export default function SignInForm() {
     }
   }
 
+  const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
+
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
@@ -92,6 +103,12 @@ export default function SignInForm() {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="rounded-md bg-red-50 px-4 py-2 my-2 text-sm text-red-600 dark:bg-red-500/10">
+              {error}
+            </div>
+          )}
+
           <div className="space-y-6">
             <FormField label="Username" required htmlFor="username">
               <Input
@@ -99,7 +116,8 @@ export default function SignInForm() {
                 placeholder="yourusername"
                 value={formData.username}
                 onChange={(e) => {
-                  setFieldErrors((prev) => ({ ...prev, username: "" }));
+                  clearFieldError("username");
+                  setError(null);
                   const value = e.target.value
                     .toLowerCase() // force lowercase
                     .replace(/\s+/g, "") // remove spaces
@@ -123,7 +141,8 @@ export default function SignInForm() {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={(e) => {
-                    setFieldErrors((prev) => ({ ...prev, password: "" }));
+                    clearFieldError("password");
+                    setError(null);
                     setFormData((prev) => ({
                       ...prev,
                       password: e.target.value,
@@ -153,17 +172,12 @@ export default function SignInForm() {
               </span>
             </div> */}
 
-            {/* Error */}
-            {error && (
-              <p className="text-sm text-error-500 text-center">{error}</p>
-            )}
-
             {/* Submit */}
             <Button
               type="submit"
               className="w-full"
               size="sm"
-              disabled={loading}
+              disabled={loading || hasErrors}
             >
               {loading ? "Signing in..." : "Sign in"}
             </Button>
