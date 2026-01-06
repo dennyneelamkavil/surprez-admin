@@ -20,7 +20,12 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  await requirePermission("product:read");
+  await requirePermission([
+    "product:read",
+    "productinventory:read",
+    "productinventory:create",
+    "productinventory:update",
+  ]);
 
   const { searchParams } = new URL(req.url);
 

@@ -24,7 +24,12 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  await requirePermission("subcategory:read");
+  await requirePermission([
+    "subcategory:read",
+    "product:read",
+    "product:create",
+    "product:update",
+  ]);
 
   const { searchParams } = new URL(req.url);
 

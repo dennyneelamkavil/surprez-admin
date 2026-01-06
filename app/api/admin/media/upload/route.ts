@@ -6,7 +6,14 @@ import { MediaFolder } from "@/server/media/media.types";
 /* ================= UPLOAD ================= */
 
 export async function POST(req: Request) {
-  await requirePermission("media:upload");
+  await requirePermission([
+    "category:create",
+    "category:update",
+    "subcategory:create",
+    "subcategory:update",
+    "product:create",
+    "product:update",
+  ]);
 
   const { searchParams } = new URL(req.url);
   const folder = searchParams.get("folder") as MediaFolder | null;

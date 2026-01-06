@@ -21,7 +21,12 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  await requirePermission("role:read");
+  await requirePermission([
+    "role:read",
+    "user:read",
+    "user:create",
+    "user:update",
+  ]);
 
   const { searchParams } = new URL(req.url);
 
