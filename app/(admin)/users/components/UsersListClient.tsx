@@ -13,7 +13,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { User, RoleBase, PaginationMeta } from "@/lib/types";
-import { deleteAction } from "@/lib/actions/deleteAction";
+import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function UsersListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +69,24 @@ export default function UsersListClient() {
       successMessage: "User deleted successfully",
       errorMessage: "Failed to delete user",
     });
+
+    if (success) {
+      fetchUsers();
+    }
+  }
+
+  async function handleToggleStatus(user: User) {
+    const success = await toggleAction(
+      `/api/admin/users/${user.id}`,
+      { isActive: !user.isActive },
+      {
+        confirmMessage: `Are you sure you want to ${
+          user.isActive ? "deactivate" : "activate"
+        } this user?`,
+        successMessage: "User status updated",
+        errorMessage: "Failed to update user status",
+      }
+    );
 
     if (success) {
       fetchUsers();
@@ -186,10 +204,13 @@ export default function UsersListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
+                        onToggle={() => handleToggleStatus(user)}
                         editHref={`/users/${user.id}/edit`}
+                        isActive={user.isActive}
                         onDelete={() => handleDelete(user.id)}
                         editPermission="user:update"
                         deletePermission="user:delete"
+                        disableToggle={user.username === "superadmin"}
                         disableDelete={user.username === "superadmin"}
                       />
                     </td>

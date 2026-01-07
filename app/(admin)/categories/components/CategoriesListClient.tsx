@@ -13,7 +13,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Category, PaginationMeta } from "@/lib/types";
-import { deleteAction } from "@/lib/actions/deleteAction";
+import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function CategoriesListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +59,24 @@ export default function CategoriesListClient() {
       successMessage: "Category deleted successfully",
       errorMessage: "Failed to delete category",
     });
+
+    if (success) {
+      fetchCategories();
+    }
+  }
+
+  async function handleToggleStatus(category: Category) {
+    const success = await toggleAction(
+      `/api/admin/categories/${category.id}`,
+      { isActive: !category.isActive },
+      {
+        confirmMessage: `Are you sure you want to ${
+          category.isActive ? "deactivate" : "activate"
+        } this category?`,
+        successMessage: "Category status updated",
+        errorMessage: "Failed to update category status",
+      }
+    );
 
     if (success) {
       fetchCategories();
@@ -156,7 +174,9 @@ export default function CategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
+                        onToggle={() => handleToggleStatus(category)}
                         editHref={`/categories/${category.id}/edit`}
+                        isActive={category.isActive}
                         onDelete={() => handleDelete(category.id)}
                         editPermission="category:update"
                         deletePermission="category:delete"

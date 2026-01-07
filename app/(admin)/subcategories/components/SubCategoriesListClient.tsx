@@ -14,7 +14,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { SubCategory, CategoryBase, PaginationMeta } from "@/lib/types";
-import { deleteAction } from "@/lib/actions/deleteAction";
+import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function SubCategoriesListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +70,24 @@ export default function SubCategoriesListClient() {
       successMessage: "Subcategory deleted successfully",
       errorMessage: "Failed to delete subcategory",
     });
+
+    if (success) {
+      fetchSubCategories();
+    }
+  }
+
+  async function handleToggleStatus(subcategory: SubCategory) {
+    const success = await toggleAction(
+      `/api/admin/subcategories/${subcategory.id}`,
+      { isActive: !subcategory.isActive },
+      {
+        confirmMessage: `Are you sure you want to ${
+          subcategory.isActive ? "deactivate" : "activate"
+        } this subcategory?`,
+        successMessage: "Subcategory status updated",
+        errorMessage: "Failed to update subcategory status",
+      }
+    );
 
     if (success) {
       fetchSubCategories();
@@ -192,7 +210,9 @@ export default function SubCategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
+                        onToggle={() => handleToggleStatus(subCat)}
                         editHref={`/subcategories/${subCat.id}/edit`}
+                        isActive={subCat.isActive}
                         onDelete={() => handleDelete(subCat.id)}
                         editPermission="subcategory:update"
                         deletePermission="subcategory:delete"

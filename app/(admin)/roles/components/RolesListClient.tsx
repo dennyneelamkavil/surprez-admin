@@ -12,7 +12,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Role, PaginationMeta } from "@/lib/types";
-import { deleteAction } from "@/lib/actions/deleteAction";
+import { deleteAction } from "@/lib/actions";
 
 export default function RolesListClient() {
   const [error, setError] = useState<string | null>(null);

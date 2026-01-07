@@ -14,7 +14,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Product, SubCategoryBase, PaginationMeta } from "@/lib/types";
-import { deleteAction } from "@/lib/actions/deleteAction";
+import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function ProductsListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +71,24 @@ export default function ProductsListClient() {
       successMessage: "Product deleted successfully",
       errorMessage: "Failed to delete product",
     });
+
+    if (success) {
+      fetchProducts();
+    }
+  }
+
+  async function handleToggleStatus(product: Product) {
+    const success = await toggleAction(
+      `/api/admin/products/${product.id}`,
+      { isActive: !product.isActive },
+      {
+        confirmMessage: `Are you sure you want to ${
+          product.isActive ? "deactivate" : "activate"
+        } this product?`,
+        successMessage: "Product status updated",
+        errorMessage: "Failed to update product status",
+      }
+    );
 
     if (success) {
       fetchProducts();
@@ -233,7 +251,9 @@ export default function ProductsListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
+                        onToggle={() => handleToggleStatus(product)}
                         editHref={`/products/${product.id}/edit`}
+                        isActive={product.isActive}
                         onDelete={() => handleDelete(product.id)}
                         editPermission="product:update"
                         deletePermission="product:delete"
