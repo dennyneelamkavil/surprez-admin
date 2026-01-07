@@ -1,15 +1,18 @@
 import "server-only";
+
 import { connectDB } from "@/server/db";
-import { SubCategoryModel } from "@/server/models/subcategory.model";
 import { CategoryModel } from "@/server/models/category.model";
+import { SubCategoryModel } from "@/server/models/subcategory.model";
+import { ProductModel } from "@/server/models/product.model";
+
 import { mapSubCategory } from "@/server/subcategory/subcategory.mapper";
 import type {
   CreateSubCategoryInput,
   UpdateSubCategoryInput,
 } from "@/server/subcategory/subcategory.validation";
+
 import { generateUniqueSubCategorySlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
-import { ProductModel } from "@/server/models/product.model";
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */

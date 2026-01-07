@@ -1,14 +1,17 @@
 import "server-only";
+
 import { connectDB } from "@/server/db";
 import { CategoryModel } from "@/server/models/category.model";
+import { SubCategoryModel } from "@/server/models/subcategory.model";
+
 import { mapCategory } from "@/server/category/category.mapper";
 import type {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from "@/server/category/category.validation";
+
 import { generateUniqueCategorySlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
-import { SubCategoryModel } from "@/server/models/subcategory.model";
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */

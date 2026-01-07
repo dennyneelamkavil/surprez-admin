@@ -1,16 +1,19 @@
 import "server-only";
+
 import { connectDB } from "@/server/db";
 import { ProductModel } from "@/server/models/product.model";
 import { SubCategoryModel } from "@/server/models/subcategory.model";
+import { ProductInventoryModel } from "@/server/models/product-inventory.model";
+import { ReviewModel } from "@/server/models/review.model";
+
 import { mapProduct } from "@/server/product/product.mapper";
 import type {
   CreateProductInput,
   UpdateProductInput,
 } from "@/server/product/product.validation";
+
 import { generateUniqueProductSlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
-import { ProductInventoryModel } from "@/server/models/product-inventory.model";
-import { ReviewModel } from "@/server/models/review.model";
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */

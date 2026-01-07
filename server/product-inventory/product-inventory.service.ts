@@ -1,7 +1,9 @@
 import "server-only";
+
 import { connectDB } from "@/server/db";
 import { ProductInventoryModel } from "@/server/models/product-inventory.model";
 import { ProductModel } from "@/server/models/product.model";
+
 import { mapProductInventory } from "@/server/product-inventory/product-inventory.mapper";
 import type {
   CreateProductInventoryInput,

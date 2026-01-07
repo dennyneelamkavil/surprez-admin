@@ -1,10 +1,13 @@
 import "server-only";
+
 import { getServerSession } from "next-auth";
 import { headers } from "next/headers";
 import jwt from "jsonwebtoken";
+
 import { authOptions } from "@/server/auth/config";
-import type { RoleWithPermissionKeys } from "@/lib/types";
+
 import { hasPermission } from "@/lib/authorization";
+import type { RoleWithPermissionKeys } from "@/lib/types";
 
 type JwtPayload = {
   sub: string;

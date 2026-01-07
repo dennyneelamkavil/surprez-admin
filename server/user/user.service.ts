@@ -1,14 +1,18 @@
 import "server-only";
+
 import bcrypt from "bcryptjs";
+
 import { connectDB } from "@/server/db";
 import { UserModel } from "@/server/models/user.model";
 import "@/server/models/role.model";
 import "@/server/models/permission.model";
+
 import { mapUser } from "@/server/user/user.mapper";
 import type {
   CreateUserInput,
   UpdateUserInput,
 } from "@/server/user/user.validation";
+
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= VERIFY ================= */

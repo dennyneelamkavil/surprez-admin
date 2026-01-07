@@ -1,12 +1,15 @@
 import "server-only";
+
 import { connectDB } from "@/server/db";
 import { PermissionModel } from "@/server/models/permission.model";
+import { RoleModel } from "@/server/models/role.model";
+
 import { mapPermission } from "@/server/permission/permission.mapper";
 import type {
   CreatePermissionInput,
   UpdatePermissionInput,
 } from "@/server/permission/permission.validation";
-import { RoleModel } from "@/server/models/role.model";
+
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
