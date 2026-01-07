@@ -73,6 +73,7 @@ export default function SignInForm() {
         autoClose: 3000,
       });
 
+      router.refresh();
       router.push("/");
     } catch (err: any) {
       toast.update(toastId, {
