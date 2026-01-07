@@ -14,6 +14,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { SubCategory, CategoryBase, PaginationMeta } from "@/lib/types";
+import { deleteAction } from "@/lib/actions/deleteAction";
 
 export default function SubCategoriesListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -64,14 +65,15 @@ export default function SubCategoriesListClient() {
   }, [page, search, category]);
 
   async function handleDelete(id: string) {
-    const ok = confirm("Are you sure you want to delete this subcategory?");
-    if (!ok) return;
-
-    await fetch(`/api/admin/subcategories/${id}`, {
-      method: "DELETE",
+    const success = await deleteAction(`/api/admin/subcategories/${id}`, {
+      confirmMessage: "Are you sure you want to delete this subcategory?",
+      successMessage: "Subcategory deleted successfully",
+      errorMessage: "Failed to delete subcategory",
     });
 
-    fetchSubCategories();
+    if (success) {
+      fetchSubCategories();
+    }
   }
 
   useEffect(() => {

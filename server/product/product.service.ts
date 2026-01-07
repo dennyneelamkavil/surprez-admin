@@ -11,6 +11,7 @@ import { generateUniqueProductSlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
 import { ProductInventoryModel } from "@/server/models/product-inventory.model";
 import { ReviewModel } from "@/server/models/review.model";
+import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
 export async function createProduct(input: CreateProductInput) {
@@ -23,7 +24,7 @@ export async function createProduct(input: CreateProductInput) {
       _id: { $in: input.subcategories },
     });
     if (count !== input.subcategories.length) {
-      throw new Error("One or more subcategories are invalid");
+      throw new AppError("One or more subcategories are invalid", 400);
     }
   }
 
@@ -107,7 +108,9 @@ export async function getProductById(id: string) {
     .populate("subcategories")
     .lean();
 
-  if (!product) throw new Error("Product not found");
+  if (!product) {
+    throw new AppError("Product not found", 404);
+  }
   return mapProduct(product);
 }
 
@@ -116,14 +119,16 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
   await connectDB();
 
   const existing = await ProductModel.findById(id);
-  if (!existing) throw new Error("Product not found");
+  if (!existing) {
+    throw new AppError("Product not found", 404);
+  }
 
   if (input.subcategories?.length) {
     const count = await SubCategoryModel.countDocuments({
       _id: { $in: input.subcategories },
     });
     if (count !== input.subcategories.length) {
-      throw new Error("One or more subcategories are invalid");
+      throw new AppError("One or more subcategories are invalid", 400);
     }
   }
 
@@ -177,20 +182,24 @@ export async function deleteProduct(id: string) {
     product: id,
   });
   if (hasInventory) {
-    throw new Error(
-      "Cannot delete product: inventories exist for this product"
+    throw new AppError(
+      "Cannot delete product: inventories exist for this product",
+      409
     );
   }
   const hasReviews = await ReviewModel.exists?.({
     product: id,
   });
   if (hasReviews) {
-    throw new Error("Cannot delete product: reviews exist for this product");
+    throw new AppError(
+      "Cannot delete product: reviews exist for this product",
+      409
+    );
   }
 
   const product = await ProductModel.findByIdAndDelete(id);
   if (!product) {
-    throw new Error("Product not found");
+    throw new AppError("Product not found", 404);
   }
 
   // delete images, videos and cover image from cloudinary

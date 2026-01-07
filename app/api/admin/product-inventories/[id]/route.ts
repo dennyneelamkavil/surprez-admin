@@ -6,42 +6,55 @@ import {
   deleteProductInventory,
 } from "@/server/product-inventory/product-inventory.service";
 import { UpdateProductInventorySchema } from "@/server/product-inventory/product-inventory.validation";
+import { handleApiError } from "@/server/errors/handleApiError";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  await requirePermission("productinventory:read");
-  return NextResponse.json(await getProductInventoryById(id));
+  try {
+    const { id } = await params;
+    await requirePermission("productinventory:read");
+    return NextResponse.json(await getProductInventoryById(id));
+  } catch (err) {
+    return handleApiError(err);
+  }
 }
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  await requirePermission("productinventory:update");
+  try {
+    const { id } = await params;
+    await requirePermission("productinventory:update");
 
-  const body = await request.json();
-  const parsed = UpdateProductInventorySchema.safeParse(body);
+    const body = await request.json();
+    const parsed = UpdateProductInventorySchema.safeParse(body);
 
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 }
-    );
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(await updateProductInventory(id, parsed.data));
+  } catch (err) {
+    return handleApiError(err);
   }
-
-  return NextResponse.json(await updateProductInventory(id, parsed.data));
 }
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  await requirePermission("productinventory:delete");
-  await deleteProductInventory(id);
-  return NextResponse.json({ success: true });
+  try {
+    const { id } = await params;
+    await requirePermission("productinventory:delete");
+    await deleteProductInventory(id);
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return handleApiError(err);
+  }
 }

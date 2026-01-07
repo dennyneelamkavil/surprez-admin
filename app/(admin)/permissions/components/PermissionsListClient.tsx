@@ -12,6 +12,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Permission, PaginationMeta } from "@/lib/types";
+import { deleteAction } from "@/lib/actions/deleteAction";
 
 export default function PermissionsListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -52,14 +53,15 @@ export default function PermissionsListClient() {
   }, [page, search]);
 
   async function handleDelete(id: string) {
-    const ok = confirm("Are you sure you want to delete this permission?");
-    if (!ok) return;
-
-    await fetch(`/api/admin/permissions/${id}`, {
-      method: "DELETE",
+    const success = await deleteAction(`/api/admin/permissions/${id}`, {
+      confirmMessage: "Are you sure you want to delete this permission?",
+      successMessage: "Permission deleted successfully",
+      errorMessage: "Failed to delete permission",
     });
 
-    fetchPermissions();
+    if (success) {
+      fetchPermissions();
+    }
   }
 
   useEffect(() => {

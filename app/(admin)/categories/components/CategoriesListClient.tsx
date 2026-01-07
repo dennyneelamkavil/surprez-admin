@@ -13,6 +13,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Category, PaginationMeta } from "@/lib/types";
+import { deleteAction } from "@/lib/actions/deleteAction";
 
 export default function CategoriesListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -53,14 +54,15 @@ export default function CategoriesListClient() {
   }, [page, search]);
 
   async function handleDelete(id: string) {
-    const ok = confirm("Are you sure you want to delete this category?");
-    if (!ok) return;
-
-    await fetch(`/api/admin/categories/${id}`, {
-      method: "DELETE",
+    const success = await deleteAction(`/api/admin/categories/${id}`, {
+      confirmMessage: "Are you sure you want to delete this category?",
+      successMessage: "Category deleted successfully",
+      errorMessage: "Failed to delete category",
     });
 
-    fetchCategories();
+    if (success) {
+      fetchCategories();
+    }
   }
 
   useEffect(() => {

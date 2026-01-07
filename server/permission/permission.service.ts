@@ -7,13 +7,16 @@ import type {
   UpdatePermissionInput,
 } from "@/server/permission/permission.validation";
 import { RoleModel } from "@/server/models/role.model";
+import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
 export async function createPermission(input: CreatePermissionInput) {
   await connectDB();
 
   const exists = await PermissionModel.findOne({ key: input.key });
-  if (exists) throw new Error("Permission already exists");
+  if (exists) {
+    throw new AppError("Permission already exists", 409);
+  }
 
   const permission = await PermissionModel.create(input);
   return mapPermission(permission);
@@ -76,7 +79,9 @@ export async function getPermissionById(id: string) {
   await connectDB();
 
   const permission = await PermissionModel.findById(id).lean();
-  if (!permission) throw new Error("Permission not found");
+  if (!permission) {
+    throw new AppError("Permission not found", 404);
+  }
 
   return mapPermission(permission);
 }
@@ -92,7 +97,9 @@ export async function updatePermission(
     new: true,
   });
 
-  if (!permission) throw new Error("Permission not found");
+  if (!permission) {
+    throw new AppError("Permission not found", 404);
+  }
   return mapPermission(permission);
 }
 
@@ -104,14 +111,15 @@ export async function deletePermission(id: string) {
     permissions: id,
   });
   if (usedInRole) {
-    throw new Error(
-      "Cannot delete permission: it is assigned to one or more roles"
+    throw new AppError(
+      "Cannot delete permission: it is assigned to one or more roles",
+      409
     );
   }
 
   const permission = await PermissionModel.findByIdAndDelete(id);
   if (!permission) {
-    throw new Error("Permission not found");
+    throw new AppError("Permission not found", 404);
   }
 
   return { success: true };

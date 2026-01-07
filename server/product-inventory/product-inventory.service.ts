@@ -7,6 +7,7 @@ import type {
   CreateProductInventoryInput,
   UpdateProductInventoryInput,
 } from "@/server/product-inventory/product-inventory.validation";
+import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
 export async function createProductInventory(
@@ -17,12 +18,16 @@ export async function createProductInventory(
   const productExists = await ProductModel.exists({
     _id: input.product,
   });
-  if (!productExists) throw new Error("Product not found");
+  if (!productExists) {
+    throw new AppError("Product not found", 404);
+  }
 
   const skuExists = await ProductInventoryModel.findOne({
     sku: input.sku,
   });
-  if (skuExists) throw new Error("SKU already exists");
+  if (skuExists) {
+    throw new AppError("SKU already exists", 409);
+  }
 
   const inventory = await ProductInventoryModel.create({
     ...input,
@@ -55,7 +60,9 @@ export async function getProductInventoryById(id: string) {
     .populate("product")
     .lean();
 
-  if (!inventory) throw new Error("Inventory not found");
+  if (!inventory) {
+    throw new AppError("Inventory not found", 404);
+  }
   return mapProductInventory(inventory);
 }
 
@@ -70,7 +77,9 @@ export async function updateProductInventory(
     new: true,
   }).populate("product");
 
-  if (!inventory) throw new Error("Inventory not found");
+  if (!inventory) {
+    throw new AppError("Inventory not found", 404);
+  }
   return mapProductInventory(inventory);
 }
 
@@ -80,6 +89,8 @@ export async function deleteProductInventory(id: string) {
 
   const inventory = await ProductInventoryModel.findByIdAndDelete(id);
 
-  if (!inventory) throw new Error("Inventory not found");
+  if (!inventory) {
+    throw new AppError("Inventory not found", 404);
+  }
   return { success: true };
 }

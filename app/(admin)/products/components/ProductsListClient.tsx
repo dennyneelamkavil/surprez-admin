@@ -14,6 +14,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Product, SubCategoryBase, PaginationMeta } from "@/lib/types";
+import { deleteAction } from "@/lib/actions/deleteAction";
 
 export default function ProductsListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -65,14 +66,15 @@ export default function ProductsListClient() {
   }, [page, search, subcategory, isFeatured]);
 
   async function handleDelete(id: string) {
-    const ok = confirm("Are you sure you want to delete this product?");
-    if (!ok) return;
-
-    await fetch(`/api/admin/products/${id}`, {
-      method: "DELETE",
+    const success = await deleteAction(`/api/admin/products/${id}`, {
+      confirmMessage: "Are you sure you want to delete this product?",
+      successMessage: "Product deleted successfully",
+      errorMessage: "Failed to delete product",
     });
 
-    fetchProducts();
+    if (success) {
+      fetchProducts();
+    }
   }
 
   useEffect(() => {

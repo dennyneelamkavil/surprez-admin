@@ -8,13 +8,16 @@ import type {
   UpdateRoleInput,
 } from "@/server/role/role.validation";
 import { UserModel } from "@/server/models/user.model";
+import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
 export async function createRole(input: CreateRoleInput) {
   await connectDB();
 
   const exists = await RoleModel.findOne({ name: input.name });
-  if (exists) throw new Error("Role already exists");
+  if (exists) {
+    throw new AppError("Role already exists", 409);
+  }
 
   const role = await RoleModel.create({
     name: input.name,
@@ -85,7 +88,9 @@ export async function getRoleById(id: string) {
 
   const role = await RoleModel.findById(id).populate("permissions").lean();
 
-  if (!role) throw new Error("Role not found");
+  if (!role) {
+    throw new AppError("Role not found", 404);
+  }
   return mapRole(role);
 }
 
@@ -97,7 +102,9 @@ export async function updateRole(id: string, input: UpdateRoleInput) {
     new: true,
   }).populate("permissions");
 
-  if (!role) throw new Error("Role not found");
+  if (!role) {
+    throw new AppError("Role not found", 404);
+  }
   return mapRole(role);
 }
 
@@ -109,14 +116,15 @@ export async function deleteRole(id: string) {
     role: id,
   });
   if (roleInUse) {
-    throw new Error(
-      "Cannot delete role: one or more users are assigned to this role"
+    throw new AppError(
+      "Cannot delete role: one or more users are assigned to this role",
+      409
     );
   }
 
   const role = await RoleModel.findByIdAndDelete(id);
   if (!role) {
-    throw new Error("Role not found");
+    throw new AppError("Role not found", 404);
   }
 
   return { success: true };

@@ -5,30 +5,39 @@ import {
   listProductInventories,
 } from "@/server/product-inventory/product-inventory.service";
 import { CreateProductInventorySchema } from "@/server/product-inventory/product-inventory.validation";
+import { handleApiError } from "@/server/errors/handleApiError";
 
 export async function POST(req: Request) {
-  await requirePermission("productinventory:create");
+  try {
+    await requirePermission("productinventory:create");
 
-  const body = await req.json();
-  const parsed = CreateProductInventorySchema.safeParse(body);
+    const body = await req.json();
+    const parsed = CreateProductInventorySchema.safeParse(body);
 
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 }
-    );
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(await createProductInventory(parsed.data), {
+      status: 201,
+    });
+  } catch (err) {
+    return handleApiError(err);
   }
-
-  return NextResponse.json(await createProductInventory(parsed.data), {
-    status: 201,
-  });
 }
 
 export async function GET(req: Request) {
-  await requirePermission("productinventory:read");
+  try {
+    await requirePermission("productinventory:read");
 
-  const { searchParams } = new URL(req.url);
-  const productId = searchParams.get("productId") ?? undefined;
+    const { searchParams } = new URL(req.url);
+    const productId = searchParams.get("productId") ?? undefined;
 
-  return NextResponse.json(await listProductInventories({ productId }));
+    return NextResponse.json(await listProductInventories({ productId }));
+  } catch (err) {
+    return handleApiError(err);
+  }
 }

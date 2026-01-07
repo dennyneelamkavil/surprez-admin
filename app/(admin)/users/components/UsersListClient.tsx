@@ -13,6 +13,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { User, RoleBase, PaginationMeta } from "@/lib/types";
+import { deleteAction } from "@/lib/actions/deleteAction";
 
 export default function UsersListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -63,14 +64,15 @@ export default function UsersListClient() {
   }, [page, search, role]);
 
   async function handleDelete(id: string) {
-    const ok = confirm("Are you sure you want to delete this user?");
-    if (!ok) return;
-
-    await fetch(`/api/admin/users/${id}`, {
-      method: "DELETE",
+    const success = await deleteAction(`/api/admin/users/${id}`, {
+      confirmMessage: "Are you sure you want to delete this user?",
+      successMessage: "User deleted successfully",
+      errorMessage: "Failed to delete user",
     });
 
-    fetchUsers();
+    if (success) {
+      fetchUsers();
+    }
   }
 
   useEffect(() => {

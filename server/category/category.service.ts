@@ -9,6 +9,7 @@ import type {
 import { generateUniqueCategorySlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
 import { SubCategoryModel } from "@/server/models/subcategory.model";
+import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
 export async function createCategory(input: CreateCategoryInput) {
@@ -82,7 +83,9 @@ export async function getCategoryById(id: string) {
   await connectDB();
 
   const category = await CategoryModel.findById(id).lean();
-  if (!category) throw new Error("Category not found");
+  if (!category) {
+    throw new AppError("Category not found", 404);
+  }
 
   return mapCategory(category);
 }
@@ -92,7 +95,9 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
   await connectDB();
 
   const existing = await CategoryModel.findById(id);
-  if (!existing) throw new Error("Category not found");
+  if (!existing) {
+    throw new AppError("Category not found", 404);
+  }
 
   const updateData: any = { ...input };
 
@@ -129,7 +134,9 @@ export async function deleteCategory(id: string) {
 
   const category = await CategoryModel.findByIdAndDelete(id);
   if (!category) {
-    throw new Error("Category not found");
+    {
+      throw new AppError("Category not found", 404);
+    }
   }
 
   // Delete category image

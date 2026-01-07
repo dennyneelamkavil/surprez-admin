@@ -9,6 +9,7 @@ import type {
   CreateUserInput,
   UpdateUserInput,
 } from "@/server/user/user.validation";
+import { AppError } from "@/server/errors/AppError";
 
 /* ================= VERIFY ================= */
 export async function verifyUser(username: string, password: string) {
@@ -43,7 +44,9 @@ export async function createUser(input: CreateUserInput) {
   await connectDB();
 
   const exists = await UserModel.findOne({ username: input.username }).lean();
-  if (exists) throw new Error("Username already taken");
+  if (exists) {
+    throw new AppError("Username already taken", 409);
+  }
 
   const passwordHash = await bcrypt.hash(input.password, 12);
 
@@ -140,7 +143,9 @@ export async function getUserById(id: string) {
     })
     .lean();
 
-  if (!user) throw new Error("User not found");
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
   return mapUser(user);
 }
 
@@ -161,20 +166,20 @@ export async function updateUser(id: string, input: UpdateUserInput) {
     populate: { path: "permissions" },
   });
 
-  if (!user) throw new Error("User not found");
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
   return mapUser(user);
 }
 
-/* ================= SOFT DELETE ================= */
+/* ================= DELETE ================= */
 export async function deleteUser(id: string) {
   await connectDB();
 
-  const user = await UserModel.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const user = await UserModel.findByIdAndDelete(id);
 
-  if (!user) throw new Error("User not found");
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
   return { success: true };
 }

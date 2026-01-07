@@ -12,6 +12,7 @@ import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Role, PaginationMeta } from "@/lib/types";
+import { deleteAction } from "@/lib/actions/deleteAction";
 
 export default function RolesListClient() {
   const [error, setError] = useState<string | null>(null);
@@ -51,12 +52,15 @@ export default function RolesListClient() {
   }, [page, search]);
 
   async function handleDelete(id: string) {
-    const ok = confirm("Are you sure you want to delete this role?");
-    if (!ok) return;
+    const success = await deleteAction(`/api/admin/roles/${id}`, {
+      confirmMessage: "Are you sure you want to delete this role?",
+      successMessage: "Role deleted successfully",
+      errorMessage: "Failed to delete role",
+    });
 
-    await fetch(`/api/admin/roles/${id}`, { method: "DELETE" });
-
-    fetchRoles();
+    if (success) {
+      fetchRoles();
+    }
   }
 
   useEffect(() => {

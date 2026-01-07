@@ -10,6 +10,7 @@ import type {
 import { generateUniqueSubCategorySlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
 import { ProductModel } from "@/server/models/product.model";
+import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
 export async function createSubCategory(input: CreateSubCategoryInput) {
@@ -18,7 +19,9 @@ export async function createSubCategory(input: CreateSubCategoryInput) {
   const categoryExists = await CategoryModel.exists({
     _id: input.category,
   });
-  if (!categoryExists) throw new Error("Category not found");
+  if (!categoryExists) {
+    throw new AppError("Category not found", 404);
+  }
 
   const slug = await generateUniqueSubCategorySlug(input.name);
 
@@ -99,7 +102,9 @@ export async function getSubCategoryById(id: string) {
     .populate("category")
     .lean();
 
-  if (!subCategory) throw new Error("SubCategory not found");
+  if (!subCategory) {
+    throw new AppError("SubCategory not found", 404);
+  }
   return mapSubCategory(subCategory);
 }
 
@@ -111,13 +116,17 @@ export async function updateSubCategory(
   await connectDB();
 
   const existing = await SubCategoryModel.findById(id);
-  if (!existing) throw new Error("SubCategory not found");
+  if (!existing) {
+    throw new AppError("SubCategory not found", 404);
+  }
 
   if (input.category) {
     const categoryExists = await CategoryModel.exists({
       _id: input.category,
     });
-    if (!categoryExists) throw new Error("Category not found");
+    if (!categoryExists) {
+      throw new AppError("Category not found", 404);
+    }
   }
 
   const updateData: any = { ...input };
@@ -148,14 +157,15 @@ export async function deleteSubCategory(id: string) {
     subcategories: id,
   });
   if (isUsed) {
-    throw new Error(
-      "Cannot delete subcategory: products are linked to this subcategory"
+    throw new AppError(
+      "Cannot delete subcategory: products are linked to this subcategory",
+      409
     );
   }
 
   const subCategory = await SubCategoryModel.findByIdAndDelete(id);
   if (!subCategory) {
-    throw new Error("SubCategory not found");
+    throw new AppError("SubCategory not found", 404);
   }
 
   // Delete subcategory image
