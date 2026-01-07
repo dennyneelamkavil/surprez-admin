@@ -59,7 +59,7 @@ export default function SignInForm() {
       const res = await signIn("credentials", {
         username: formData.username,
         password: formData.password,
-        redirect: false,
+        callbackUrl: "/",
       });
 
       if (!res || !res.ok) {
@@ -72,9 +72,6 @@ export default function SignInForm() {
         isLoading: false,
         autoClose: 3000,
       });
-
-      router.refresh();
-      router.push("/");
     } catch (err: any) {
       toast.update(toastId, {
         render: err.message || "Sign in failed",
