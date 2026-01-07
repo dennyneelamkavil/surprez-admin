@@ -9,6 +9,7 @@ import type {
 } from "@/server/subcategory/subcategory.validation";
 import { generateUniqueSubCategorySlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
+import { ProductModel } from "@/server/models/product.model";
 
 /* ================= CREATE ================= */
 export async function createSubCategory(input: CreateSubCategoryInput) {
@@ -139,18 +140,25 @@ export async function updateSubCategory(
   return mapSubCategory(updated);
 }
 
-/* ================= SOFT DELETE ================= */
+/* ================= DELETE ================= */
 export async function deleteSubCategory(id: string) {
   await connectDB();
 
-  const subCategory = await SubCategoryModel.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const isUsed = await ProductModel.exists({
+    subcategories: id,
+  });
+  if (isUsed) {
+    throw new Error(
+      "Cannot delete subcategory: products are linked to this subcategory"
+    );
+  }
 
-  if (!subCategory) throw new Error("SubCategory not found");
+  const subCategory = await SubCategoryModel.findByIdAndDelete(id);
+  if (!subCategory) {
+    throw new Error("SubCategory not found");
+  }
 
+  // Delete subcategory image
   if (subCategory?.image?.publicId) {
     await deleteFromCloudinary(
       subCategory.image.publicId,

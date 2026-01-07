@@ -74,15 +74,11 @@ export async function updateProductInventory(
   return mapProductInventory(inventory);
 }
 
-/* ================= SOFT DELETE ================= */
+/* ================= DELETE ================= */
 export async function deleteProductInventory(id: string) {
   await connectDB();
 
-  const inventory = await ProductInventoryModel.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const inventory = await ProductInventoryModel.findByIdAndDelete(id);
 
   if (!inventory) throw new Error("Inventory not found");
   return { success: true };

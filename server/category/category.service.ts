@@ -8,6 +8,7 @@ import type {
 } from "@/server/category/category.validation";
 import { generateUniqueCategorySlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
+import { SubCategoryModel } from "@/server/models/subcategory.model";
 
 /* ================= CREATE ================= */
 export async function createCategory(input: CreateCategoryInput) {
@@ -113,18 +114,25 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
   return mapCategory(updated);
 }
 
-/* ================= SOFT DELETE ================= */
+/* ================= DELETE ================= */
 export async function deleteCategory(id: string) {
   await connectDB();
 
-  const category = await CategoryModel.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const isUsed = await SubCategoryModel.exists({
+    category: id,
+  });
+  if (isUsed) {
+    throw new Error(
+      "Cannot delete category: subcategories are linked to this category"
+    );
+  }
 
-  if (!category) throw new Error("Category not found");
+  const category = await CategoryModel.findByIdAndDelete(id);
+  if (!category) {
+    throw new Error("Category not found");
+  }
 
+  // Delete category image
   if (category?.image?.publicId) {
     await deleteFromCloudinary(
       category.image.publicId,

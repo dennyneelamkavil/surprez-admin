@@ -6,6 +6,7 @@ import type {
   CreatePermissionInput,
   UpdatePermissionInput,
 } from "@/server/permission/permission.validation";
+import { RoleModel } from "@/server/models/role.model";
 
 /* ================= CREATE ================= */
 export async function createPermission(input: CreatePermissionInput) {
@@ -99,8 +100,19 @@ export async function updatePermission(
 export async function deletePermission(id: string) {
   await connectDB();
 
+  const usedInRole = await RoleModel.exists({
+    permissions: id,
+  });
+  if (usedInRole) {
+    throw new Error(
+      "Cannot delete permission: it is assigned to one or more roles"
+    );
+  }
+
   const permission = await PermissionModel.findByIdAndDelete(id);
-  if (!permission) throw new Error("Permission not found");
+  if (!permission) {
+    throw new Error("Permission not found");
+  }
 
   return { success: true };
 }

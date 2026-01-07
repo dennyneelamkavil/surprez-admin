@@ -7,6 +7,7 @@ import type {
   CreateRoleInput,
   UpdateRoleInput,
 } from "@/server/role/role.validation";
+import { UserModel } from "@/server/models/user.model";
 
 /* ================= CREATE ================= */
 export async function createRole(input: CreateRoleInput) {
@@ -104,8 +105,19 @@ export async function updateRole(id: string, input: UpdateRoleInput) {
 export async function deleteRole(id: string) {
   await connectDB();
 
+  const roleInUse = await UserModel.exists({
+    role: id,
+  });
+  if (roleInUse) {
+    throw new Error(
+      "Cannot delete role: one or more users are assigned to this role"
+    );
+  }
+
   const role = await RoleModel.findByIdAndDelete(id);
-  if (!role) throw new Error("Role not found");
+  if (!role) {
+    throw new Error("Role not found");
+  }
 
   return { success: true };
 }

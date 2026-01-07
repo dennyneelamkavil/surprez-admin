@@ -9,6 +9,8 @@ import type {
 } from "@/server/product/product.validation";
 import { generateUniqueProductSlug } from "@/server/utils/slug.util";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
+import { ProductInventoryModel } from "@/server/models/product-inventory.model";
+import { ReviewModel } from "@/server/models/review.model";
 
 /* ================= CREATE ================= */
 export async function createProduct(input: CreateProductInput) {
@@ -167,30 +169,43 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
   return mapProduct(updated);
 }
 
-/* ================= SOFT DELETE ================= */
+/* ================= DELETE ================= */
 export async function deleteProduct(id: string) {
   await connectDB();
 
-  const product = await ProductModel.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const hasInventory = await ProductInventoryModel.exists({
+    product: id,
+  });
+  if (hasInventory) {
+    throw new Error(
+      "Cannot delete product: inventories exist for this product"
+    );
+  }
+  const hasReviews = await ReviewModel.exists?.({
+    product: id,
+  });
+  if (hasReviews) {
+    throw new Error("Cannot delete product: reviews exist for this product");
+  }
 
-  if (!product) throw new Error("Product not found");
+  const product = await ProductModel.findByIdAndDelete(id);
+  if (!product) {
+    throw new Error("Product not found");
+  }
 
-  for (const img of product.images) {
+  // delete images, videos and cover image from cloudinary
+  for (const img of product.images ?? []) {
     await deleteFromCloudinary(img.publicId, "image");
   }
-
-  for (const vid of product.videos) {
+  for (const vid of product.videos ?? []) {
     await deleteFromCloudinary(vid.publicId, "video");
   }
-
-  await deleteFromCloudinary(
-    product.coverImage.publicId,
-    product.coverImage.resourceType
-  );
+  if (product.coverImage?.publicId) {
+    await deleteFromCloudinary(
+      product.coverImage.publicId,
+      product.coverImage.resourceType
+    );
+  }
 
   return { success: true };
 }
