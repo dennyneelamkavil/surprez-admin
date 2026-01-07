@@ -56,15 +56,11 @@ export default function SignInForm() {
 
     const toastId = toast.loading("Signing in...");
     try {
-      const res = await signIn("credentials", {
+      await signIn("credentials", {
         username: formData.username,
         password: formData.password,
         callbackUrl: "/",
       });
-
-      if (!res || !res.ok) {
-        throw new Error(res?.error || "Invalid username or password");
-      }
 
       toast.update(toastId, {
         render: "Signed in successfully",
