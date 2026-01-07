@@ -75,9 +75,8 @@ export default function SignInForm() {
         autoClose: 3000,
       });
 
-      router.refresh();
-      console.log("log after refresh");
-      router.push("/");
+      console.log("log after toast");
+      router.replace("/");
       console.log("log after push");
     } catch (err: any) {
       toast.update(toastId, {
