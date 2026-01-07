@@ -73,7 +73,7 @@ export default function SignInForm() {
         autoClose: 3000,
       });
 
-      router.push("/");
+      window.location.href = "/";
     } catch (err: any) {
       toast.update(toastId, {
         render: err.message || "Sign in failed",
