@@ -75,10 +75,10 @@ export default function SignInForm() {
         autoClose: 3000,
       });
 
-      setTimeout(() => {
-        router.refresh();
-        router.push("/");
-      }, 300);
+      router.refresh();
+      console.log("log after refresh");
+      router.push("/");
+      console.log("log after push");
     } catch (err: any) {
       toast.update(toastId, {
         render: err.message || "Sign in failed",
