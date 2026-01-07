@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { ListActions, ListFilters, ListHeader } from "@/components/listing";
+import {
+  ListActions,
+  ListError,
+  ListFilters,
+  ListHeader,
+} from "@/components/listing";
 import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
@@ -10,6 +15,7 @@ import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import type { User, RoleBase, PaginationMeta } from "@/lib/types";
 
 export default function UsersListClient() {
+  const [error, setError] = useState<string | null>(null);
   const [roles, setRoles] = useState<RoleBase[]>([]);
   const [role, setRole] = useState("");
   const [users, setUsers] = useState<User[]>([]);
@@ -49,6 +55,8 @@ export default function UsersListClient() {
           totalPages: data.pagination.totalPages,
         });
       }
+    } catch (error: any) {
+      setError(error.message ?? "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -142,6 +150,8 @@ export default function UsersListClient() {
             <tbody>
               {loading ? (
                 <TableSkeleton columns={6} />
+              ) : error ? (
+                <ListError error={error} columns={6} />
               ) : users.length === 0 ? (
                 <tr>
                   <td

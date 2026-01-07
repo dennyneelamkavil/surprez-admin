@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
-import { ListActions, ListFilters, ListHeader } from "@/components/listing";
+import {
+  ListActions,
+  ListError,
+  ListFilters,
+  ListHeader,
+} from "@/components/listing";
 import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
@@ -11,6 +16,7 @@ import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import type { SubCategory, CategoryBase, PaginationMeta } from "@/lib/types";
 
 export default function SubCategoriesListClient() {
+  const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<CategoryBase[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
@@ -50,6 +56,8 @@ export default function SubCategoriesListClient() {
           totalPages: data.pagination.totalPages,
         });
       }
+    } catch (error: any) {
+      setError(error.message ?? "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -142,6 +150,8 @@ export default function SubCategoriesListClient() {
             <tbody>
               {loading ? (
                 <TableSkeleton columns={6} />
+              ) : error ? (
+                <ListError error={error} columns={6} />
               ) : subCategories.length === 0 ? (
                 <tr>
                   <td

@@ -2,13 +2,19 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { ListActions, ListFilters, ListHeader } from "@/components/listing";
+import {
+  ListActions,
+  ListError,
+  ListFilters,
+  ListHeader,
+} from "@/components/listing";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Role, PaginationMeta } from "@/lib/types";
 
 export default function RolesListClient() {
+  const [error, setError] = useState<string | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -37,6 +43,8 @@ export default function RolesListClient() {
           totalPages: data.pagination.totalPages,
         });
       }
+    } catch (error: any) {
+      setError(error.message ?? "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -98,6 +106,8 @@ export default function RolesListClient() {
           <tbody>
             {loading ? (
               <TableSkeleton columns={4} />
+            ) : error ? (
+              <ListError error={error} columns={4} />
             ) : roles.length === 0 ? (
               <tr>
                 <td

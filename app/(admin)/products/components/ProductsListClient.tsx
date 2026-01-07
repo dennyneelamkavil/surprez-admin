@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
-import { ListActions, ListFilters, ListHeader } from "@/components/listing";
+import {
+  ListActions,
+  ListError,
+  ListFilters,
+  ListHeader,
+} from "@/components/listing";
 import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
@@ -11,6 +16,7 @@ import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import type { Product, SubCategoryBase, PaginationMeta } from "@/lib/types";
 
 export default function ProductsListClient() {
+  const [error, setError] = useState<string | null>(null);
   const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
   const [subcategory, setSubcategory] = useState("");
   const [isFeatured, setIsFeatured] = useState("");
@@ -51,6 +57,8 @@ export default function ProductsListClient() {
           totalPages: data.pagination.totalPages,
         });
       }
+    } catch (error: any) {
+      setError(error.message ?? "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -164,6 +172,8 @@ export default function ProductsListClient() {
             <tbody>
               {loading ? (
                 <TableSkeleton columns={7} />
+              ) : error ? (
+                <ListError error={error} columns={7} />
               ) : products.length === 0 ? (
                 <tr>
                   <td

@@ -3,13 +3,19 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
-import { ListActions, ListFilters, ListHeader } from "@/components/listing";
+import {
+  ListActions,
+  ListError,
+  ListFilters,
+  ListHeader,
+} from "@/components/listing";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
 import type { Category, PaginationMeta } from "@/lib/types";
 
 export default function CategoriesListClient() {
+  const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -39,6 +45,8 @@ export default function CategoriesListClient() {
           totalPages: data.pagination.totalPages,
         });
       }
+    } catch (error: any) {
+      setError(error.message ?? "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -109,6 +117,8 @@ export default function CategoriesListClient() {
             <tbody>
               {loading ? (
                 <TableSkeleton columns={5} />
+              ) : error ? (
+                <ListError error={error} columns={5} />
               ) : categories.length === 0 ? (
                 <tr>
                   <td
