@@ -130,8 +130,9 @@ export async function deleteCategory(id: string) {
     category: id,
   });
   if (isUsed) {
-    throw new Error(
-      "Cannot delete category: subcategories are linked to this category"
+    throw new AppError(
+      "Cannot delete category: subcategories are linked to this category",
+      409
     );
   }
 
