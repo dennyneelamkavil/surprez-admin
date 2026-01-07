@@ -61,10 +61,8 @@ export default function SignInForm() {
         password: formData.password,
         redirect: false,
       });
-      console.log(res);
 
       if (!res || !res.ok) {
-        console.log(res?.ok);
         throw new Error(res?.error || "Invalid username or password");
       }
 
@@ -75,9 +73,7 @@ export default function SignInForm() {
         autoClose: 3000,
       });
 
-      console.log("log after toast");
-      router.replace("/");
-      console.log("log after push");
+      router.push("/");
     } catch (err: any) {
       toast.update(toastId, {
         render: err.message || "Sign in failed",
