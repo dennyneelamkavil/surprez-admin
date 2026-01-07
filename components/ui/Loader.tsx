@@ -32,7 +32,6 @@ export default function Loader() {
           alt="Surprez Logo"
           fill
           className="object-contain p-4"
-          priority
         />
       </div>
 
