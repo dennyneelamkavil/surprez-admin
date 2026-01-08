@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { Modal } from "@/components/ui/modal";
-import Button from "@/components/ui/button/Button";
 
 type MediaPreviewModalProps = {
   isOpen: boolean;
@@ -21,22 +20,23 @@ export default function MediaPreviewModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-4xl min-w-xl max-h-[80vh] min-h-[60vh] p-4 bg-white/50 dark:bg-gray-900/50"
+      className="max-w-5xl w-full p-0 bg-transparent border-none shadow-none"
     >
-      <div className="flex h-full w-full items-center justify-center">
+      <div className="relative w-full h-[80vh] flex items-center justify-center rounded-lg overflow-hidden">
         {type === "image" ? (
           <Image
             src={src}
             alt="Preview"
-            width={600}
-            height={600}
-            className="max-h-[75vh] max-w-3xl rounded object-contain"
+            fill
+            className="object-contain p-2"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+            priority
           />
         ) : (
           <video
             src={src}
             controls
-            className="max-h-[75vh] max-w-3xl rounded"
+            className="w-full h-full object-contain p-2"
           />
         )}
       </div>
