@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
+import FormError from "@/components/form/FormError";
 import Input from "@/components/form/input/InputField";
 import Checkbox from "@/components/form/input/Checkbox";
 import Switch from "@/components/form/switch/Switch";
@@ -31,6 +32,7 @@ export default function RoleFormClient({ mode, id }: Props) {
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
     useFieldErrors<Fields>();
@@ -57,8 +59,8 @@ export default function RoleFormClient({ mode, id }: Props) {
       setName(data.name);
       setIsSuperAdmin(data.isSuperAdmin);
       setSelected(data.permissions.map((p: any) => p.id));
-    } catch {
-      setError("Failed to load permission");
+    } catch (error: any) {
+      setEditError(error.message ?? "Failed to load permission");
     } finally {
       setLoading(false);
     }
@@ -143,13 +145,11 @@ export default function RoleFormClient({ mode, id }: Props) {
       <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
           <FormSkeleton />
+        ) : editError ? (
+          <FormError error={editError} />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="rounded-md bg-red-50 px-4 py-2 my-2 text-sm text-red-600 dark:bg-red-500/10">
-                {error}
-              </div>
-            )}
+            {error && <FormError error={error} />}
 
             <FormField label="Role name" required htmlFor="name">
               <Input

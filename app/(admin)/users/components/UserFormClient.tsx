@@ -8,6 +8,7 @@ import { EyeCloseIcon, EyeIcon } from "@/icons";
 import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
+import FormError from "@/components/form/FormError";
 import Input from "@/components/form/input/InputField";
 import Switch from "@/components/form/switch/Switch";
 import Select from "@/components/form/Select";
@@ -37,6 +38,7 @@ export default function UserFormClient({ mode, id }: Props) {
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
@@ -68,8 +70,8 @@ export default function UserFormClient({ mode, id }: Props) {
       setRole(data.role?.id ?? "");
       setPhone(data.phone ?? "");
       setIsActive(data.isActive);
-    } catch {
-      setError("Failed to load user");
+    } catch (error: any) {
+      setEditError(error.message ?? "Failed to load user");
     } finally {
       setLoading(false);
     }
@@ -174,13 +176,11 @@ export default function UserFormClient({ mode, id }: Props) {
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
           <FormSkeleton />
+        ) : editError ? (
+          <FormError error={editError} />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="rounded-md bg-red-50 px-4 py-2 my-2 text-sm text-red-600 dark:bg-red-500/10">
-                {error}
-              </div>
-            )}
+            {error && <FormError error={error} />}
 
             <FormField label="Username" required htmlFor="username">
               <Input
