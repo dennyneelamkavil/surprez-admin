@@ -144,6 +144,7 @@ export default function RolesListClient() {
                       </span>
                     ) : (
                       <ListActions
+                        viewHref={`/roles/${role.id}/view`}
                         editHref={`/roles/${role.id}/edit`}
                         onDelete={() => setItem(role)}
                         editPermission="role:update"

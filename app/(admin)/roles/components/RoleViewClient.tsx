@@ -1,0 +1,91 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
+import FormHeader from "@/components/form/FormHeader";
+import FormError from "@/components/form/FormError";
+import FormActions from "@/components/form/FormActions";
+import FormSkeleton from "@/components/skeletons/FormSkeleton";
+
+import { ViewBadge, ViewField, ViewList, ViewSection } from "@/components/view";
+
+import { useAdminEntity } from "@/hooks/useAdminEntity";
+
+import type { Role } from "@/lib/types";
+
+type Props = {
+  id: string;
+};
+
+export default function RoleViewClient({ id }: Props) {
+  const router = useRouter();
+
+  const {
+    data: role,
+    loading,
+    error,
+  } = useAdminEntity<Role>({
+    endpoint: "roles",
+    id,
+  });
+
+  return (
+    <div className="space-y-6">
+      <FormHeader title="View Role" backHref="/roles" />
+
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+        {loading ? (
+          <FormSkeleton />
+        ) : error ? (
+          <FormError error={error} />
+        ) : !role ? null : (
+          <div className="space-y-6">
+            <div className="sm:sticky top-30 z-10 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/40">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ViewField label="Role Name" value={role.name} mono />
+
+                <div>
+                  <p className="text-sm text-gray-500 mb-2">Super Admin</p>
+                  <ViewBadge
+                    label={role.isSuperAdmin ? "Yes" : "No"}
+                    variant={role.isSuperAdmin ? "success" : "info"}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {role.permissions.length > 0 && (
+              <ViewSection title="Permissions">
+                <ViewList
+                  label="Assigned Permissions"
+                  items={role.permissions.map((p) => p.key)}
+                />
+              </ViewSection>
+            )}
+
+            <ViewSection>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <ViewField
+                  label="Created At"
+                  value={new Date(role.createdAt).toLocaleString()}
+                  mono
+                />
+                <ViewField
+                  label="Last Updated"
+                  value={new Date(role.updatedAt).toLocaleString()}
+                  mono
+                />
+              </div>
+            </ViewSection>
+
+            <FormActions
+              primaryLabel="Edit Role"
+              onPrimary={() => router.push(`/roles/${id}/edit`)}
+              onBack={() => router.push("/roles")}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

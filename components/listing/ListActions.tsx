@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { Pencil, Trash2, ToggleLeft, ToggleRight, Eye } from "lucide-react";
 import { Authorized } from "@/components/auth/Authorized";
 import Tooltip from "@/components/ui/tooltip/Tooltip";
 
 type ListActionsProps = {
+  viewHref?: string;
   editHref?: string;
 
   onDelete?: () => void;
@@ -21,6 +22,7 @@ type ListActionsProps = {
 };
 
 export default function ListActions({
+  viewHref,
   editHref,
   onDelete,
   onToggle,
@@ -34,6 +36,19 @@ export default function ListActions({
 }: ListActionsProps) {
   return (
     <div className="inline-flex items-center gap-3">
+      {/* View */}
+      {viewHref && (
+        <Tooltip content="View">
+          <Link
+            href={viewHref}
+            aria-label="View"
+            className="inline-flex items-center text-gray-500 hover:text-gray-700"
+          >
+            <Eye size={16} />
+          </Link>
+        </Tooltip>
+      )}
+
       {/* Toggle Active / Inactive */}
       {onToggle && editPermission && typeof isActive === "boolean" && (
         <Authorized permission={editPermission}>

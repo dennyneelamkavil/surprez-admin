@@ -256,6 +256,7 @@ export default function ProductsListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
+                        viewHref={`/products/${product.id}/view`}
                         onToggle={() => setToggleItem(product)}
                         editHref={`/products/${product.id}/edit`}
                         isActive={product.isActive}
