@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import AlertModal from "@/components/ui/alert/AlertModal";
 import {
   ListActions,
   ListError,
@@ -17,6 +18,8 @@ import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function UsersListClient() {
   const [error, setError] = useState<string | null>(null);
+  const [item, setItem] = useState<User | null>(null);
+  const [toggleItem, setToggleItem] = useState<User | null>(null);
   const [roles, setRoles] = useState<RoleBase[]>([]);
   const [role, setRole] = useState("");
   const [users, setUsers] = useState<User[]>([]);
@@ -63,9 +66,10 @@ export default function UsersListClient() {
     }
   }, [page, search, role]);
 
-  async function handleDelete(id: string) {
-    const success = await deleteAction(`/api/admin/users/${id}`, {
-      confirmMessage: "Are you sure you want to delete this user?",
+  async function confirmDelete() {
+    if (!item) return;
+
+    const success = await deleteAction(`/api/admin/users/${item.id}`, {
       successMessage: "User deleted successfully",
       errorMessage: "Failed to delete user",
     });
@@ -73,16 +77,16 @@ export default function UsersListClient() {
     if (success) {
       fetchUsers();
     }
+    setItem(null);
   }
 
-  async function handleToggleStatus(user: User) {
+  async function confirmToggleStatus() {
+    if (!toggleItem) return;
+
     const success = await toggleAction(
-      `/api/admin/users/${user.id}`,
-      { isActive: !user.isActive },
+      `/api/admin/users/${toggleItem.id}`,
+      { isActive: !toggleItem.isActive },
       {
-        confirmMessage: `Are you sure you want to ${
-          user.isActive ? "deactivate" : "activate"
-        } this user?`,
         successMessage: "User status updated",
         errorMessage: "Failed to update user status",
       }
@@ -91,6 +95,7 @@ export default function UsersListClient() {
     if (success) {
       fetchUsers();
     }
+    setToggleItem(null);
   }
 
   useEffect(() => {
@@ -204,10 +209,10 @@ export default function UsersListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        onToggle={() => handleToggleStatus(user)}
+                        onToggle={() => setToggleItem(user)}
                         editHref={`/users/${user.id}/edit`}
                         isActive={user.isActive}
-                        onDelete={() => handleDelete(user.id)}
+                        onDelete={() => setItem(user)}
                         editPermission="user:update"
                         deletePermission="user:delete"
                         disableToggle={user.username === "superadmin"}
@@ -232,6 +237,34 @@ export default function UsersListClient() {
           </div>
         )}
       </div>
+
+      <AlertModal
+        isOpen={!!item?.id}
+        variant="danger"
+        title={`Delete User: ${item?.fullname}?`}
+        message="If you only want to block access, mark the user as inactive instead."
+        confirmText="Delete"
+        onClose={() => setItem(null)}
+        onConfirm={confirmDelete}
+        secondaryText="Deactivate Instead"
+        onSecondary={() => {
+          setToggleItem(item);
+          setItem(null);
+        }}
+      />
+      <AlertModal
+        isOpen={!!toggleItem}
+        variant="warning"
+        title={`${toggleItem?.isActive ? "Deactivate" : "Activate"} User: ${
+          toggleItem?.fullname
+        }?`}
+        message={`This action will ${
+          toggleItem?.isActive ? "deactivate" : "activate"
+        } this user.`}
+        confirmText={toggleItem?.isActive ? "Deactivate" : "Activate"}
+        onClose={() => setToggleItem(null)}
+        onConfirm={confirmToggleStatus}
+      />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { toast } from "react-toastify";
 
 type DeleteActionOptions = {
-  confirmMessage?: string;
   successMessage?: string;
   errorMessage?: string;
 };
@@ -11,19 +10,12 @@ export async function deleteAction(
   options?: DeleteActionOptions
 ): Promise<boolean> {
   const {
-    confirmMessage = "Are you sure you want to delete this item?",
     successMessage = "Deleted successfully",
     errorMessage = "Failed to delete item",
   } = options ?? {};
 
-  const ok = confirm(confirmMessage);
-  if (!ok) return false;
-
   try {
-    const res = await fetch(url, {
-      method: "DELETE",
-    });
-
+    const res = await fetch(url, { method: "DELETE" });
     const data = await res.json();
 
     if (!res.ok) {
@@ -33,7 +25,7 @@ export async function deleteAction(
 
     toast.success(successMessage);
     return true;
-  } catch (err) {
+  } catch {
     toast.error("Network error. Please try again.");
     return false;
   }

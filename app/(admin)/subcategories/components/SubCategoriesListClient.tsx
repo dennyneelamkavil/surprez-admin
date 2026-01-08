@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
+import AlertModal from "@/components/ui/alert/AlertModal";
 import {
   ListActions,
   ListError,
@@ -18,6 +19,8 @@ import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function SubCategoriesListClient() {
   const [error, setError] = useState<string | null>(null);
+  const [item, setItem] = useState<SubCategory | null>(null);
+  const [toggleItem, setToggleItem] = useState<SubCategory | null>(null);
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<CategoryBase[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
@@ -64,9 +67,10 @@ export default function SubCategoriesListClient() {
     }
   }, [page, search, category]);
 
-  async function handleDelete(id: string) {
-    const success = await deleteAction(`/api/admin/subcategories/${id}`, {
-      confirmMessage: "Are you sure you want to delete this subcategory?",
+  async function confirmDelete() {
+    if (!item) return;
+
+    const success = await deleteAction(`/api/admin/subcategories/${item.id}`, {
       successMessage: "Subcategory deleted successfully",
       errorMessage: "Failed to delete subcategory",
     });
@@ -74,16 +78,16 @@ export default function SubCategoriesListClient() {
     if (success) {
       fetchSubCategories();
     }
+    setItem(null);
   }
 
-  async function handleToggleStatus(subcategory: SubCategory) {
+  async function confirmToggleStatus() {
+    if (!toggleItem) return;
+
     const success = await toggleAction(
-      `/api/admin/subcategories/${subcategory.id}`,
-      { isActive: !subcategory.isActive },
+      `/api/admin/subcategories/${toggleItem.id}`,
+      { isActive: !toggleItem.isActive },
       {
-        confirmMessage: `Are you sure you want to ${
-          subcategory.isActive ? "deactivate" : "activate"
-        } this subcategory?`,
         successMessage: "Subcategory status updated",
         errorMessage: "Failed to update subcategory status",
       }
@@ -92,6 +96,7 @@ export default function SubCategoriesListClient() {
     if (success) {
       fetchSubCategories();
     }
+    setToggleItem(null);
   }
 
   useEffect(() => {
@@ -210,10 +215,10 @@ export default function SubCategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        onToggle={() => handleToggleStatus(subCat)}
+                        onToggle={() => setToggleItem(subCat)}
                         editHref={`/subcategories/${subCat.id}/edit`}
                         isActive={subCat.isActive}
-                        onDelete={() => handleDelete(subCat.id)}
+                        onDelete={() => setItem(subCat)}
                         editPermission="subcategory:update"
                         deletePermission="subcategory:delete"
                       />
@@ -236,6 +241,34 @@ export default function SubCategoriesListClient() {
           </div>
         )}
       </div>
+
+      <AlertModal
+        isOpen={!!item?.id}
+        variant="danger"
+        title={`Delete SubCategory: ${item?.name}?`}
+        message="If you only want to hide this subcategory from users, consider marking it as inactive instead."
+        confirmText="Delete"
+        onClose={() => setItem(null)}
+        onConfirm={confirmDelete}
+        secondaryText="Deactivate Instead"
+        onSecondary={() => {
+          setToggleItem(item);
+          setItem(null);
+        }}
+      />
+      <AlertModal
+        isOpen={!!toggleItem}
+        variant="warning"
+        title={`${
+          toggleItem?.isActive ? "Deactivate" : "Activate"
+        } SubCategory: ${toggleItem?.name}?`}
+        message={`This action will ${
+          toggleItem?.isActive ? "deactivate" : "activate"
+        } this subcategory.`}
+        confirmText={toggleItem?.isActive ? "Deactivate" : "Activate"}
+        onClose={() => setToggleItem(null)}
+        onConfirm={confirmToggleStatus}
+      />
     </div>
   );
 }

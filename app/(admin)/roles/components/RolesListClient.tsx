@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import AlertModal from "@/components/ui/alert/AlertModal";
 import {
   ListActions,
   ListError,
@@ -16,6 +17,7 @@ import { deleteAction } from "@/lib/actions";
 
 export default function RolesListClient() {
   const [error, setError] = useState<string | null>(null);
+  const [item, setItem] = useState<Role | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -51,9 +53,10 @@ export default function RolesListClient() {
     }
   }, [page, search]);
 
-  async function handleDelete(id: string) {
-    const success = await deleteAction(`/api/admin/roles/${id}`, {
-      confirmMessage: "Are you sure you want to delete this role?",
+  async function confirmDelete() {
+    if (!item) return;
+
+    const success = await deleteAction(`/api/admin/roles/${item.id}`, {
       successMessage: "Role deleted successfully",
       errorMessage: "Failed to delete role",
     });
@@ -61,6 +64,7 @@ export default function RolesListClient() {
     if (success) {
       fetchRoles();
     }
+    setItem(null);
   }
 
   useEffect(() => {
@@ -141,7 +145,7 @@ export default function RolesListClient() {
                     ) : (
                       <ListActions
                         editHref={`/roles/${role.id}/edit`}
-                        onDelete={() => handleDelete(role.id)}
+                        onDelete={() => setItem(role)}
                         editPermission="role:update"
                         deletePermission="role:delete"
                       />
@@ -163,6 +167,16 @@ export default function RolesListClient() {
           </div>
         )}
       </div>
+
+      <AlertModal
+        isOpen={!!item?.id}
+        variant="danger"
+        title={`Delete Role: ${item?.name}?`}
+        message="This will permanently remove this role if it is not in use."
+        confirmText="Delete"
+        onClose={() => setItem(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

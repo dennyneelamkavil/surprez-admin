@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import AlertModal from "@/components/ui/alert/AlertModal";
 import {
   ListActions,
   ListError,
@@ -16,6 +17,7 @@ import { deleteAction } from "@/lib/actions";
 
 export default function PermissionsListClient() {
   const [error, setError] = useState<string | null>(null);
+  const [item, setItem] = useState<Permission | null>(null);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -52,9 +54,10 @@ export default function PermissionsListClient() {
     }
   }, [page, search]);
 
-  async function handleDelete(id: string) {
-    const success = await deleteAction(`/api/admin/permissions/${id}`, {
-      confirmMessage: "Are you sure you want to delete this permission?",
+  async function confirmDelete() {
+    if (!item) return;
+
+    const success = await deleteAction(`/api/admin/permissions/${item.id}`, {
       successMessage: "Permission deleted successfully",
       errorMessage: "Failed to delete permission",
     });
@@ -62,6 +65,7 @@ export default function PermissionsListClient() {
     if (success) {
       fetchPermissions();
     }
+    setItem(null);
   }
 
   useEffect(() => {
@@ -144,7 +148,7 @@ export default function PermissionsListClient() {
                     <td className="px-5 py-4 text-right">
                       <ListActions
                         editHref={`/permissions/${permission.id}/edit`}
-                        onDelete={() => handleDelete(permission.id)}
+                        onDelete={() => setItem(permission)}
                         editPermission="permission:update"
                         deletePermission="permission:delete"
                       />
@@ -167,6 +171,16 @@ export default function PermissionsListClient() {
           </div>
         )}
       </div>
+
+      <AlertModal
+        isOpen={!!item?.id}
+        variant="danger"
+        title={`Delete Permission: ${item?.key}?`}
+        message="This will permanently remove this permission if it is not in use."
+        confirmText="Delete"
+        onClose={() => setItem(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

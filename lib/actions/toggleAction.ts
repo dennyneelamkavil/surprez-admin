@@ -1,7 +1,6 @@
 import { toast } from "react-toastify";
 
 type ToggleActionOptions = {
-  confirmMessage?: string;
   successMessage?: string;
   errorMessage?: string;
 };
@@ -12,13 +11,9 @@ export async function toggleAction(
   options?: ToggleActionOptions
 ): Promise<boolean> {
   const {
-    confirmMessage = "Are you sure you want to update this status?",
     successMessage = "Status updated successfully",
     errorMessage = "Failed to update status",
   } = options ?? {};
-
-  const ok = confirm(confirmMessage);
-  if (!ok) return false;
 
   try {
     const res = await fetch(url, {

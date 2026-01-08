@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
+import AlertModal from "@/components/ui/alert/AlertModal";
 import {
   ListActions,
   ListError,
@@ -17,6 +18,8 @@ import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function CategoriesListClient() {
   const [error, setError] = useState<string | null>(null);
+  const [item, setItem] = useState<Category | null>(null);
+  const [toggleItem, setToggleItem] = useState<Category | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -53,9 +56,10 @@ export default function CategoriesListClient() {
     }
   }, [page, search]);
 
-  async function handleDelete(id: string) {
-    const success = await deleteAction(`/api/admin/categories/${id}`, {
-      confirmMessage: "Are you sure you want to delete this category?",
+  async function confirmDelete() {
+    if (!item) return;
+
+    const success = await deleteAction(`/api/admin/categories/${item.id}`, {
       successMessage: "Category deleted successfully",
       errorMessage: "Failed to delete category",
     });
@@ -63,16 +67,16 @@ export default function CategoriesListClient() {
     if (success) {
       fetchCategories();
     }
+    setItem(null);
   }
 
-  async function handleToggleStatus(category: Category) {
+  async function confirmToggleStatus() {
+    if (!toggleItem) return;
+
     const success = await toggleAction(
-      `/api/admin/categories/${category.id}`,
-      { isActive: !category.isActive },
+      `/api/admin/categories/${toggleItem.id}`,
+      { isActive: !toggleItem.isActive },
       {
-        confirmMessage: `Are you sure you want to ${
-          category.isActive ? "deactivate" : "activate"
-        } this category?`,
         successMessage: "Category status updated",
         errorMessage: "Failed to update category status",
       }
@@ -81,6 +85,7 @@ export default function CategoriesListClient() {
     if (success) {
       fetchCategories();
     }
+    setToggleItem(null);
   }
 
   useEffect(() => {
@@ -174,10 +179,10 @@ export default function CategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        onToggle={() => handleToggleStatus(category)}
+                        onToggle={() => setToggleItem(category)}
                         editHref={`/categories/${category.id}/edit`}
                         isActive={category.isActive}
-                        onDelete={() => handleDelete(category.id)}
+                        onDelete={() => setItem(category)}
                         editPermission="category:update"
                         deletePermission="category:delete"
                       />
@@ -200,6 +205,34 @@ export default function CategoriesListClient() {
           </div>
         )}
       </div>
+
+      <AlertModal
+        isOpen={!!item?.id}
+        variant="danger"
+        title={`Delete Category: ${item?.name}?`}
+        message="If you just want to hide this category from users, consider marking it as inactive instead."
+        confirmText="Delete"
+        onClose={() => setItem(null)}
+        onConfirm={confirmDelete}
+        secondaryText="Deactivate Instead"
+        onSecondary={() => {
+          setToggleItem(item);
+          setItem(null);
+        }}
+      />
+      <AlertModal
+        isOpen={!!toggleItem}
+        variant="warning"
+        title={`${toggleItem?.isActive ? "Deactivate" : "Activate"} Category: ${
+          toggleItem?.name
+        }?`}
+        message={`This action will ${
+          toggleItem?.isActive ? "deactivate" : "activate"
+        } this category.`}
+        confirmText={toggleItem?.isActive ? "Deactivate" : "Activate"}
+        onClose={() => setToggleItem(null)}
+        onConfirm={confirmToggleStatus}
+      />
     </div>
   );
 }

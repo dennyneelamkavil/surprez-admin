@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
+import AlertModal from "@/components/ui/alert/AlertModal";
 import {
   ListActions,
   ListError,
@@ -18,6 +19,8 @@ import { deleteAction, toggleAction } from "@/lib/actions";
 
 export default function ProductsListClient() {
   const [error, setError] = useState<string | null>(null);
+  const [item, setItem] = useState<Product | null>(null);
+  const [toggleItem, setToggleItem] = useState<Product | null>(null);
   const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
   const [subcategory, setSubcategory] = useState("");
   const [isFeatured, setIsFeatured] = useState("");
@@ -65,9 +68,10 @@ export default function ProductsListClient() {
     }
   }, [page, search, subcategory, isFeatured]);
 
-  async function handleDelete(id: string) {
-    const success = await deleteAction(`/api/admin/products/${id}`, {
-      confirmMessage: "Are you sure you want to delete this product?",
+  async function confirmDelete() {
+    if (!item) return;
+
+    const success = await deleteAction(`/api/admin/products/${item.id}`, {
       successMessage: "Product deleted successfully",
       errorMessage: "Failed to delete product",
     });
@@ -75,16 +79,16 @@ export default function ProductsListClient() {
     if (success) {
       fetchProducts();
     }
+    setItem(null);
   }
 
-  async function handleToggleStatus(product: Product) {
+  async function confirmToggleStatus() {
+    if (!toggleItem) return;
+
     const success = await toggleAction(
-      `/api/admin/products/${product.id}`,
-      { isActive: !product.isActive },
+      `/api/admin/products/${toggleItem.id}`,
+      { isActive: !toggleItem.isActive },
       {
-        confirmMessage: `Are you sure you want to ${
-          product.isActive ? "deactivate" : "activate"
-        } this product?`,
         successMessage: "Product status updated",
         errorMessage: "Failed to update product status",
       }
@@ -93,6 +97,7 @@ export default function ProductsListClient() {
     if (success) {
       fetchProducts();
     }
+    setToggleItem(null);
   }
 
   useEffect(() => {
@@ -251,10 +256,10 @@ export default function ProductsListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        onToggle={() => handleToggleStatus(product)}
+                        onToggle={() => setToggleItem(product)}
                         editHref={`/products/${product.id}/edit`}
                         isActive={product.isActive}
-                        onDelete={() => handleDelete(product.id)}
+                        onDelete={() => setItem(product)}
                         editPermission="product:update"
                         deletePermission="product:delete"
                       />
@@ -277,6 +282,34 @@ export default function ProductsListClient() {
           </div>
         )}
       </div>
+
+      <AlertModal
+        isOpen={!!item?.id}
+        variant="danger"
+        title={`Delete Product: ${item?.name}?`}
+        message="If you only want to hide this product from users, consider marking it as inactive instead."
+        confirmText="Delete"
+        onClose={() => setItem(null)}
+        onConfirm={confirmDelete}
+        secondaryText="Deactivate Instead"
+        onSecondary={() => {
+          setToggleItem(item);
+          setItem(null);
+        }}
+      />
+      <AlertModal
+        isOpen={!!toggleItem}
+        variant="warning"
+        title={`${toggleItem?.isActive ? "Deactivate" : "Activate"} Product: ${
+          toggleItem?.name
+        }?`}
+        message={`This action will ${
+          toggleItem?.isActive ? "deactivate" : "activate"
+        } this product.`}
+        confirmText={toggleItem?.isActive ? "Deactivate" : "Activate"}
+        onClose={() => setToggleItem(null)}
+        onConfirm={confirmToggleStatus}
+      />
     </div>
   );
 }
