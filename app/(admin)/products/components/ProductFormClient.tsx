@@ -37,7 +37,11 @@ export default function ProductFormClient({ mode, id }: Props) {
   const [coverImage, setCoverImage] = useState<Media | null>(null);
   const [images, setImages] = useState<Media[]>([]);
   const [videos, setVideos] = useState<Media[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState({
+    cover: false,
+    images: false,
+    videos: false,
+  });
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [attributes, setAttributes] = useState<AttributeRow[]>([]);
@@ -258,42 +262,58 @@ export default function ProductFormClient({ mode, id }: Props) {
             </FormField>
 
             <FormField label="Cover Image" required htmlFor="coverImage">
-              <FileInput
-                id="coverImage"
-                accept="image/*"
-                error={!!fieldErrors.coverImage}
-                hint={fieldErrors.coverImage}
-                disabled={uploading}
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
+              <div className="flex items-center gap-4">
+                {/* Left: input + uploading text */}
+                <div className="flex flex-col gap-2">
+                  <FileInput
+                    id="coverImage"
+                    accept="image/*"
+                    error={!!fieldErrors.coverImage}
+                    hint={fieldErrors.coverImage}
+                    disabled={uploading.cover}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                  try {
-                    setUploading(true);
-                    clearFieldError("coverImage");
-                    setError(null);
-                    const media = await uploadMedia(file, "products/covers");
-                    setCoverImage(media);
-                  } catch (err: any) {
-                    setFieldError("coverImage", err.message ?? "Upload failed");
-                  } finally {
-                    setUploading(false);
-                  }
-                }}
-              />
-              {uploading && (
-                <p className="text-sm text-gray-500">Uploading image...</p>
-              )}
+                      try {
+                        setUploading((u) => ({ ...u, cover: true }));
+                        clearFieldError("coverImage");
+                        setError(null);
+                        const media = await uploadMedia(
+                          file,
+                          "products/covers"
+                        );
+                        setCoverImage(media);
+                      } catch (err: any) {
+                        setFieldError(
+                          "coverImage",
+                          err.message ?? "Upload failed"
+                        );
+                      } finally {
+                        setUploading((u) => ({ ...u, cover: false }));
+                      }
+                    }}
+                  />
+                  {uploading.cover && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Uploading image...
+                    </p>
+                  )}
+                </div>
 
-              {coverImage && (
-                <Image
-                  src={coverImage.url}
-                  alt="Product Cover Image Preview"
-                  width={50}
-                  height={50}
-                  className="rounded object-cover"
-                />
-              )}
+                {/* Right: image preview */}
+                {coverImage && (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={coverImage.url}
+                      alt="Product Cover Image Preview"
+                      width={50}
+                      height={50}
+                      className="rounded object-cover"
+                    />
+                  </div>
+                )}
+              </div>
             </FormField>
 
             <FormField label="Description" htmlFor="description">
@@ -329,7 +349,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                 }}
                 onFiles={async (files) => {
                   try {
-                    setUploading(true);
+                    setUploading((u) => ({ ...u, images: true }));
                     const uploaded = await Promise.all(
                       files.map((file) => uploadMedia(file, "products/images"))
                     );
@@ -337,11 +357,11 @@ export default function ProductFormClient({ mode, id }: Props) {
                   } catch (err: any) {
                     setError(err.message);
                   } finally {
-                    setUploading(false);
+                    setUploading((u) => ({ ...u, images: false }));
                   }
                 }}
               />
-              {uploading && (
+              {uploading.images && (
                 <p className="text-sm text-gray-500">Uploading images...</p>
               )}
             </FormField>
@@ -354,7 +374,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                 accept={{ "video/*": [] }}
                 onFiles={async (files) => {
                   try {
-                    setUploading(true);
+                    setUploading((u) => ({ ...u, videos: true }));
                     const uploaded = await Promise.all(
                       files.map((file) => uploadMedia(file, "products/videos"))
                     );
@@ -362,11 +382,11 @@ export default function ProductFormClient({ mode, id }: Props) {
                   } catch (err: any) {
                     setError(err.message);
                   } finally {
-                    setUploading(false);
+                    setUploading((u) => ({ ...u, videos: false }));
                   }
                 }}
               />
-              {uploading && (
+              {uploading.videos && (
                 <p className="text-sm text-gray-500">Uploading videos...</p>
               )}
             </FormField>
@@ -388,7 +408,13 @@ export default function ProductFormClient({ mode, id }: Props) {
                   ? "Create Product"
                   : "Update Product"
               }
-              primaryDisabled={saving || uploading || hasErrors}
+              primaryDisabled={
+                saving ||
+                uploading.cover ||
+                uploading.images ||
+                uploading.videos ||
+                hasErrors
+              }
               backLabel="Cancel"
               onBack={() => router.push("/products")}
             />

@@ -224,42 +224,52 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
             </FormField>
 
             <FormField label="Image" required htmlFor="image">
-              <FileInput
-                id="image"
-                accept="image/*"
-                error={!!fieldErrors.image}
-                hint={fieldErrors.image}
-                disabled={uploading}
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
+              <div className="flex items-center gap-4">
+                {/* Left: input + uploading text */}
+                <div className="flex flex-col gap-2">
+                  <FileInput
+                    id="image"
+                    accept="image/*"
+                    error={!!fieldErrors.image}
+                    hint={fieldErrors.image}
+                    disabled={uploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                  try {
-                    setUploading(true);
-                    clearFieldError("image");
-                    setError(null);
-                    const media = await uploadMedia(file, "subcategories");
-                    setImage(media);
-                  } catch (err: any) {
-                    setFieldError("image", err.message ?? "Upload failed");
-                  } finally {
-                    setUploading(false);
-                  }
-                }}
-              />
-              {uploading && (
-                <p className="text-sm text-gray-500">Uploading image...</p>
-              )}
+                      try {
+                        setUploading(true);
+                        clearFieldError("image");
+                        setError(null);
+                        const media = await uploadMedia(file, "subcategories");
+                        setImage(media);
+                      } catch (err: any) {
+                        setFieldError("image", err.message ?? "Upload failed");
+                      } finally {
+                        setUploading(false);
+                      }
+                    }}
+                  />
+                  {uploading && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Uploading image...
+                    </p>
+                  )}
+                </div>
 
-              {image && (
-                <Image
-                  src={image.url}
-                  alt="SubCategory Image Preview"
-                  width={50}
-                  height={50}
-                  className="rounded object-cover"
-                />
-              )}
+                {/* Right: image preview */}
+                {image && (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={image.url}
+                      alt="SubCategory Image Preview"
+                      width={50}
+                      height={50}
+                      className="rounded object-cover"
+                    />
+                  </div>
+                )}
+              </div>
             </FormField>
 
             <FormField label="Description" htmlFor="description">
