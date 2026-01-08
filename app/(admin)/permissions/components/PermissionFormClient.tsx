@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
 import FormError from "@/components/form/FormError";
+import FormActions from "@/components/form/FormActions";
 import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
@@ -178,23 +178,18 @@ export default function PermissionFormClient({ mode, id }: Props) {
             </FormField>
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving || hasErrors}>
-                {saving
+            <FormActions
+              primaryLabel={
+                saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create Permission"
-                  : "Update Permission"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push("/permissions")}
-              >
-                Cancel
-              </Button>
-            </div>
+                  : "Update Permission"
+              }
+              primaryDisabled={saving || hasErrors}
+              backLabel="Cancel"
+              onBack={() => router.push("/permissions")}
+            />
           </form>
         )}
       </div>

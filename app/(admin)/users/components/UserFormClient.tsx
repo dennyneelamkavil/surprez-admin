@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 
-import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
 import FormError from "@/components/form/FormError";
+import FormActions from "@/components/form/FormActions";
 import Input from "@/components/form/input/InputField";
 import Switch from "@/components/form/switch/Switch";
 import Select from "@/components/form/Select";
@@ -299,23 +299,18 @@ export default function UserFormClient({ mode, id }: Props) {
             </FormField>
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving || hasErrors}>
-                {saving
+            <FormActions
+              primaryLabel={
+                saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create User"
-                  : "Update User"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push("/users")}
-              >
-                Cancel
-              </Button>
-            </div>
+                  : "Update User"
+              }
+              primaryDisabled={saving || hasErrors}
+              backLabel="Cancel"
+              onBack={() => router.push("/users")}
+            />
           </form>
         )}
       </div>

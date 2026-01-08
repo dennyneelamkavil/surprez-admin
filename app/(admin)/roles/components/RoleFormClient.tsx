@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
 import FormError from "@/components/form/FormError";
+import FormActions from "@/components/form/FormActions";
 import Input from "@/components/form/input/InputField";
 import Checkbox from "@/components/form/input/Checkbox";
 import Switch from "@/components/form/switch/Switch";
@@ -258,23 +258,18 @@ export default function RoleFormClient({ mode, id }: Props) {
             )}
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving || hasErrors}>
-                {saving
+            <FormActions
+              primaryLabel={
+                saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create Role"
-                  : "Update Role"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push("/roles")}
-              >
-                Cancel
-              </Button>
-            </div>
+                  : "Update Role"
+              }
+              primaryDisabled={saving || hasErrors}
+              backLabel="Cancel"
+              onBack={() => router.push("/roles")}
+            />
           </form>
         )}
       </div>

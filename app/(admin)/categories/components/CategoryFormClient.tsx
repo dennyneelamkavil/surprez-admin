@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-import Button from "@/components/ui/button/Button";
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
 import FormError from "@/components/form/FormError";
+import FormActions from "@/components/form/FormActions";
 import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
 import FileInput from "@/components/form/input/FileInput";
@@ -243,23 +243,18 @@ export default function CategoryFormClient({ mode, id }: Props) {
             </FormField>
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
-              <Button type="submit" disabled={saving || uploading || hasErrors}>
-                {saving
+            <FormActions
+              primaryLabel={
+                saving
                   ? "Saving..."
                   : mode === "create"
                   ? "Create Category"
-                  : "Update Category"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push("/categories")}
-              >
-                Cancel
-              </Button>
-            </div>
+                  : "Update Category"
+              }
+              primaryDisabled={saving || uploading || hasErrors}
+              backLabel="Cancel"
+              onBack={() => router.push("/categories")}
+            />
           </form>
         )}
       </div>
