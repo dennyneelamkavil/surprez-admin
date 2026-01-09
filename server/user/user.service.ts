@@ -101,7 +101,7 @@ export async function listUsers(params: {
         path: "role",
         populate: { path: "permissions" },
       })
-      .sort({ key: 1 })
+      .sort({ createdAt: 1 })
       .lean();
 
     return {

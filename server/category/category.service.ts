@@ -51,7 +51,9 @@ export async function listCategories(params?: {
   }
 
   if (params?.all) {
-    const categories = await CategoryModel.find(query).sort({ key: 1 }).lean();
+    const categories = await CategoryModel.find(query)
+      .sort({ createdAt: 1 })
+      .lean();
 
     return {
       categories: categories.map(mapCategory),
