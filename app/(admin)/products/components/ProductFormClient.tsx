@@ -33,29 +33,37 @@ type Props = {
 
 export default function ProductFormClient({ mode, id }: Props) {
   const router = useRouter();
+
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
+
   const [coverImage, setCoverImage] = useState<Media | null>(null);
   const [images, setImages] = useState<Media[]>([]);
   const [videos, setVideos] = useState<Media[]>([]);
+
+  const [subcategories, setSubcategories] = useState<string[]>([]);
+  const [attributes, setAttributes] = useState<AttributeRow[]>([]);
+
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+
+  const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
+  const [loading, setLoading] = useState(mode === "edit");
+  const [saving, setSaving] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
+
   const [uploading, setUploading] = useState({
     cover: false,
     images: false,
     videos: false,
   });
-  const [subcategories, setSubcategories] = useState<string[]>([]);
-  const [description, setDescription] = useState("");
-  const [attributes, setAttributes] = useState<AttributeRow[]>([]);
-  const [slug, setSlug] = useState("");
-  const [isFeatured, setIsFeatured] = useState(false);
-  const [isActive, setIsActive] = useState(true);
-  const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
-  const [loading, setLoading] = useState(mode === "edit");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [editError, setEditError] = useState<string | null>(null);
 
   const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
     useFieldErrors<Fields>();
+
   useScrollToTop(error || fieldErrors);
 
   async function fetchSubCategories() {
@@ -76,14 +84,17 @@ export default function ProductFormClient({ mode, id }: Props) {
 
       if (!res.ok) throw new Error("Failed to load product");
       const data = await res.json();
+
       setName(data.name);
       setSlug(data.slug);
       setCoverImage(data.coverImage);
       setImages(data.images);
       setVideos(data.videos);
-      setSubcategories(data.subcategories.map((sub: any) => sub.id));
+      setSubcategories(data.subcategories.map((s: any) => s.id));
       setDescription(data.description ?? "");
       setIsFeatured(data.isFeatured);
+      setIsActive(data.isActive);
+
       if (data.attributes) {
         setAttributes(
           Object.entries(data.attributes).map(([key, val]) => ({
@@ -93,13 +104,26 @@ export default function ProductFormClient({ mode, id }: Props) {
           }))
         );
       }
-      setIsActive(data.isActive);
-    } catch (error: any) {
-      setEditError(error.message ?? "Failed to load product");
+    } catch (err: any) {
+      setEditError(err.message ?? "Failed to load product");
     } finally {
       setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    fetchSubCategories();
+    if (mode === "edit") fetchProduct();
+  }, [mode, fetchProduct]);
+
+  const subCategoryOptions = subcats.map((sub) => ({
+    value: sub.id,
+    label: sub.name,
+  }));
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSlug(formatSlug(e.target.value));
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -108,22 +132,27 @@ export default function ProductFormClient({ mode, id }: Props) {
     clearAllFieldErrors();
 
     let hasError = false;
+
     if (!name) {
       setFieldError("name", "Name is required");
       hasError = true;
     }
+
     if (!subcategories.length) {
       setFieldError("subcategories", "SubCategories is required");
       hasError = true;
     }
+
     if (mode === "edit" && !slug) {
       setFieldError("slug", "Slug is required");
       hasError = true;
     }
+
     if (!coverImage) {
       setFieldError("coverImage", "Cover Image is required");
       hasError = true;
     }
+
     if (hasError) {
       setSaving(false);
       return;
@@ -132,11 +161,9 @@ export default function ProductFormClient({ mode, id }: Props) {
     const attributesPayload = attributes.reduce<Record<string, any>>(
       (acc, { key, value }) => {
         if (!key) return acc;
-
         acc[key] = value.includes(",")
           ? value.split(",").map((v) => v.trim())
           : value;
-
         return acc;
       },
       {}
@@ -147,9 +174,7 @@ export default function ProductFormClient({ mode, id }: Props) {
         mode === "create" ? "/api/admin/products" : `/api/admin/products/${id}`,
         {
           method: mode === "create" ? "POST" : "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name,
             slug,
@@ -178,143 +203,121 @@ export default function ProductFormClient({ mode, id }: Props) {
     }
   }
 
-  useEffect(() => {
-    fetchSubCategories();
-    if (mode === "edit") fetchProduct();
-  }, [mode, fetchProduct]);
-
-  const subCategoryOptions = subcats.map((sub) => ({
-    value: sub.id,
-    label: sub.name,
-  }));
-
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = formatSlug(e.target.value);
-    setSlug(value);
-  };
-
   const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
 
   return (
-    <div className="max-w-2xl space-y-6">
-      {/* Header */}
+    <div className="space-y-6">
       <FormHeader
         title={mode === "create" ? "Create Product" : "Edit Product"}
         backHref="/products"
       />
 
-      {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
           <FormSkeleton />
         ) : editError ? (
           <FormError error={editError} />
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-8">
             {error && <FormError error={error} />}
 
-            <FormField label="Product Name" required htmlFor="name">
-              <Input
-                id="name"
-                placeholder="Dolls, Action Figures, etc."
-                value={name}
-                onChange={(e) => {
-                  clearFieldError("name");
-                  setError(null);
-                  setName(e.target.value);
-                }}
-                error={!!fieldErrors.name}
-                hint={fieldErrors.name}
-                autoFocus
-              />
-            </FormField>
-
-            {mode === "edit" && (
-              <FormField label="Slug" required htmlFor="slug">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Product Name" required htmlFor="name">
                 <Input
-                  id="slug"
-                  placeholder="toys"
-                  value={slug}
+                  id="name"
+                  placeholder="Dolls, Action Figures, etc."
+                  value={name}
                   onChange={(e) => {
-                    clearFieldError("slug");
+                    clearFieldError("name");
                     setError(null);
-                    handleSlugChange(e);
+                    setName(e.target.value);
                   }}
-                  error={!!fieldErrors.slug}
-                  hint={fieldErrors.slug}
+                  error={!!fieldErrors.name}
+                  hint={fieldErrors.name}
+                  autoFocus
                 />
               </FormField>
-            )}
 
-            <FormField label="SubCategories" required>
-              <MultiSelect
-                options={subCategoryOptions}
-                value={subcategories}
-                placeholder="Select subcategories"
-                onChange={(e) => {
-                  clearFieldError("subcategories");
-                  setError(null);
-                  setSubcategories(e);
-                }}
-                error={!!fieldErrors.subcategories}
-                hint={fieldErrors.subcategories}
-              />
-            </FormField>
-
-            <FormField label="Cover Image" required htmlFor="coverImage">
-              <div className="flex items-center gap-4">
-                {/* Left: input + uploading text */}
-                <div className="flex flex-col gap-2">
-                  <FileInput
-                    id="coverImage"
-                    accept="image/*"
-                    error={!!fieldErrors.coverImage}
-                    hint={fieldErrors.coverImage}
-                    disabled={uploading.cover}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-
-                      try {
-                        setUploading((u) => ({ ...u, cover: true }));
-                        clearFieldError("coverImage");
-                        setError(null);
-                        const media = await uploadMedia(
-                          file,
-                          "products/covers"
-                        );
-                        setCoverImage(media);
-                      } catch (err: any) {
-                        setFieldError(
-                          "coverImage",
-                          err.message ?? "Upload failed"
-                        );
-                      } finally {
-                        setUploading((u) => ({ ...u, cover: false }));
-                      }
+              {mode === "edit" && (
+                <FormField label="Slug" required htmlFor="slug">
+                  <Input
+                    id="slug"
+                    placeholder="toys"
+                    value={slug}
+                    onChange={(e) => {
+                      clearFieldError("slug");
+                      setError(null);
+                      handleSlugChange(e);
                     }}
+                    error={!!fieldErrors.slug}
+                    hint={fieldErrors.slug}
                   />
-                  {uploading.cover && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Uploading image...
-                    </p>
-                  )}
-                </div>
+                </FormField>
+              )}
 
-                {/* Right: image preview */}
-                {coverImage && (
-                  <div className="flex-shrink-0">
-                    <Image
-                      src={coverImage.url}
-                      alt="Product Cover Image Preview"
-                      width={50}
-                      height={50}
-                      className="rounded object-cover"
-                    />
-                  </div>
+              <FormField label="SubCategories" required>
+                <MultiSelect
+                  options={subCategoryOptions}
+                  value={subcategories}
+                  placeholder="Select subcategories"
+                  onChange={(e) => {
+                    clearFieldError("subcategories");
+                    setError(null);
+                    setSubcategories(e);
+                  }}
+                  error={!!fieldErrors.subcategories}
+                  hint={fieldErrors.subcategories}
+                />
+              </FormField>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Cover Image" required htmlFor="coverImage">
+                <FileInput
+                  id="coverImage"
+                  accept="image/*"
+                  error={!!fieldErrors.coverImage}
+                  hint={fieldErrors.coverImage}
+                  disabled={uploading.cover}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    try {
+                      setUploading((u) => ({ ...u, cover: true }));
+                      clearFieldError("coverImage");
+                      setError(null);
+                      const media = await uploadMedia(file, "products/covers");
+                      setCoverImage(media);
+                    } catch (err: any) {
+                      setFieldError(
+                        "coverImage",
+                        err.message ?? "Upload failed"
+                      );
+                    } finally {
+                      setUploading((u) => ({ ...u, cover: false }));
+                    }
+                  }}
+                />
+                {uploading.cover && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Uploading image...
+                  </p>
                 )}
-              </div>
-            </FormField>
+              </FormField>
+
+              {coverImage && (
+                <div className="flex items-end">
+                  <Image
+                    src={coverImage.url}
+                    alt="Cover preview"
+                    width={120}
+                    height={120}
+                    className="rounded object-cover border dark:border-gray-800"
+                  />
+                </div>
+              )}
+            </div>
 
             <FormField label="Description" htmlFor="description">
               <TextArea
@@ -329,77 +332,84 @@ export default function ProductFormClient({ mode, id }: Props) {
               <AttributeEditor value={attributes} onChange={setAttributes} />
             </FormField>
 
-            <FormField label="Featured">
-              <Switch
-                label="Mark as featured product"
-                defaultChecked={isFeatured}
-                onChange={setIsFeatured}
-              />
-            </FormField>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Featured">
+                <Switch
+                  label="Mark as featured product"
+                  defaultChecked={isFeatured}
+                  onChange={setIsFeatured}
+                />
+              </FormField>
 
-            <FormField label="Product Images" htmlFor="images">
-              <Dropzone
-                title="Drop product images here or Browse"
-                description="PNG, JPG, WebP, etc supported"
-                multiple
-                accept={{
-                  "image/png": [],
-                  "image/jpeg": [],
-                  "image/webp": [],
-                }}
-                onFiles={async (files) => {
-                  try {
-                    setUploading((u) => ({ ...u, images: true }));
-                    const uploaded = await Promise.all(
-                      files.map((file) => uploadMedia(file, "products/images"))
-                    );
-                    setImages((prev) => [...prev, ...uploaded]);
-                  } catch (err: any) {
-                    setError(err.message);
-                  } finally {
-                    setUploading((u) => ({ ...u, images: false }));
-                  }
-                }}
-              />
-              {uploading.images && (
-                <p className="text-sm text-gray-500">Uploading images...</p>
-              )}
-            </FormField>
+              <FormField label="Status">
+                <Switch
+                  label={isActive ? "Active" : "Inactive"}
+                  defaultChecked={isActive}
+                  onChange={setIsActive}
+                />
+              </FormField>
+            </div>
 
-            <FormField label="Product Videos" htmlFor="videos">
-              <Dropzone
-                title="Drop product videos here or Browse"
-                description="MP4, WebM, MKV, etc supported"
-                multiple
-                accept={{ "video/*": [] }}
-                onFiles={async (files) => {
-                  try {
-                    setUploading((u) => ({ ...u, videos: true }));
-                    const uploaded = await Promise.all(
-                      files.map((file) => uploadMedia(file, "products/videos"))
-                    );
-                    setVideos((prev) => [...prev, ...uploaded]);
-                  } catch (err: any) {
-                    setError(err.message);
-                  } finally {
-                    setUploading((u) => ({ ...u, videos: false }));
-                  }
-                }}
-              />
-              {uploading.videos && (
-                <p className="text-sm text-gray-500">Uploading videos...</p>
-              )}
-            </FormField>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <FormField label="Product Images" htmlFor="images">
+                <Dropzone
+                  title="Drop product images here or Browse"
+                  description="PNG, JPG, WebP, etc supported"
+                  multiple
+                  accept={{
+                    "image/png": [],
+                    "image/jpeg": [],
+                    "image/webp": [],
+                  }}
+                  onFiles={async (files) => {
+                    try {
+                      setUploading((u) => ({ ...u, images: true }));
+                      const uploaded = await Promise.all(
+                        files.map((file) =>
+                          uploadMedia(file, "products/images")
+                        )
+                      );
+                      setImages((prev) => [...prev, ...uploaded]);
+                    } catch (err: any) {
+                      setError(err.message);
+                    } finally {
+                      setUploading((u) => ({ ...u, images: false }));
+                    }
+                  }}
+                />
+                {uploading.images && (
+                  <p className="text-sm text-gray-500">Uploading images...</p>
+                )}
+              </FormField>
 
-            <FormField label="SubCategory Status">
-              <Switch
-                label={isActive ? "Active" : "Inactive"}
-                defaultChecked={isActive}
-                onChange={setIsActive}
-              />
-            </FormField>
+              <FormField label="Product Videos" htmlFor="videos">
+                <Dropzone
+                  title="Drop product videos here or Browse"
+                  description="MP4, WebM, MKV, etc supported"
+                  multiple
+                  accept={{ "video/*": [] }}
+                  onFiles={async (files) => {
+                    try {
+                      setUploading((u) => ({ ...u, videos: true }));
+                      const uploaded = await Promise.all(
+                        files.map((file) =>
+                          uploadMedia(file, "products/videos")
+                        )
+                      );
+                      setVideos((prev) => [...prev, ...uploaded]);
+                    } catch (err: any) {
+                      setError(err.message);
+                    } finally {
+                      setUploading((u) => ({ ...u, videos: false }));
+                    }
+                  }}
+                />
+                {uploading.videos && (
+                  <p className="text-sm text-gray-500">Uploading videos...</p>
+                )}
+              </FormField>
+            </div>
 
-            {/* Actions */}
             <FormActions
               primaryLabel={
                 saving

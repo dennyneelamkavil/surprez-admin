@@ -18,6 +18,7 @@ import { useScrollToTop } from "@/hooks/useScrollToTop";
 import type { PermissionBase } from "@/lib/types";
 
 type Fields = "name";
+
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -25,17 +26,22 @@ type Props = {
 
 export default function RoleFormClient({ mode, id }: Props) {
   const router = useRouter();
+
   const [name, setName] = useState("");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
   const [permissions, setPermissions] = useState<PermissionBase[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
+
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
 
   const { fieldErrors, setFieldError, clearFieldError, clearAllFieldErrors } =
     useFieldErrors<Fields>();
+
   useScrollToTop(error || fieldErrors);
 
   async function fetchPermissions() {
@@ -53,18 +59,37 @@ export default function RoleFormClient({ mode, id }: Props) {
       const res = await fetch(`/api/admin/roles/${id}`, {
         cache: "no-store",
       });
+
       if (!res.ok) throw new Error("Failed to load role");
 
       const data = await res.json();
       setName(data.name);
       setIsSuperAdmin(data.isSuperAdmin);
       setSelected(data.permissions.map((p: any) => p.id));
-    } catch (error: any) {
-      setEditError(error.message ?? "Failed to load permission");
+    } catch (err: any) {
+      setEditError(err.message ?? "Failed to load role");
     } finally {
       setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    fetchPermissions();
+    if (mode === "edit") fetchRole();
+  }, [mode, fetchRole]);
+
+  const ACTIONS = ["read", "create", "update", "delete"] as const;
+
+  const groupedPermissions = permissions.reduce((acc, perm) => {
+    const [module, action] = perm.key.split(":");
+
+    if (!ACTIONS.includes(action as any)) return acc;
+
+    if (!acc[module]) acc[module] = {};
+    acc[module][action] = perm;
+
+    return acc;
+  }, {} as Record<string, Record<string, PermissionBase>>);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -73,14 +98,17 @@ export default function RoleFormClient({ mode, id }: Props) {
     clearAllFieldErrors();
 
     let hasError = false;
+
     if (!name) {
       setFieldError("name", "Role name is required");
       hasError = true;
     }
+
     if (!isSuperAdmin && selected.length === 0) {
       setError("Select at least one permission or enable Super Admin");
       hasError = true;
     }
+
     if (hasError) {
       setSaving(false);
       return;
@@ -113,70 +141,52 @@ export default function RoleFormClient({ mode, id }: Props) {
     }
   }
 
-  useEffect(() => {
-    fetchPermissions();
-    if (mode === "edit") fetchRole();
-  }, [mode, fetchRole]);
-
-  const ACTIONS = ["read", "create", "update", "delete"] as const;
-
-  const groupedPermissions = permissions.reduce((acc, perm) => {
-    const [module, action] = perm.key.split(":");
-
-    if (!ACTIONS.includes(action as any)) return acc;
-
-    if (!acc[module]) acc[module] = {};
-    acc[module][action] = perm;
-
-    return acc;
-  }, {} as Record<string, Record<string, PermissionBase>>);
-
   const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
 
   return (
-    <div className="max-w-3xl space-y-6">
-      {/* Header */}
+    <div className="space-y-6">
       <FormHeader
         title={mode === "create" ? "Create Role" : "Edit Role"}
         backHref="/roles"
       />
 
-      {/* Card */}
       <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
           <FormSkeleton />
         ) : editError ? (
           <FormError error={editError} />
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-8">
             {error && <FormError error={error} />}
 
-            <FormField label="Role name" required htmlFor="name">
-              <Input
-                id="name"
-                placeholder="admin"
-                value={name}
-                onChange={(e) => {
-                  clearFieldError("name");
-                  setError(null);
-                  setName(e.target.value);
-                }}
-                error={!!fieldErrors.name}
-                hint={fieldErrors.name}
-                autoFocus
-              />
-            </FormField>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Role name" required htmlFor="name">
+                <Input
+                  id="name"
+                  placeholder="admin"
+                  value={name}
+                  onChange={(e) => {
+                    clearFieldError("name");
+                    setError(null);
+                    setName(e.target.value);
+                  }}
+                  error={!!fieldErrors.name}
+                  hint={fieldErrors.name}
+                  autoFocus
+                />
+              </FormField>
 
-            <FormField label="Super Admin">
-              <Checkbox
-                checked={isSuperAdmin}
-                onChange={(checked) => {
-                  setIsSuperAdmin(checked);
-                  setError(null);
-                }}
-                label="Super Admin (bypass permissions)"
-              />
-            </FormField>
+              <FormField label="Super Admin">
+                <Checkbox
+                  checked={isSuperAdmin}
+                  onChange={(checked) => {
+                    setIsSuperAdmin(checked);
+                    setError(null);
+                  }}
+                  label="Super Admin (bypass permissions)"
+                />
+              </FormField>
+            </div>
 
             {!isSuperAdmin && (
               <div>
@@ -229,15 +239,13 @@ export default function RoleFormClient({ mode, id }: Props) {
                                         label=""
                                         defaultChecked={isChecked}
                                         onChange={(checked) => {
-                                          setSelected((prev) => {
-                                            const next = checked
+                                          setSelected((prev) =>
+                                            checked
                                               ? [...prev, permission.id]
                                               : prev.filter(
                                                   (id) => id !== permission.id
-                                                );
-
-                                            return next;
-                                          });
+                                                )
+                                          );
                                           setError(null);
                                         }}
                                       />

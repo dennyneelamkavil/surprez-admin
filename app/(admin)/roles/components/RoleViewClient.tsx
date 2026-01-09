@@ -55,7 +55,7 @@ export default function RoleViewClient({ id }: Props) {
             </div>
 
             {role.permissions.length > 0 && (
-              <ViewSection title="Permissions">
+              <ViewSection>
                 <ViewList
                   label="Assigned Permissions"
                   items={role.permissions.map((p) => p.key)}
