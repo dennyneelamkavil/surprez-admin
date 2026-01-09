@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { ResolvedSeo } from "./seo.types";
+import { withDomain } from "./seo.utils";
 
 type MapSeoInput = {
   seo?: {
@@ -25,7 +26,9 @@ export function mapSeo({ seo, fallback }: MapSeoInput): ResolvedSeo {
     title: seo?.title ?? fallback.title,
     description: seo?.description ?? fallback.description?.slice(0, 160),
     keywords: seo?.keywords,
-    canonical: seo?.canonical ?? `${fallback.canonicalBase}/${fallback.slug}`,
+    canonical: withDomain(
+      seo?.canonical ?? `${fallback.canonicalBase}/${fallback.slug}`
+    ),
     noIndex: seo?.noIndex,
     ogImage: seo?.ogImage
       ? { url: seo.ogImage.url }
