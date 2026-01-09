@@ -1,6 +1,7 @@
 import "server-only";
 import { Schema, model, models } from "mongoose";
 import { MediaSchema } from "@/server/media/media.schema";
+import { SeoSchema } from "@/server/seo/seo.schema";
 
 const ProductSchema = new Schema(
   {
@@ -61,6 +62,9 @@ const ProductSchema = new Schema(
     isFeatured: {
       type: Boolean,
       default: false,
+    },
+    seo: {
+      type: SeoSchema,
     },
   },
   { timestamps: true }

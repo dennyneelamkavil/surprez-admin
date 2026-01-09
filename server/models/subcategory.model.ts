@@ -1,6 +1,7 @@
 import "server-only";
 import { Schema, model, models } from "mongoose";
 import { MediaSchema } from "@/server/media/media.schema";
+import { SeoSchema } from "@/server/seo/seo.schema";
 
 const SubCategorySchema = new Schema(
   {
@@ -31,6 +32,9 @@ const SubCategorySchema = new Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    seo: {
+      type: SeoSchema,
     },
   },
   { timestamps: true }

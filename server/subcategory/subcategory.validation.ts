@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { MediaValidation } from "@/server/media/media.validation";
+import { SeoValidation } from "@/server/seo/seo.validation";
 
 export const CreateSubCategorySchema = z.object({
   name: z.string().min(2),
@@ -8,6 +9,7 @@ export const CreateSubCategorySchema = z.object({
   category: z.string(), // Category ID
   description: z.string().optional(),
   isActive: z.boolean().optional(),
+  seo: SeoValidation.optional(),
 });
 
 export const UpdateSubCategorySchema = z.object({
@@ -17,6 +19,7 @@ export const UpdateSubCategorySchema = z.object({
   category: z.string().optional(),
   description: z.string().optional(),
   isActive: z.boolean().optional(),
+  seo: SeoValidation.optional(),
 });
 
 export type CreateSubCategoryInput = z.infer<typeof CreateSubCategorySchema>;

@@ -17,6 +17,7 @@ export function mapProduct(product: any) {
         name: sc.name,
         slug: sc.slug,
       })) ?? [],
+    seo: product.seo,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
   };

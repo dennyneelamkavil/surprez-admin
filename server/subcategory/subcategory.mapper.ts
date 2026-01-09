@@ -13,6 +13,7 @@ export function mapSubCategory(subCategory: any) {
           slug: subCategory.category.slug,
         }
       : null,
+    seo: subCategory.seo,
     createdAt: subCategory.createdAt,
     updatedAt: subCategory.updatedAt,
   };

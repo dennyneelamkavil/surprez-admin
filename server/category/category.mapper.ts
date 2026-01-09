@@ -6,6 +6,7 @@ export function mapCategory(category: any) {
     image: category.image,
     description: category.description,
     isActive: category.isActive,
+    seo: category.seo,
     createdAt: category.createdAt,
     updatedAt: category.updatedAt,
   };
