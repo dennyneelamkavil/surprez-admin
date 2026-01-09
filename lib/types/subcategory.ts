@@ -1,4 +1,5 @@
 import type { Media } from "./media";
+import type { Seo } from "./seo";
 import type { CategoryBase } from "./category";
 
 /**
@@ -19,6 +20,7 @@ export interface SubCategory extends SubCategoryBase {
   image: Media;
   category: CategoryBase; // populated
   description?: string;
+  seo?: Seo;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

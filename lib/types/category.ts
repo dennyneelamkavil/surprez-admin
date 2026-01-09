@@ -1,4 +1,5 @@
 import type { Media } from "./media";
+import type { Seo } from "./seo";
 
 /**
  * Lightweight category reference
@@ -17,6 +18,7 @@ export interface CategoryBase {
 export interface Category extends CategoryBase {
   image: Media;
   description?: string;
+  seo?: Seo;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

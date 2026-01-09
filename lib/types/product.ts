@@ -1,4 +1,5 @@
 import type { Media } from "./media";
+import type { Seo } from "./seo";
 import type { SubCategoryBase } from "./subcategory";
 
 /**
@@ -40,6 +41,7 @@ export interface Product extends ProductBase {
   description?: string;
   attributes?: ProductAttributes;
   rating: ProductRating;
+  seo?: Seo;
   isActive: boolean;
   isFeatured: boolean;
   createdAt: string;
