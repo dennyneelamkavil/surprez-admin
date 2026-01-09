@@ -9,4 +9,5 @@ export type MediaFolder =
   | "subcategories"
   | "products/covers"
   | "products/images"
-  | "products/videos";
+  | "products/videos"
+  | "seo";

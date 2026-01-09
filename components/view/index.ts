@@ -5,3 +5,4 @@ export { default as ViewList } from "./ViewList";
 export { default as ViewMediaGrid } from "./ViewMediaGrid";
 export { default as ViewRating } from "./ViewRating";
 export { default as ViewSection } from "./ViewSection";
+export { default as ViewSEOSection } from "./ViewSEOSection";
