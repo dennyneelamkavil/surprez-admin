@@ -53,7 +53,8 @@ export async function listRoles(params: {
   if (params?.all) {
     const roles = await RoleModel.find(query)
       .populate("permissions")
-      .sort({ createdAt: 1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
       .lean();
 
     return {

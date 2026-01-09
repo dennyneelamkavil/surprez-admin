@@ -73,7 +73,8 @@ export async function listProducts(params?: {
   if (params?.all) {
     const products = await ProductModel.find(query)
       .populate("subcategories")
-      .sort({ createdAt: 1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
       .lean();
 
     return {

@@ -52,7 +52,8 @@ export async function listCategories(params?: {
 
   if (params?.all) {
     const categories = await CategoryModel.find(query)
-      .sort({ createdAt: 1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
       .lean();
 
     return {

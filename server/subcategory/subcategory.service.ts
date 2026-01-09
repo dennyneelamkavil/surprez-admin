@@ -67,7 +67,8 @@ export async function listSubCategories(params?: {
   if (params?.all) {
     const subcategories = await SubCategoryModel.find(query)
       .populate("category")
-      .sort({ createdAt: 1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
       .lean();
 
     return {
