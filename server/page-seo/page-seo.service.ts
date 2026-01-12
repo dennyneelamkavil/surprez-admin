@@ -29,12 +29,53 @@ export async function createPageSeo(input: CreatePageSeoInput) {
 }
 
 /* ================= LIST ================= */
-export async function listPageSeos() {
+export async function listPageSeos(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  all?: boolean;
+}) {
   await connectDB();
 
-  const pages = await PageSeoModel.find().sort({ pageKey: 1 }).lean();
+  const page = Math.max(1, params?.page ?? 1);
+  const limit = Math.min(50, params?.limit ?? 10);
+  const skip = (page - 1) * limit;
 
-  return pages.map(mapPageSeo);
+  const query: any = {};
+
+  if (params?.search) {
+    query.pageKey = { $regex: params.search, $options: "i" };
+  }
+
+  if (params?.all) {
+    const pageSeos = await PageSeoModel.find(query).sort({ pageKey: 1 }).lean();
+
+    return {
+      pageSeos: pageSeos.map(mapPageSeo),
+      pagination: null,
+    };
+  }
+
+  const [pageSeos, total] = await Promise.all([
+    PageSeoModel.find(query)
+      .sort({ pageKey: 1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    PageSeoModel.countDocuments(query),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    pageSeos: pageSeos.map(mapPageSeo),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+  };
 }
 
 /* ================= GET (ADMIN) ================= */

@@ -42,16 +42,22 @@ export default function SeoViewClient({ id }: Props) {
         ) : !data ? null : (
           <div className="space-y-6">
             <ViewSection>
-              <ViewField
-                label="Page"
-                value={data.pageKey}
-                mono
-                valueClass="capitalize"
-              />
-              <ViewBadge
-                label={data.isActive ? "Active" : "Inactive"}
-                variant={data.isActive ? "success" : "danger"}
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ViewField
+                  label="Page"
+                  value={data.pageKey}
+                  mono
+                  valueClass="capitalize"
+                />
+
+                <div>
+                  <p className="text-sm text-gray-500 mb-2">Status</p>
+                  <ViewBadge
+                    label={data.isActive ? "Active" : "Inactive"}
+                    variant={data.isActive ? "success" : "danger"}
+                  />
+                </div>
+              </div>
             </ViewSection>
 
             <ViewSEOSection seo={data.seo} />

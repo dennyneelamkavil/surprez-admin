@@ -62,7 +62,7 @@ export default function ViewSEOSection({
 
           {/* Row 2 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {seo.keywords?.length && (
+            {seo.keywords && seo.keywords.length > 0 && (
               <ViewField label="Keywords" value={seo.keywords.join(", ")} />
             )}
 

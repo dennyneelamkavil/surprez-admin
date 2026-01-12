@@ -19,7 +19,7 @@ export default function SeoListClient() {
   const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<PageSeo | null>(null);
   const [toggleItem, setToggleItem] = useState<PageSeo | null>(null);
-  const [pages, setPages] = useState<PageSeo[]>([]);
+  const [pageSeos, setPageSeos] = useState<PageSeo[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -40,11 +40,7 @@ export default function SeoListClient() {
 
       const data = await res.json();
 
-      if (Array.isArray(data.pages)) {
-        setPages(data.pages);
-      } else {
-        setPages([]);
-      }
+      setPageSeos(data.pageSeos ?? data);
       if (data.pagination) {
         setPagination({
           page: data.pagination.page,
@@ -137,7 +133,7 @@ export default function SeoListClient() {
                 <TableSkeleton columns={4} />
               ) : error ? (
                 <ListError error={error} columns={4} />
-              ) : pages.length === 0 ? (
+              ) : pageSeos.length === 0 ? (
                 <tr>
                   <td
                     colSpan={4}
@@ -147,12 +143,12 @@ export default function SeoListClient() {
                   </td>
                 </tr>
               ) : (
-                pages.map((pageSeo) => (
+                pageSeos.map((pageSeo) => (
                   <tr
                     key={pageSeo.id}
                     className="border-b border-gray-200 dark:border-gray-800"
                   >
-                    <td className="px-5 py-4 font-mono text-sm text-gray-800 dark:text-white/90">
+                    <td className="px-5 py-4 font-mono text-sm text-gray-800 dark:text-white/90 capitalize">
                       {pageSeo.pageKey}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">

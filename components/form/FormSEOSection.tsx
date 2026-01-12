@@ -30,6 +30,9 @@ export default function FormSEOSection({
   defaultOpen = false,
 }: Props) {
   const [open, setOpen] = useState(!collapsible || defaultOpen);
+  const [keywordsDraft, setKeywordsDraft] = useState<string | null>(null);
+
+  const keywordsValue = keywordsDraft ?? value.keywords?.join(", ") ?? "";
 
   function update<K extends keyof Seo>(key: K, val: Seo[K]) {
     onChange({ ...value, [key]: val });
@@ -90,16 +93,18 @@ export default function FormSEOSection({
             <FormField label="SEO Keywords">
               <Input
                 placeholder="comma,separated,keywords"
-                value={value.keywords?.join(", ") ?? ""}
-                onChange={(e) =>
+                value={keywordsValue}
+                onChange={(e) => setKeywordsDraft(e.target.value)}
+                onBlur={() => {
                   update(
                     "keywords",
-                    e.target.value
+                    keywordsValue
                       .split(",")
                       .map((k) => k.trim())
                       .filter(Boolean)
-                  )
-                }
+                  );
+                  setKeywordsDraft(null);
+                }}
               />
             </FormField>
 
