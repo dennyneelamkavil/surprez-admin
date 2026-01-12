@@ -15,14 +15,17 @@ import MultiSelect from "@/components/form/MultiSelect";
 import Switch from "@/components/form/switch/Switch";
 import AttributeEditor from "@/components/form/AttributeEditor";
 import Dropzone from "@/components/form/form-elements/DropZone";
+import FormSEOSection from "@/components/form/FormSEOSection";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
+
+import { Authorized } from "@/components/auth/Authorized";
 
 import { useFieldErrors } from "@/hooks/useFieldErrors";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 import { uploadMedia } from "@/lib/uploadMedia";
 import { formatSlug } from "@/lib/utils";
-import type { Media, SubCategoryBase } from "@/lib/types";
+import type { Media, Seo, SubCategoryBase } from "@/lib/types";
 import type { AttributeRow } from "@/components/form/AttributeEditor";
 
 type Fields = "name" | "slug" | "coverImage" | "subcategories";
@@ -37,6 +40,8 @@ export default function ProductFormClient({ mode, id }: Props) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [seo, setSeo] = useState<Seo>({});
+  const [uploadingSeoImg, setUploadingSeoImg] = useState(false);
 
   const [coverImage, setCoverImage] = useState<Media | null>(null);
   const [images, setImages] = useState<Media[]>([]);
@@ -93,6 +98,7 @@ export default function ProductFormClient({ mode, id }: Props) {
       setSubcategories(data.subcategories.map((s: any) => s.id));
       setDescription(data.description ?? "");
       setIsFeatured(data.isFeatured);
+      setSeo(data.seo ?? {});
       setIsActive(data.isActive);
 
       if (data.attributes) {
@@ -124,6 +130,15 @@ export default function ProductFormClient({ mode, id }: Props) {
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSlug(formatSlug(e.target.value));
   };
+
+  async function handleUploadOgImage(file: File) {
+    setUploadingSeoImg(true);
+    try {
+      return await uploadMedia(file, "seo");
+    } finally {
+      setUploadingSeoImg(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -185,6 +200,7 @@ export default function ProductFormClient({ mode, id }: Props) {
             description,
             isFeatured,
             attributes: attributesPayload,
+            seo,
             isActive,
           }),
         }
@@ -409,6 +425,19 @@ export default function ProductFormClient({ mode, id }: Props) {
                 )}
               </FormField>
             </div>
+
+            <Authorized
+              permission={mode === "create" ? "seo:create" : "seo:update"}
+            >
+              <FormSEOSection
+                value={seo}
+                onChange={setSeo}
+                uploading={uploadingSeoImg}
+                onUploadOgImage={handleUploadOgImage}
+                collapsible
+                defaultOpen={false}
+              />
+            </Authorized>
 
             <FormActions
               primaryLabel={

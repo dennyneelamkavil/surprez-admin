@@ -15,7 +15,10 @@ import {
   ViewMediaGrid,
   ViewRating,
   ViewSection,
+  ViewSEOSection,
 } from "@/components/view";
+
+import { Authorized } from "@/components/auth/Authorized";
 
 import { useAdminEntity } from "@/hooks/useAdminEntity";
 
@@ -137,6 +140,14 @@ export default function ProductViewClient({ id }: Props) {
                 </div>
               </ViewSection>
             )}
+
+            <Authorized permission="seo:read">
+              <ViewSEOSection
+                seo={product.seo}
+                collapsible
+                defaultOpen={false}
+              />
+            </Authorized>
 
             <ViewSection>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

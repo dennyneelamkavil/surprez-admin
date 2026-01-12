@@ -12,14 +12,17 @@ import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
 import FileInput from "@/components/form/input/FileInput";
 import Switch from "@/components/form/switch/Switch";
+import FormSEOSection from "@/components/form/FormSEOSection";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
+
+import { Authorized } from "@/components/auth/Authorized";
 
 import { useFieldErrors } from "@/hooks/useFieldErrors";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 import { uploadMedia } from "@/lib/uploadMedia";
 import { formatSlug } from "@/lib/utils";
-import type { Media } from "@/lib/types";
+import type { Media, Seo } from "@/lib/types";
 
 type Fields = "name" | "slug" | "image";
 
@@ -34,6 +37,8 @@ export default function CategoryFormClient({ mode, id }: Props) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [seo, setSeo] = useState<Seo>({});
+  const [uploadingSeoImg, setUploadingSeoImg] = useState(false);
 
   const [image, setImage] = useState<Media | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -66,6 +71,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
       setSlug(data.slug);
       setImage(data.image);
       setDescription(data.description ?? "");
+      setSeo(data.seo ?? {});
       setIsActive(data.isActive);
     } catch (err: any) {
       setEditError(err.message ?? "Failed to load category");
@@ -81,6 +87,15 @@ export default function CategoryFormClient({ mode, id }: Props) {
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSlug(formatSlug(e.target.value));
   };
+
+  async function handleUploadOgImage(file: File) {
+    setUploadingSeoImg(true);
+    try {
+      return await uploadMedia(file, "seo");
+    } finally {
+      setUploadingSeoImg(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -123,6 +138,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
             slug,
             image,
             description,
+            seo,
             isActive,
           }),
         }
@@ -257,6 +273,19 @@ export default function CategoryFormClient({ mode, id }: Props) {
                 />
               </FormField>
             </div>
+
+            <Authorized
+              permission={mode === "create" ? "seo:create" : "seo:update"}
+            >
+              <FormSEOSection
+                value={seo}
+                onChange={setSeo}
+                uploading={uploadingSeoImg}
+                onUploadOgImage={handleUploadOgImage}
+                collapsible
+                defaultOpen={false}
+              />
+            </Authorized>
 
             {/* Actions */}
             <FormActions

@@ -12,7 +12,10 @@ import {
   ViewField,
   ViewImage,
   ViewSection,
+  ViewSEOSection,
 } from "@/components/view";
+
+import { Authorized } from "@/components/auth/Authorized";
 
 import { useAdminEntity } from "@/hooks/useAdminEntity";
 
@@ -78,6 +81,14 @@ export default function CategoryViewClient({ id }: Props) {
                 <ViewField label="Description" value={category.description} />
               </div>
             )}
+
+            <Authorized permission="seo:read">
+              <ViewSEOSection
+                seo={category.seo}
+                collapsible
+                defaultOpen={false}
+              />
+            </Authorized>
 
             <ViewSection>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

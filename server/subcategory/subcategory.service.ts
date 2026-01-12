@@ -34,6 +34,7 @@ export async function createSubCategory(input: CreateSubCategoryInput) {
     image: input.image,
     category: input.category,
     description: input.description,
+    seo: input.seo,
     isActive: input.isActive ?? true,
   });
 

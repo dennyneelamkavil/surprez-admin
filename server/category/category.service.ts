@@ -25,6 +25,7 @@ export async function createCategory(input: CreateCategoryInput) {
     slug,
     image: input.image,
     description: input.description,
+    seo: input.seo,
     isActive: input.isActive ?? true,
   });
 

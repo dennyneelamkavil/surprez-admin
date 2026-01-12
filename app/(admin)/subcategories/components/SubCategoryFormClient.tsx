@@ -13,14 +13,17 @@ import TextArea from "@/components/form/input/TextArea";
 import FileInput from "@/components/form/input/FileInput";
 import Switch from "@/components/form/switch/Switch";
 import Select from "@/components/form/Select";
+import FormSEOSection from "@/components/form/FormSEOSection";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
+
+import { Authorized } from "@/components/auth/Authorized";
 
 import { useFieldErrors } from "@/hooks/useFieldErrors";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 import { uploadMedia } from "@/lib/uploadMedia";
 import { formatSlug } from "@/lib/utils";
-import type { Media, CategoryBase } from "@/lib/types";
+import type { Media, CategoryBase, Seo } from "@/lib/types";
 
 type Fields = "name" | "slug" | "image" | "category";
 
@@ -35,6 +38,8 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [seo, setSeo] = useState<Seo>({});
+  const [uploadingSeoImg, setUploadingSeoImg] = useState(false);
 
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<CategoryBase[]>([]);
@@ -79,6 +84,7 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
       setCategory(data.category.id);
       setImage(data.image);
       setDescription(data.description ?? "");
+      setSeo(data.seo ?? {});
       setIsActive(data.isActive);
     } catch (err: any) {
       setEditError(err.message ?? "Failed to load subcategory");
@@ -100,6 +106,15 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSlug(formatSlug(e.target.value));
   };
+
+  async function handleUploadOgImage(file: File) {
+    setUploadingSeoImg(true);
+    try {
+      return await uploadMedia(file, "seo");
+    } finally {
+      setUploadingSeoImg(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -148,6 +163,7 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
             category,
             image,
             description,
+            seo,
             isActive,
           }),
         }
@@ -297,6 +313,19 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
                 />
               </FormField>
             </div>
+
+            <Authorized
+              permission={mode === "create" ? "seo:create" : "seo:update"}
+            >
+              <FormSEOSection
+                value={seo}
+                onChange={setSeo}
+                uploading={uploadingSeoImg}
+                onUploadOgImage={handleUploadOgImage}
+                collapsible
+                defaultOpen={false}
+              />
+            </Authorized>
 
             <FormActions
               primaryLabel={
