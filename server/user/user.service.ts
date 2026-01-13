@@ -2,6 +2,8 @@ import "server-only";
 
 import bcrypt from "bcryptjs";
 
+import { auth } from "@/server/auth/session";
+
 import { connectDB } from "@/server/db";
 import { UserModel } from "@/server/models/user.model";
 import "@/server/models/role.model";
@@ -177,12 +179,34 @@ export async function getUserById(id: string) {
 export async function updateUser(id: string, input: UpdateUserInput) {
   await connectDB();
 
-  const existing = await UserModel.findById(id).select("username").lean();
+  const session = await auth();
+  const currentUserId = session?.user?.id;
+  if (!currentUserId) {
+    throw new AppError("Unauthorized", 401);
+  }
+
+  const existing = await UserModel.findById(id).lean();
   if (!existing) {
     throw new AppError("User not found", 404);
   }
+
+  // SYSTEM USER GUARD
   if (existing.username === "superadmin") {
     throw new AppError("System user cannot be modified", 403);
+  }
+
+  // SELF USER GUARD
+  if (id === currentUserId) {
+    if (input.role && String(existing.role) !== String(input.role)) {
+      throw new AppError("You cannot change your own role", 403);
+    }
+
+    if (
+      typeof input.isActive === "boolean" &&
+      existing.isActive !== input.isActive
+    ) {
+      throw new AppError("You cannot deactivate your own account", 403);
+    }
   }
 
   const update: any = { ...input };
@@ -208,11 +232,23 @@ export async function updateUser(id: string, input: UpdateUserInput) {
 export async function deleteUser(id: string) {
   await connectDB();
 
+  const session = await auth();
+  const currentUserId = session?.user?.id;
+  if (!currentUserId) {
+    throw new AppError("Unauthorized", 401);
+  }
+
+  // SELF USER GUARD
+  if (id === currentUserId) {
+    throw new AppError("You cannot delete your own account", 403);
+  }
+
   const user = await UserModel.findById(id).select("username");
   if (!user) {
     throw new AppError("User not found", 404);
   }
 
+  // SYSTEM USER GUARD
   if (user.username === "superadmin") {
     throw new AppError("System user cannot be deleted", 403);
   }

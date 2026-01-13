@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import FormHeader from "@/components/form/FormHeader";
 import FormError from "@/components/form/FormError";
@@ -18,6 +19,8 @@ type Props = {
 };
 
 export default function RoleViewClient({ id }: Props) {
+  const { data: session } = useSession();
+  const currentUserRoleId = session?.user?.role?.id;
   const router = useRouter();
 
   const {
@@ -82,6 +85,7 @@ export default function RoleViewClient({ id }: Props) {
               primaryLabel="Edit Role"
               onPrimary={() => router.push(`/roles/${id}/edit`)}
               onBack={() => router.push("/roles")}
+              primaryDisabled={id === currentUserRoleId}
             />
           </div>
         )}

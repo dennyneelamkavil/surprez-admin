@@ -19,6 +19,7 @@ type ListActionsProps = {
 
   disableDelete?: boolean;
   disableToggle?: boolean;
+  disableEdit?: boolean;
 };
 
 export default function ListActions({
@@ -33,6 +34,7 @@ export default function ListActions({
 
   disableDelete = false,
   disableToggle = false,
+  disableEdit = false,
 }: ListActionsProps) {
   return (
     <div className="inline-flex items-center gap-3">
@@ -79,14 +81,20 @@ export default function ListActions({
       {/* Edit */}
       {editHref && editPermission && (
         <Authorized permission={editPermission}>
-          <Tooltip content="Edit">
-            <Link
-              href={editHref}
-              aria-label="Edit"
-              className="inline-flex items-center text-brand-500 hover:text-brand-600"
-            >
-              <Pencil size={16} />
-            </Link>
+          <Tooltip content="Edit" disabled={disableEdit}>
+            {disableEdit ? (
+              <span className="inline-flex items-center text-brand-500 hover:text-brand-600 cursor-not-allowed opacity-60">
+                <Pencil size={16} />
+              </span>
+            ) : (
+              <Link
+                href={editHref}
+                aria-label="Edit"
+                className="inline-flex items-center text-brand-500 hover:text-brand-600"
+              >
+                <Pencil size={16} />
+              </Link>
+            )}
           </Tooltip>
         </Authorized>
       )}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 
@@ -26,6 +27,8 @@ type Props = {
 };
 
 export default function UserFormClient({ mode, id }: Props) {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
   const router = useRouter();
 
   const [username, setUsername] = useState("");
@@ -218,6 +221,7 @@ export default function UserFormClient({ mode, id }: Props) {
                   }}
                   error={!!fieldErrors.role}
                   hint={fieldErrors.role}
+                  disabled={id === currentUserId}
                 />
               </FormField>
             </div>
@@ -307,6 +311,7 @@ export default function UserFormClient({ mode, id }: Props) {
                   label={isActive ? "Active" : "Inactive"}
                   defaultChecked={isActive}
                   onChange={setIsActive}
+                  disabled={id === currentUserId}
                 />
               </FormField>
             </div>

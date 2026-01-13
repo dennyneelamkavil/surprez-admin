@@ -1,5 +1,7 @@
 import "server-only";
 
+import { auth } from "@/server/auth/session";
+
 import { connectDB } from "@/server/db";
 import { RoleModel } from "@/server/models/role.model";
 import { UserModel } from "@/server/models/user.model";
@@ -121,10 +123,26 @@ export async function getRoleById(id: string) {
 export async function updateRole(id: string, input: UpdateRoleInput) {
   await connectDB();
 
+  const session = await auth();
+  const currentUserRoleId = session?.user?.role?.id;
+  if (!currentUserRoleId) {
+    throw new AppError("Unauthorized", 401);
+  }
+
+  // SELF ROLE GUARD
+  if (id === currentUserRoleId) {
+    throw new AppError(
+      "You cannot modify the role currently assigned to you",
+      403
+    );
+  }
+
   const existing = await RoleModel.findById(id).select("name").lean();
   if (!existing) {
     throw new AppError("Role not found", 404);
   }
+
+  // SYSTEM ROLE GUARD
   if (existing.name === "superadmin") {
     throw new AppError("System role cannot be modified", 403);
   }
@@ -143,10 +161,26 @@ export async function updateRole(id: string, input: UpdateRoleInput) {
 export async function deleteRole(id: string) {
   await connectDB();
 
+  const session = await auth();
+  const currentUserRoleId = session?.user?.role?.id;
+  if (!currentUserRoleId) {
+    throw new AppError("Unauthorized", 401);
+  }
+
+  // SELF ROLE GUARD
+  if (id === currentUserRoleId) {
+    throw new AppError(
+      "You cannot delete the role currently assigned to you",
+      403
+    );
+  }
+
   const existing = await RoleModel.findById(id).select("name").lean();
   if (!existing) {
     throw new AppError("Role not found", 404);
   }
+
+  // SYSTEM ROLE GUARD
   if (existing.name === "superadmin") {
     throw new AppError("System role cannot be deleted", 403);
   }

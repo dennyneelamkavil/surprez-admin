@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
@@ -24,6 +25,8 @@ type Props = {
 };
 
 export default function RoleFormClient({ mode, id }: Props) {
+  const { data: session } = useSession();
+  const currentUserRoleId = session?.user?.role?.id;
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -141,6 +144,20 @@ export default function RoleFormClient({ mode, id }: Props) {
   }
 
   const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
+
+  if (currentUserRoleId && id === currentUserRoleId) {
+    return (
+      <div className="space-y-6">
+        <FormHeader
+          title={mode === "create" ? "Create Role" : "Edit Role"}
+          backHref="/roles"
+        />
+        <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+          <FormError error={"You cannot edit your own role"} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

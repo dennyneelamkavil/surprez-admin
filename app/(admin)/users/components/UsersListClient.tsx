@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
 import {
@@ -22,6 +23,9 @@ import { deleteAction, toggleAction } from "@/lib/actions";
 type UserSortKey = "username" | "fullname" | "isActive" | "createdAt";
 
 export default function UsersListClient() {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
+
   const [item, setItem] = useState<User | null>(null);
   const [toggleItem, setToggleItem] = useState<User | null>(null);
   const [role, setRole] = useState("");
@@ -50,7 +54,7 @@ export default function UsersListClient() {
   });
 
   async function confirmDelete() {
-    if (!item) return;
+    if (!item || item.id === currentUserId) return;
 
     const success = await deleteAction(`/api/admin/users/${item.id}`, {
       successMessage: "User deleted successfully",
@@ -64,7 +68,7 @@ export default function UsersListClient() {
   }
 
   async function confirmToggleStatus() {
-    if (!toggleItem) return;
+    if (!toggleItem || toggleItem.id === currentUserId) return;
 
     const success = await toggleAction(
       `/api/admin/users/${toggleItem.id}`,
@@ -218,6 +222,8 @@ export default function UsersListClient() {
                         onDelete={() => setItem(user)}
                         editPermission="user:update"
                         deletePermission="user:delete"
+                        disableToggle={user.id === currentUserId}
+                        disableDelete={user.id === currentUserId}
                       />
                     </td>
                   </tr>

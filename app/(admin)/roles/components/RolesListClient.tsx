@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
 import {
@@ -21,6 +22,9 @@ import { deleteAction } from "@/lib/actions";
 type RoleSortKey = "name" | "isSuperAdmin" | "createdAt";
 
 export default function RolesListClient() {
+  const { data: session } = useSession();
+  const currentUserRoleId = session?.user?.role?.id;
+
   const [item, setItem] = useState<Role | null>(null);
 
   const {
@@ -145,6 +149,8 @@ export default function RolesListClient() {
                       onDelete={() => setItem(role)}
                       editPermission="role:update"
                       deletePermission="role:delete"
+                      disableEdit={role.id === currentUserRoleId}
+                      disableDelete={role.id === currentUserRoleId}
                     />
                   </td>
                 </tr>
