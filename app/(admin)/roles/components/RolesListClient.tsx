@@ -139,19 +139,13 @@ export default function RolesListClient() {
                     {new Date(role.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-5 py-4 text-right">
-                    {role.name === "superadmin" ? (
-                      <span className="text-sm italic text-gray-400">
-                        System role
-                      </span>
-                    ) : (
-                      <ListActions
-                        viewHref={`/roles/${role.id}/view`}
-                        editHref={`/roles/${role.id}/edit`}
-                        onDelete={() => setItem(role)}
-                        editPermission="role:update"
-                        deletePermission="role:delete"
-                      />
-                    )}
+                    <ListActions
+                      viewHref={`/roles/${role.id}/view`}
+                      editHref={`/roles/${role.id}/edit`}
+                      onDelete={() => setItem(role)}
+                      editPermission="role:update"
+                      deletePermission="role:delete"
+                    />
                   </td>
                 </tr>
               ))

@@ -171,7 +171,6 @@ export default function UserFormClient({ mode, id }: Props) {
     label: r.name,
   }));
 
-  const isSuperAdminEdit = mode === "edit" && username === "superadmin";
   const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
 
   return (
@@ -203,7 +202,6 @@ export default function UserFormClient({ mode, id }: Props) {
                   }}
                   error={!!fieldErrors.username}
                   hint={fieldErrors.username}
-                  disabled={isSuperAdminEdit}
                   autoFocus
                 />
               </FormField>
@@ -220,7 +218,6 @@ export default function UserFormClient({ mode, id }: Props) {
                   }}
                   error={!!fieldErrors.role}
                   hint={fieldErrors.role}
-                  disabled={isSuperAdminEdit}
                 />
               </FormField>
             </div>

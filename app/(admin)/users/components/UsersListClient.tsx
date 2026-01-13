@@ -218,8 +218,6 @@ export default function UsersListClient() {
                         onDelete={() => setItem(user)}
                         editPermission="user:update"
                         deletePermission="user:delete"
-                        disableToggle={user.username === "superadmin"}
-                        disableDelete={user.username === "superadmin"}
                       />
                     </td>
                   </tr>
