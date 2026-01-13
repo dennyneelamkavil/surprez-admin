@@ -56,7 +56,9 @@ export async function listRoles(params: {
     defaultSortDir: "desc",
   });
 
-  const query: any = {};
+  const query: any = {
+    name: { $ne: "superadmin" },
+  };
 
   if (params.search) {
     query.name = { $regex: params.search, $options: "i" };
@@ -119,6 +121,14 @@ export async function getRoleById(id: string) {
 export async function updateRole(id: string, input: UpdateRoleInput) {
   await connectDB();
 
+  const existing = await RoleModel.findById(id).select("name").lean();
+  if (!existing) {
+    throw new AppError("Role not found", 404);
+  }
+  if (existing.name === "superadmin") {
+    throw new AppError("System role cannot be modified", 403);
+  }
+
   const role = await RoleModel.findByIdAndUpdate(id, input, {
     new: true,
   }).populate("permissions");
@@ -132,6 +142,14 @@ export async function updateRole(id: string, input: UpdateRoleInput) {
 /* ================= DELETE ================= */
 export async function deleteRole(id: string) {
   await connectDB();
+
+  const existing = await RoleModel.findById(id).select("name").lean();
+  if (!existing) {
+    throw new AppError("Role not found", 404);
+  }
+  if (existing.name === "superadmin") {
+    throw new AppError("System role cannot be deleted", 403);
+  }
 
   const roleInUse = await UserModel.exists({
     role: id,

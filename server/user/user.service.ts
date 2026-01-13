@@ -93,7 +93,9 @@ export async function listUsers(params: {
     defaultSortDir: "desc",
   });
 
-  const query: any = {};
+  const query: any = {
+    username: { $ne: "superadmin" },
+  };
 
   if (params.search) {
     query.$or = [
@@ -175,6 +177,14 @@ export async function getUserById(id: string) {
 export async function updateUser(id: string, input: UpdateUserInput) {
   await connectDB();
 
+  const existing = await UserModel.findById(id).select("username").lean();
+  if (!existing) {
+    throw new AppError("User not found", 404);
+  }
+  if (existing.username === "superadmin") {
+    throw new AppError("System user cannot be modified", 403);
+  }
+
   const update: any = { ...input };
 
   if (input.password) {
@@ -198,10 +208,16 @@ export async function updateUser(id: string, input: UpdateUserInput) {
 export async function deleteUser(id: string) {
   await connectDB();
 
-  const user = await UserModel.findByIdAndDelete(id);
-
+  const user = await UserModel.findById(id).select("username");
   if (!user) {
     throw new AppError("User not found", 404);
   }
+
+  if (user.username === "superadmin") {
+    throw new AppError("System user cannot be deleted", 403);
+  }
+
+  await UserModel.findByIdAndDelete(id);
+
   return { success: true };
 }
