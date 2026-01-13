@@ -9,6 +9,8 @@ import {
   UpdatePageSeoInput,
 } from "@/server/page-seo/page-seo.validation";
 
+import { buildSortSpec } from "@/server/utils/build-sort-spec";
+
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
@@ -34,12 +36,22 @@ export async function listPageSeos(params?: {
   limit?: number;
   search?: string;
   all?: boolean;
+  sortBy?: string;
+  sortDir?: string;
 }) {
   await connectDB();
 
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
   const skip = (page - 1) * limit;
+
+  const { sortSpec, sortBy, sortDir } = buildSortSpec({
+    type: "pageseo",
+    sortBy: params?.sortBy,
+    sortDir: params?.sortDir,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
 
   const query: any = {};
 
@@ -51,14 +63,15 @@ export async function listPageSeos(params?: {
     const pageSeos = await PageSeoModel.find(query).sort({ pageKey: 1 }).lean();
 
     return {
-      pageSeos: pageSeos.map(mapPageSeo),
+      data: pageSeos.map(mapPageSeo),
       pagination: null,
     };
   }
 
   const [pageSeos, total] = await Promise.all([
     PageSeoModel.find(query)
-      .sort({ pageKey: 1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort(sortSpec)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -68,12 +81,16 @@ export async function listPageSeos(params?: {
   const totalPages = Math.ceil(total / limit);
 
   return {
-    pageSeos: pageSeos.map(mapPageSeo),
+    data: pageSeos.map(mapPageSeo),
     pagination: {
       page,
       limit,
       total,
       totalPages,
+    },
+    sort: {
+      by: sortBy,
+      dir: sortDir,
     },
   };
 }

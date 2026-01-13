@@ -10,6 +10,8 @@ import type {
   UpdatePermissionInput,
 } from "@/server/permission/permission.validation";
 
+import { buildSortSpec } from "@/server/utils/build-sort-spec";
+
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
@@ -31,12 +33,22 @@ export async function listPermissions(params: {
   limit?: number;
   search?: string;
   all?: boolean;
+  sortBy?: string;
+  sortDir?: string;
 }) {
   await connectDB();
 
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(50, params.limit ?? 10);
   const skip = (page - 1) * limit;
+
+  const { sortSpec, sortBy, sortDir } = buildSortSpec({
+    type: "permission",
+    sortBy: params?.sortBy,
+    sortDir: params?.sortDir,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
 
   const query: any = {};
 
@@ -50,14 +62,15 @@ export async function listPermissions(params: {
       .lean();
 
     return {
-      permissions: permissions.map(mapPermission),
+      data: permissions.map(mapPermission),
       pagination: null,
     };
   }
 
   const [permissions, total] = await Promise.all([
     PermissionModel.find(query)
-      .sort({ createdAt: -1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort(sortSpec)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -67,12 +80,16 @@ export async function listPermissions(params: {
   const totalPages = Math.ceil(total / limit);
 
   return {
-    permissions: permissions.map(mapPermission),
+    data: permissions.map(mapPermission),
     pagination: {
       page,
       limit,
       total,
       totalPages,
+    },
+    sort: {
+      by: sortBy,
+      dir: sortDir,
     },
   };
 }

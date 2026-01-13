@@ -39,9 +39,10 @@ export async function GET(req: Request) {
     const page = Number(searchParams.get("page") ?? 1);
     const limit = Number(searchParams.get("limit") ?? 10);
     const search = searchParams.get("search") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortDir = searchParams.get("sortDir") ?? undefined;
     const subcategoryId = searchParams.get("subcategoryId") ?? undefined;
-    const isFeatured =
-      searchParams.get("isFeatured") === "true" ? true : undefined;
+    const isFeatured = searchParams.get("isFeatured") ?? undefined;
 
     return NextResponse.json(
       await listProducts({
@@ -51,6 +52,8 @@ export async function GET(req: Request) {
         subcategoryId,
         isFeatured,
         all,
+        sortBy,
+        sortDir,
       })
     );
   } catch (err) {

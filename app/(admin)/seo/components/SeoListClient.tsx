@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
 import {
@@ -12,47 +12,34 @@ import {
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
-import type { PageSeo, PaginationMeta } from "@/lib/types";
+import type { PageSeo } from "@/lib/types";
 import { deleteAction, toggleAction } from "@/lib/actions";
 
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+import { useAdminTable } from "@/hooks/useAdminTable";
+
+type PageSeoSortKey = "pageKey" | "isActive" | "createdAt";
+
 export default function SeoListClient() {
-  const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<PageSeo | null>(null);
   const [toggleItem, setToggleItem] = useState<PageSeo | null>(null);
-  const [pageSeos, setPageSeos] = useState<PageSeo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationMeta>({
-    page: 1,
-    totalPages: 1,
+
+  const {
+    data: pageSeos,
+    loading,
+    error,
+    pagination,
+    setPage,
+    search,
+    setSearch,
+    sortState,
+    onSortChange,
+    refetch,
+  } = useAdminTable<PageSeo, PageSeoSortKey>({
+    endpoint: "seo",
+    storageKey: "table:seo",
+    defaultSort: { key: "createdAt", direction: "desc" },
   });
-
-  const fetchPages = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/seo?page=${page}&limit=10&search=${search}`,
-        { cache: "no-store" }
-      );
-
-      if (!res.ok) throw new Error("Failed to fetch");
-
-      const data = await res.json();
-
-      setPageSeos(data.pageSeos ?? data);
-      if (data.pagination) {
-        setPagination({
-          page: data.pagination.page,
-          totalPages: data.pagination.totalPages,
-        });
-      }
-    } catch (error: any) {
-      setError(error.message ?? "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search]);
 
   async function confirmDelete() {
     if (!item) return;
@@ -62,7 +49,7 @@ export default function SeoListClient() {
       errorMessage: "Failed to delete Page SEO",
     });
 
-    if (success) fetchPages();
+    if (success) refetch();
     setItem(null);
   }
 
@@ -78,13 +65,9 @@ export default function SeoListClient() {
       }
     );
 
-    if (success) fetchPages();
+    if (success) refetch();
     setToggleItem(null);
   }
-
-  useEffect(() => {
-    fetchPages();
-  }, [fetchPages]);
 
   return (
     <div className="space-y-6">
@@ -114,13 +97,31 @@ export default function SeoListClient() {
             <thead className="border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Page
+                  <SortableTableHeader<PageSeoSortKey>
+                    columnKey="pageKey"
+                    label="Page"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Status
+                  <SortableTableHeader<PageSeoSortKey>
+                    columnKey="isActive"
+                    label="Status"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Created
+                  <SortableTableHeader<PageSeoSortKey>
+                    columnKey="createdAt"
+                    label="Created"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-right text-sm font-medium text-gray-500 dark:text-gray-400">
                   Actions
@@ -175,7 +176,7 @@ export default function SeoListClient() {
           </table>
         </div>
 
-        {pagination.totalPages > 1 && (
+        {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-end p-4">
             <Pagination
               currentPage={pagination.page}

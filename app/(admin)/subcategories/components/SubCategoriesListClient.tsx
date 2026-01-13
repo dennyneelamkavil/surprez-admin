@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
@@ -14,58 +14,42 @@ import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
-import type { SubCategory, CategoryBase, PaginationMeta } from "@/lib/types";
+import type { SubCategory, CategoryBase } from "@/lib/types";
 import { deleteAction, toggleAction } from "@/lib/actions";
 
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+import { useAdminTable } from "@/hooks/useAdminTable";
+import { useAdminAll } from "@/hooks/useAdminAll";
+
+type SubCatSortKey = "name" | "isActive" | "createdAt";
+
 export default function SubCategoriesListClient() {
-  const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<SubCategory | null>(null);
   const [toggleItem, setToggleItem] = useState<SubCategory | null>(null);
   const [category, setCategory] = useState("");
-  const [categories, setCategories] = useState<CategoryBase[]>([]);
-  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationMeta>({
-    page: 1,
-    totalPages: 1,
+
+  const {
+    data: subCategories,
+    loading,
+    error,
+    pagination,
+    setPage,
+    search,
+    setSearch,
+    sortState,
+    onSortChange,
+    refetch,
+  } = useAdminTable<SubCategory, SubCatSortKey>({
+    endpoint: "subcategories",
+    storageKey: "table:subcategories",
+    defaultSort: { key: "createdAt", direction: "desc" },
+    extraParams: () => ({
+      categoryId: category,
+    }),
   });
-
-  async function fetchCategories() {
-    const res = await fetch("/api/admin/categories?all=true", {
-      cache: "no-store",
-    });
-    const data = await res.json();
-    setCategories(data.categories ?? data);
-  }
-
-  const fetchSubCategories = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/subcategories?page=${page}&limit=10&search=${search}&categoryId=${category}`,
-        { cache: "no-store" }
-      );
-
-      if (!res.ok) throw new Error("Failed to fetch");
-
-      const data = await res.json();
-
-      // supports both paginated & non-paginated responses
-      setSubCategories(data.subcategories ?? data);
-      if (data.pagination) {
-        setPagination({
-          page: data.pagination.page,
-          totalPages: data.pagination.totalPages,
-        });
-      }
-    } catch (error: any) {
-      setError(error.message ?? "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, category]);
+  const { data: categories } = useAdminAll<CategoryBase>({
+    endpoint: "categories",
+  });
 
   async function confirmDelete() {
     if (!item) return;
@@ -76,7 +60,7 @@ export default function SubCategoriesListClient() {
     });
 
     if (success) {
-      fetchSubCategories();
+      refetch();
     }
     setItem(null);
   }
@@ -94,15 +78,10 @@ export default function SubCategoriesListClient() {
     );
 
     if (success) {
-      fetchSubCategories();
+      refetch();
     }
     setToggleItem(null);
   }
-
-  useEffect(() => {
-    fetchSubCategories();
-    fetchCategories();
-  }, [fetchSubCategories]);
 
   function clearFilters() {
     setSearch("");
@@ -152,7 +131,13 @@ export default function SubCategoriesListClient() {
             <thead className="border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Name
+                  <SortableTableHeader<SubCatSortKey>
+                    columnKey="name"
+                    label="Name"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
                   Category
@@ -161,10 +146,22 @@ export default function SubCategoriesListClient() {
                   Image
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Status
+                  <SortableTableHeader<SubCatSortKey>
+                    columnKey="isActive"
+                    label="Status"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Created
+                  <SortableTableHeader<SubCatSortKey>
+                    columnKey="createdAt"
+                    label="Created"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-right text-sm font-medium text-gray-500 dark:text-gray-400">
                   Actions
@@ -232,7 +229,7 @@ export default function SubCategoriesListClient() {
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
+        {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-end p-4">
             <Pagination
               currentPage={pagination.page}

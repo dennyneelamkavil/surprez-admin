@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
 import {
@@ -12,46 +12,33 @@ import {
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
-import type { Role, PaginationMeta } from "@/lib/types";
+import type { Role } from "@/lib/types";
 import { deleteAction } from "@/lib/actions";
 
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+import { useAdminTable } from "@/hooks/useAdminTable";
+
+type RoleSortKey = "name" | "isSuperAdmin" | "createdAt";
+
 export default function RolesListClient() {
-  const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<Role | null>(null);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationMeta>({
-    page: 1,
-    totalPages: 1,
+
+  const {
+    data: roles,
+    loading,
+    error,
+    pagination,
+    setPage,
+    search,
+    setSearch,
+    sortState,
+    onSortChange,
+    refetch,
+  } = useAdminTable<Role, RoleSortKey>({
+    endpoint: "roles",
+    storageKey: "table:roles",
+    defaultSort: { key: "createdAt", direction: "desc" },
   });
-
-  const fetchRoles = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/roles?page=${page}&limit=10&search=${search}`,
-        { cache: "no-store" }
-      );
-
-      if (!res.ok) throw new Error("Failed to fetch");
-
-      const data = await res.json();
-
-      setRoles(data.roles ?? data);
-      if (data.pagination) {
-        setPagination({
-          page: data.pagination.page,
-          totalPages: data.pagination.totalPages,
-        });
-      }
-    } catch (error: any) {
-      setError(error.message ?? "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search]);
 
   async function confirmDelete() {
     if (!item) return;
@@ -62,14 +49,10 @@ export default function RolesListClient() {
     });
 
     if (success) {
-      fetchRoles();
+      refetch();
     }
     setItem(null);
   }
-
-  useEffect(() => {
-    fetchRoles();
-  }, [fetchRoles]);
 
   return (
     <div className="space-y-6">
@@ -98,13 +81,31 @@ export default function RolesListClient() {
           <thead className="border-b dark:border-gray-800">
             <tr>
               <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                Name
+                <SortableTableHeader<RoleSortKey>
+                  columnKey="name"
+                  label="Name"
+                  activeKey={sortState.key}
+                  direction={sortState.direction}
+                  onSort={onSortChange}
+                />
               </th>
               <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                Super Admin
+                <SortableTableHeader<RoleSortKey>
+                  columnKey="isSuperAdmin"
+                  label="Super Admin"
+                  activeKey={sortState.key}
+                  direction={sortState.direction}
+                  onSort={onSortChange}
+                />
               </th>
               <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                Created
+                <SortableTableHeader<RoleSortKey>
+                  columnKey="createdAt"
+                  label="Created"
+                  activeKey={sortState.key}
+                  direction={sortState.direction}
+                  onSort={onSortChange}
+                />
               </th>
               <th className="px-5 py-3 text-right text-sm font-medium text-gray-500 dark:text-gray-400">
                 Actions
@@ -158,7 +159,7 @@ export default function RolesListClient() {
           </tbody>
         </table>
 
-        {pagination.totalPages > 1 && (
+        {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-end p-4">
             <Pagination
               currentPage={pagination.page}

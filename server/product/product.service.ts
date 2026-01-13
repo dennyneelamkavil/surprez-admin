@@ -13,6 +13,7 @@ import type {
 } from "@/server/product/product.validation";
 
 import { generateUniqueProductSlug } from "@/server/utils/slug.util";
+import { buildSortSpec } from "@/server/utils/build-sort-spec";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
 import { AppError } from "@/server/errors/AppError";
 
@@ -47,14 +48,24 @@ export async function listProducts(params?: {
   limit?: number;
   search?: string;
   all?: boolean;
+  sortBy?: string;
+  sortDir?: string;
   subcategoryId?: string;
-  isFeatured?: boolean;
+  isFeatured?: string;
 }) {
   await connectDB();
 
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
   const skip = (page - 1) * limit;
+
+  const { sortSpec, sortBy, sortDir } = buildSortSpec({
+    type: "product",
+    sortBy: params?.sortBy,
+    sortDir: params?.sortDir,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
 
   const query: any = {};
 
@@ -66,8 +77,10 @@ export async function listProducts(params?: {
     query.subcategories = params.subcategoryId;
   }
 
-  if (typeof params?.isFeatured === "boolean") {
-    query.isFeatured = params.isFeatured;
+  if (params?.isFeatured === "true") {
+    query.isFeatured = true;
+  } else if (params?.isFeatured === "false") {
+    query.isFeatured = false;
   }
 
   if (params?.all) {
@@ -78,7 +91,7 @@ export async function listProducts(params?: {
       .lean();
 
     return {
-      products: products.map(mapProduct),
+      data: products.map(mapProduct),
       pagination: null,
     };
   }
@@ -86,7 +99,8 @@ export async function listProducts(params?: {
   const [products, total] = await Promise.all([
     ProductModel.find(query)
       .populate("subcategories")
-      .sort({ createdAt: -1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort(sortSpec)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -94,12 +108,16 @@ export async function listProducts(params?: {
   ]);
 
   return {
-    products: products.map(mapProduct),
+    data: products.map(mapProduct),
     pagination: {
       page,
       limit,
       total,
       totalPages: Math.ceil(total / limit),
+    },
+    sort: {
+      by: sortBy,
+      dir: sortDir,
     },
   };
 }

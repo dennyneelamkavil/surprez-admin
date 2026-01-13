@@ -13,6 +13,8 @@ import type {
   UpdateUserInput,
 } from "@/server/user/user.validation";
 
+import { buildSortSpec } from "@/server/utils/build-sort-spec";
+
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= VERIFY ================= */
@@ -73,6 +75,8 @@ export async function listUsers(params: {
   limit?: number;
   search?: string;
   all?: boolean;
+  sortBy?: string;
+  sortDir?: string;
   roleId?: string;
 }) {
   await connectDB();
@@ -80,6 +84,14 @@ export async function listUsers(params: {
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(50, params.limit ?? 10);
   const skip = (page - 1) * limit;
+
+  const { sortSpec, sortBy, sortDir } = buildSortSpec({
+    type: "user",
+    sortBy: params?.sortBy,
+    sortDir: params?.sortDir,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
 
   const query: any = {};
 
@@ -106,7 +118,7 @@ export async function listUsers(params: {
       .lean();
 
     return {
-      users: users.map(mapUser),
+      data: users.map(mapUser),
       pagination: null,
     };
   }
@@ -117,7 +129,8 @@ export async function listUsers(params: {
         path: "role",
         populate: { path: "permissions" },
       })
-      .sort({ createdAt: -1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort(sortSpec)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -127,12 +140,16 @@ export async function listUsers(params: {
   const totalPages = Math.ceil(total / limit);
 
   return {
-    users: users.map(mapUser),
+    data: users.map(mapUser),
     pagination: {
       page,
       limit,
       total,
       totalPages,
+    },
+    sort: {
+      by: sortBy,
+      dir: sortDir,
     },
   };
 }

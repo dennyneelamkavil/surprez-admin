@@ -40,8 +40,17 @@ export async function GET(req: Request) {
     const page = Number(searchParams.get("page") ?? 1);
     const limit = Number(searchParams.get("limit") ?? 10);
     const search = searchParams.get("search") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortDir = searchParams.get("sortDir") ?? undefined;
 
-    const roles = await listRoles({ page, limit, search, all });
+    const roles = await listRoles({
+      page,
+      limit,
+      search,
+      all,
+      sortBy,
+      sortDir,
+    });
     return NextResponse.json(roles);
   } catch (err) {
     return handleApiError(err);

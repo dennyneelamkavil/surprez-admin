@@ -43,6 +43,8 @@ export async function GET(req: Request) {
     const page = Number(searchParams.get("page") ?? 1);
     const limit = Number(searchParams.get("limit") ?? 10);
     const search = searchParams.get("search") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortDir = searchParams.get("sortDir") ?? undefined;
     const categoryId = searchParams.get("categoryId") ?? undefined;
 
     const data = await listSubCategories({
@@ -51,6 +53,8 @@ export async function GET(req: Request) {
       search,
       categoryId,
       all,
+      sortBy,
+      sortDir,
     });
 
     return NextResponse.json(data);

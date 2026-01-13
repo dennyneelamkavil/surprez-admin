@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
@@ -14,59 +14,44 @@ import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
-import type { Product, SubCategoryBase, PaginationMeta } from "@/lib/types";
+import type { Product, SubCategoryBase } from "@/lib/types";
 import { deleteAction, toggleAction } from "@/lib/actions";
 
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+import { useAdminTable } from "@/hooks/useAdminTable";
+import { useAdminAll } from "@/hooks/useAdminAll";
+
+type ProductSortKey = "name" | "isFeatured" | "isActive" | "createdAt";
+
 export default function ProductsListClient() {
-  const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<Product | null>(null);
   const [toggleItem, setToggleItem] = useState<Product | null>(null);
-  const [subcats, setSubcats] = useState<SubCategoryBase[]>([]);
   const [subcategory, setSubcategory] = useState("");
   const [isFeatured, setIsFeatured] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationMeta>({
-    page: 1,
-    totalPages: 1,
+
+  const {
+    data: products,
+    loading,
+    error,
+    pagination,
+    setPage,
+    search,
+    setSearch,
+    sortState,
+    onSortChange,
+    refetch,
+  } = useAdminTable<Product, ProductSortKey>({
+    endpoint: "products",
+    storageKey: "table:products",
+    defaultSort: { key: "createdAt", direction: "desc" },
+    extraParams: () => ({
+      subcategoryId: subcategory,
+      isFeatured,
+    }),
   });
-
-  async function fetchSubCategories() {
-    const res = await fetch("/api/admin/subcategories?all=true", {
-      cache: "no-store",
-    });
-    const data = await res.json();
-    setSubcats(data.subcategories ?? data);
-  }
-
-  const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/products?page=${page}&limit=10&search=${search}&subcategoryId=${subcategory}&isFeatured=${isFeatured}`,
-        { cache: "no-store" }
-      );
-
-      if (!res.ok) throw new Error("Failed to fetch");
-
-      const data = await res.json();
-
-      // supports both paginated & non-paginated responses
-      setProducts(data.products ?? data);
-      if (data.pagination) {
-        setPagination({
-          page: data.pagination.page,
-          totalPages: data.pagination.totalPages,
-        });
-      }
-    } catch (error: any) {
-      setError(error.message ?? "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, subcategory, isFeatured]);
+  const { data: subcats } = useAdminAll<SubCategoryBase>({
+    endpoint: "subcategories",
+  });
 
   async function confirmDelete() {
     if (!item) return;
@@ -77,7 +62,7 @@ export default function ProductsListClient() {
     });
 
     if (success) {
-      fetchProducts();
+      refetch();
     }
     setItem(null);
   }
@@ -95,15 +80,10 @@ export default function ProductsListClient() {
     );
 
     if (success) {
-      fetchProducts();
+      refetch();
     }
     setToggleItem(null);
   }
-
-  useEffect(() => {
-    fetchProducts();
-    fetchSubCategories();
-  }, [fetchProducts]);
 
   function clearFilters() {
     setSearch("");
@@ -151,6 +131,7 @@ export default function ProductsListClient() {
         <div className="w-full sm:max-w-xs">
           <Select
             options={[
+              { value: "", label: "All" },
               { value: "true", label: "Featured" },
               { value: "false", label: "Not Featured" },
             ]}
@@ -171,7 +152,13 @@ export default function ProductsListClient() {
             <thead className="border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Name
+                  <SortableTableHeader<ProductSortKey>
+                    columnKey="name"
+                    label="Name"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
                   Subcategories
@@ -180,13 +167,31 @@ export default function ProductsListClient() {
                   Cover Image
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Featured
+                  <SortableTableHeader<ProductSortKey>
+                    columnKey="isFeatured"
+                    label="Featured"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Status
+                  <SortableTableHeader<ProductSortKey>
+                    columnKey="isActive"
+                    label="Status"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Created
+                  <SortableTableHeader<ProductSortKey>
+                    columnKey="createdAt"
+                    label="Created"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-right text-sm font-medium text-gray-500 dark:text-gray-400">
                   Actions
@@ -273,7 +278,7 @@ export default function ProductsListClient() {
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
+        {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-end p-4">
             <Pagination
               currentPage={pagination.page}

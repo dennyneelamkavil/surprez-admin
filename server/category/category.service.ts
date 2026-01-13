@@ -11,6 +11,7 @@ import type {
 } from "@/server/category/category.validation";
 
 import { generateUniqueCategorySlug } from "@/server/utils/slug.util";
+import { buildSortSpec } from "@/server/utils/build-sort-spec";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
 import { AppError } from "@/server/errors/AppError";
 
@@ -38,12 +39,22 @@ export async function listCategories(params?: {
   limit?: number;
   search?: string;
   all?: boolean;
+  sortBy?: string;
+  sortDir?: string;
 }) {
   await connectDB();
 
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
   const skip = (page - 1) * limit;
+
+  const { sortSpec, sortBy, sortDir } = buildSortSpec({
+    type: "category",
+    sortBy: params?.sortBy,
+    sortDir: params?.sortDir,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
 
   const query: any = {};
 
@@ -58,14 +69,15 @@ export async function listCategories(params?: {
       .lean();
 
     return {
-      categories: categories.map(mapCategory),
+      data: categories.map(mapCategory),
       pagination: null,
     };
   }
 
   const [categories, total] = await Promise.all([
     CategoryModel.find(query)
-      .sort({ createdAt: -1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort(sortSpec)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -75,12 +87,16 @@ export async function listCategories(params?: {
   const totalPages = Math.ceil(total / limit);
 
   return {
-    categories: categories.map(mapCategory),
+    data: categories.map(mapCategory),
     pagination: {
       page,
       limit,
       total,
       totalPages,
+    },
+    sort: {
+      by: sortBy,
+      dir: sortDir,
     },
   };
 }

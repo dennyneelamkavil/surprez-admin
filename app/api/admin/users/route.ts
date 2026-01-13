@@ -35,9 +35,19 @@ export async function GET(req: Request) {
     const page = Number(searchParams.get("page") ?? 1);
     const limit = Number(searchParams.get("limit") ?? 10);
     const search = searchParams.get("search") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortDir = searchParams.get("sortDir") ?? undefined;
     const roleId = searchParams.get("roleId") ?? undefined;
 
-    const users = await listUsers({ page, limit, search, all, roleId });
+    const users = await listUsers({
+      page,
+      limit,
+      search,
+      all,
+      roleId,
+      sortBy,
+      sortDir,
+    });
     return NextResponse.json(users);
   } catch (err) {
     return handleApiError(err);

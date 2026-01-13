@@ -67,9 +67,11 @@ export async function GET(req: Request) {
     const page = Number(searchParams.get("page") ?? 1);
     const limit = Number(searchParams.get("limit") ?? 10);
     const search = searchParams.get("search") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortDir = searchParams.get("sortDir") ?? undefined;
 
     return NextResponse.json(
-      await listPermissions({ page, limit, search, all })
+      await listPermissions({ page, limit, search, all, sortBy, sortDir })
     );
   } catch (err) {
     return handleApiError(err);

@@ -12,6 +12,7 @@ import type {
 } from "@/server/subcategory/subcategory.validation";
 
 import { generateUniqueSubCategorySlug } from "@/server/utils/slug.util";
+import { buildSortSpec } from "@/server/utils/build-sort-spec";
 import { deleteFromCloudinary } from "@/server/media/media.provider";
 import { AppError } from "@/server/errors/AppError";
 
@@ -47,6 +48,8 @@ export async function listSubCategories(params?: {
   limit?: number;
   search?: string;
   all?: boolean;
+  sortBy?: string;
+  sortDir?: string;
   categoryId?: string;
 }) {
   await connectDB();
@@ -54,6 +57,14 @@ export async function listSubCategories(params?: {
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
   const skip = (page - 1) * limit;
+
+  const { sortSpec, sortBy, sortDir } = buildSortSpec({
+    type: "subcategory",
+    sortBy: params?.sortBy,
+    sortDir: params?.sortDir,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
 
   const query: any = {};
 
@@ -73,7 +84,7 @@ export async function listSubCategories(params?: {
       .lean();
 
     return {
-      subcategories: subcategories.map(mapSubCategory),
+      data: subcategories.map(mapSubCategory),
       pagination: null,
     };
   }
@@ -81,7 +92,8 @@ export async function listSubCategories(params?: {
   const [subcategories, total] = await Promise.all([
     SubCategoryModel.find(query)
       .populate("category")
-      .sort({ createdAt: -1 })
+      .collation({ locale: "en", strength: 2 })
+      .sort(sortSpec)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -89,12 +101,16 @@ export async function listSubCategories(params?: {
   ]);
 
   return {
-    subcategories: subcategories.map(mapSubCategory),
+    data: subcategories.map(mapSubCategory),
     pagination: {
       page,
       limit,
       total,
       totalPages: Math.ceil(total / limit),
+    },
+    sort: {
+      by: sortBy,
+      dir: sortDir,
     },
   };
 }

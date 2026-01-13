@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
 import {
@@ -12,47 +12,33 @@ import {
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 
-import type { Permission, PaginationMeta } from "@/lib/types";
+import type { Permission } from "@/lib/types";
 import { deleteAction } from "@/lib/actions";
 
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+import { useAdminTable } from "@/hooks/useAdminTable";
+
+type PermissionSortKey = "key" | "createdAt";
+
 export default function PermissionsListClient() {
-  const [error, setError] = useState<string | null>(null);
   const [item, setItem] = useState<Permission | null>(null);
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationMeta>({
-    page: 1,
-    totalPages: 1,
+
+  const {
+    data: permissions,
+    loading,
+    error,
+    pagination,
+    setPage,
+    search,
+    setSearch,
+    sortState,
+    onSortChange,
+    refetch,
+  } = useAdminTable<Permission, PermissionSortKey>({
+    endpoint: "permissions",
+    storageKey: "table:permissions",
+    defaultSort: { key: "key", direction: "asc" },
   });
-
-  const fetchPermissions = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/permissions?page=${page}&limit=10&search=${search}`,
-        { cache: "no-store" }
-      );
-
-      if (!res.ok) throw new Error("Failed to fetch");
-
-      const data = await res.json();
-
-      // supports both paginated & non-paginated responses
-      setPermissions(data.permissions ?? data);
-      if (data.pagination) {
-        setPagination({
-          page: data.pagination.page,
-          totalPages: data.pagination.totalPages,
-        });
-      }
-    } catch (error: any) {
-      setError(error.message ?? "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search]);
 
   async function confirmDelete() {
     if (!item) return;
@@ -63,14 +49,10 @@ export default function PermissionsListClient() {
     });
 
     if (success) {
-      fetchPermissions();
+      refetch();
     }
     setItem(null);
   }
-
-  useEffect(() => {
-    fetchPermissions();
-  }, [fetchPermissions]);
 
   return (
     <div className="space-y-6">
@@ -102,13 +84,25 @@ export default function PermissionsListClient() {
             <thead className="border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Key
+                  <SortableTableHeader<PermissionSortKey>
+                    columnKey="key"
+                    label="Key"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
                   Description
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Created
+                  <SortableTableHeader<PermissionSortKey>
+                    columnKey="createdAt"
+                    label="Created"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
                 </th>
                 <th className="px-5 py-3 text-right text-sm font-medium text-gray-500 dark:text-gray-400">
                   Actions
@@ -162,7 +156,7 @@ export default function PermissionsListClient() {
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
+        {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-end p-4">
             <Pagination
               currentPage={pagination.page}
