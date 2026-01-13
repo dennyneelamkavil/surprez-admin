@@ -74,8 +74,8 @@ export default function ProductFormClient({ mode, id }: Props) {
     const res = await fetch("/api/admin/subcategories?all=true", {
       cache: "no-store",
     });
-    const data = await res.json();
-    setSubcats(data.subcategories ?? data);
+    const json = await res.json();
+    setSubcats(json.data);
   }
 
   const fetchProduct = useCallback(async () => {

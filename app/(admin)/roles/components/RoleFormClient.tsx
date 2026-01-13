@@ -47,8 +47,8 @@ export default function RoleFormClient({ mode, id }: Props) {
     const res = await fetch("/api/admin/permissions?all=true", {
       cache: "no-store",
     });
-    const data = await res.json();
-    setPermissions(data.permissions ?? data);
+    const json = await res.json();
+    setPermissions(json.data);
   }
 
   const fetchRole = useCallback(async () => {

@@ -63,8 +63,8 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
     const res = await fetch("/api/admin/categories?all=true", {
       cache: "no-store",
     });
-    const data = await res.json();
-    setCategories(data.categories ?? data);
+    const json = await res.json();
+    setCategories(json.data);
   }
 
   const fetchSubCategory = useCallback(async () => {

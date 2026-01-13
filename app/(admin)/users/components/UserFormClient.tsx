@@ -55,8 +55,8 @@ export default function UserFormClient({ mode, id }: Props) {
     const res = await fetch("/api/admin/roles?all=true", {
       cache: "no-store",
     });
-    const data = await res.json();
-    setRoles(data.roles ?? data);
+    const json = await res.json();
+    setRoles(json.data);
   }
 
   const fetchUser = useCallback(async () => {
