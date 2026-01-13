@@ -12,8 +12,7 @@ import Checkbox from "@/components/form/input/Checkbox";
 import Switch from "@/components/form/switch/Switch";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { useFieldErrors } from "@/hooks/useFieldErrors";
-import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { useFieldErrors, useScrollToTop } from "@/hooks";
 
 import type { PermissionBase } from "@/lib/types";
 

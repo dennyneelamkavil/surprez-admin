@@ -11,8 +11,7 @@ import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { useFieldErrors } from "@/hooks/useFieldErrors";
-import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { useFieldErrors, useScrollToTop } from "@/hooks";
 
 type Fields = "key";
 

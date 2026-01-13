@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export type FieldErrors<T extends string> = Partial<Record<T, string>>;
+type FieldErrors<T extends string> = Partial<Record<T, string>>;
 
 export function useFieldErrors<T extends string>() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<T>>({});

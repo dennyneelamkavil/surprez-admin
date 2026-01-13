@@ -14,7 +14,7 @@ import {
   ViewSEOSection,
 } from "@/components/view";
 
-import { useAdminEntity } from "@/hooks/useAdminEntity";
+import { useAdminEntity } from "@/hooks";
 
 import type { PageSeo } from "@/lib/types";
 

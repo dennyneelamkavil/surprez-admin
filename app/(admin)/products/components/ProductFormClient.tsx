@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+import { Authorized } from "@/components/auth/Authorized";
+
 import FormHeader from "@/components/form/FormHeader";
 import FormField from "@/components/form/FormField";
 import FormError from "@/components/form/FormError";
@@ -18,10 +20,7 @@ import Dropzone from "@/components/form/form-elements/DropZone";
 import FormSEOSection from "@/components/form/FormSEOSection";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { Authorized } from "@/components/auth/Authorized";
-
-import { useFieldErrors } from "@/hooks/useFieldErrors";
-import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { useFieldErrors, useScrollToTop } from "@/hooks";
 
 import { uploadMedia } from "@/lib/uploadMedia";
 import { formatSlug } from "@/lib/utils";

@@ -14,8 +14,7 @@ import Switch from "@/components/form/switch/Switch";
 import Select from "@/components/form/Select";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { useFieldErrors } from "@/hooks/useFieldErrors";
-import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { useFieldErrors, useScrollToTop } from "@/hooks";
 
 import type { RoleBase } from "@/lib/types";
 

@@ -12,8 +12,7 @@ import FormField from "@/components/form/FormField";
 import Input from "@/components/form/input/InputField";
 import Checkbox from "@/components/form/input/Checkbox";
 
-import { useFieldErrors } from "@/hooks/useFieldErrors";
-import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { useFieldErrors, useScrollToTop } from "@/hooks";
 
 type Fields = "username" | "password";
 

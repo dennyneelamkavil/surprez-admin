@@ -1,10 +1,12 @@
 "use client";
 
-import GridShape from "@/components/common/GridShape";
-import useGoBack from "@/hooks/useGoBack";
-import { ArrowLeft, Home } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+
+import { ArrowLeft, Home } from "lucide-react";
+
+import GridShape from "@/components/common/GridShape";
+import { useGoBack } from "@/hooks";
 
 export default function NotFoundClient() {
   const goBack = useGoBack();

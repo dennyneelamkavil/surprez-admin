@@ -12,13 +12,12 @@ import {
 import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+
+import { useAdminAll, useAdminTable } from "@/hooks";
 
 import type { User, RoleBase } from "@/lib/types";
 import { deleteAction, toggleAction } from "@/lib/actions";
-
-import { SortableTableHeader } from "@/components/common/SortableTableHeader";
-import { useAdminTable } from "@/hooks/useAdminTable";
-import { useAdminAll } from "@/hooks/useAdminAll";
 
 type UserSortKey = "username" | "fullname" | "isActive" | "createdAt";
 

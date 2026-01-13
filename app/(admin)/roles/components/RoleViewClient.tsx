@@ -9,7 +9,7 @@ import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { ViewBadge, ViewField, ViewList, ViewSection } from "@/components/view";
 
-import { useAdminEntity } from "@/hooks/useAdminEntity";
+import { useAdminEntity } from "@/hooks";
 
 import type { Role } from "@/lib/types";
 

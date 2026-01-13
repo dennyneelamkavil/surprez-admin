@@ -11,12 +11,12 @@ import {
 } from "@/components/listing";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+
+import { useAdminTable } from "@/hooks";
 
 import type { Role } from "@/lib/types";
 import { deleteAction } from "@/lib/actions";
-
-import { SortableTableHeader } from "@/components/common/SortableTableHeader";
-import { useAdminTable } from "@/hooks/useAdminTable";
 
 type RoleSortKey = "name" | "isSuperAdmin" | "createdAt";
 

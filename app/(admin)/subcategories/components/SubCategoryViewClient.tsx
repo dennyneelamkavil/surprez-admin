@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
+import { Authorized } from "@/components/auth/Authorized";
+
 import FormHeader from "@/components/form/FormHeader";
 import FormError from "@/components/form/FormError";
 import FormActions from "@/components/form/FormActions";
@@ -15,9 +17,7 @@ import {
   ViewSEOSection,
 } from "@/components/view";
 
-import { Authorized } from "@/components/auth/Authorized";
-
-import { useAdminEntity } from "@/hooks/useAdminEntity";
+import { useAdminEntity } from "@/hooks";
 
 import type { SubCategory } from "@/lib/types";
 

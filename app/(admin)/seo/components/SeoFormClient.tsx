@@ -12,8 +12,7 @@ import Select from "@/components/form/Select";
 import FormSEOSection from "@/components/form/FormSEOSection";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { useFieldErrors } from "@/hooks/useFieldErrors";
-import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { useFieldErrors, useScrollToTop } from "@/hooks";
 
 import { uploadMedia } from "@/lib/uploadMedia";
 import type { Seo } from "@/lib/types";

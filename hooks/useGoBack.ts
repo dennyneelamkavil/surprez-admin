@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-const useGoBack = () => {
+export const useGoBack = () => {
   const router = useRouter();
 
   const goBack = () => {
@@ -13,5 +13,3 @@ const useGoBack = () => {
 
   return goBack;
 };
-
-export default useGoBack;

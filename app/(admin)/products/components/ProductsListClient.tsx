@@ -13,13 +13,12 @@ import {
 import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
+import { SortableTableHeader } from "@/components/common/SortableTableHeader";
+
+import { useAdminAll, useAdminTable } from "@/hooks";
 
 import type { Product, SubCategoryBase } from "@/lib/types";
 import { deleteAction, toggleAction } from "@/lib/actions";
-
-import { SortableTableHeader } from "@/components/common/SortableTableHeader";
-import { useAdminTable } from "@/hooks/useAdminTable";
-import { useAdminAll } from "@/hooks/useAdminAll";
 
 type ProductSortKey = "name" | "isFeatured" | "isActive" | "createdAt";
 
