@@ -1,10 +1,10 @@
 import "server-only";
 import { uploadToCloudinary, deleteFromCloudinary } from "./media.provider";
-import { MediaFolder } from "@/lib/types";
+import { TempMediaFolder } from "@/lib/types";
 
 export async function uploadImage(
   file: Buffer,
-  options?: { folder?: MediaFolder }
+  options?: { folder?: TempMediaFolder }
 ) {
   // Later we can switch provider here (AWS, GCP, etc.)
   return uploadToCloudinary(file, options);
