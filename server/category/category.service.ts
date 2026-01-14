@@ -12,7 +12,10 @@ import type {
 
 import { generateUniqueCategorySlug } from "@/server/utils/slug.util";
 import { buildSortSpec } from "@/server/utils/build-sort-spec";
-import { deleteFromCloudinary } from "@/server/media/media.provider";
+import {
+  deleteFromCloudinary,
+  moveMediaToFinalFolder,
+} from "@/server/media/media.provider";
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
@@ -21,10 +24,18 @@ export async function createCategory(input: CreateCategoryInput) {
 
   const slug = await generateUniqueCategorySlug(input.name);
 
+  const image = input.image?.publicId.includes("/temp/")
+    ? await moveMediaToFinalFolder(input.image, "categories")
+    : input.image;
+
+  if (input.seo?.ogImage?.publicId.includes("/temp/")) {
+    input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
+  }
+
   const category = await CategoryModel.create({
     name: input.name,
     slug,
-    image: input.image,
+    image,
     description: input.description,
     seo: input.seo,
     isActive: input.isActive ?? true,
@@ -122,7 +133,15 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     throw new AppError("Category not found", 404);
   }
 
-  const updateData: any = { ...input };
+  const image = input.image?.publicId.includes("/temp/")
+    ? await moveMediaToFinalFolder(input.image, "categories")
+    : input.image;
+
+  if (input.seo?.ogImage?.publicId.includes("/temp/")) {
+    input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
+  }
+
+  const updateData: any = { ...input, image };
 
   if (input.name) {
     updateData.slug = await generateUniqueCategorySlug(input.name, id);
@@ -132,10 +151,25 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     new: true,
   });
 
-  if (input.image && existing.image?.publicId) {
+  if (
+    input.image &&
+    existing.image?.publicId &&
+    input.image.publicId !== existing.image.publicId
+  ) {
     await deleteFromCloudinary(
       existing.image.publicId,
       existing.image.resourceType
+    );
+  }
+
+  if (
+    input.seo?.ogImage &&
+    existing.seo?.ogImage?.publicId &&
+    input.seo.ogImage.publicId !== existing.seo.ogImage.publicId
+  ) {
+    await deleteFromCloudinary(
+      existing.seo.ogImage.publicId,
+      existing.seo.ogImage.resourceType
     );
   }
 
@@ -168,6 +202,12 @@ export async function deleteCategory(id: string) {
     await deleteFromCloudinary(
       category.image.publicId,
       category.image.resourceType
+    );
+  }
+  if (category.seo?.ogImage?.publicId) {
+    await deleteFromCloudinary(
+      category.seo.ogImage.publicId,
+      category.seo.ogImage.resourceType
     );
   }
 

@@ -1,6 +1,6 @@
 import "server-only";
 import { uploadToCloudinary, deleteFromCloudinary } from "./media.provider";
-import { MediaFolder } from "./media.types";
+import { MediaFolder } from "@/lib/types";
 
 export async function uploadImage(
   file: Buffer,

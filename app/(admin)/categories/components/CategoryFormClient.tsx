@@ -90,7 +90,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
   async function handleUploadOgImage(file: File) {
     setUploadingSeoImg(true);
     try {
-      return await uploadMedia(file, "seo");
+      return await uploadMedia(file, "temp/seo");
     } finally {
       setUploadingSeoImg(false);
     }
@@ -225,7 +225,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
                       setUploading(true);
                       clearFieldError("image");
                       setError(null);
-                      const media = await uploadMedia(file, "categories");
+                      const media = await uploadMedia(file, "temp/categories");
                       setImage(media);
                     } catch (err: any) {
                       setFieldError("image", err.message ?? "Upload failed");

@@ -13,7 +13,10 @@ import type {
 
 import { generateUniqueSubCategorySlug } from "@/server/utils/slug.util";
 import { buildSortSpec } from "@/server/utils/build-sort-spec";
-import { deleteFromCloudinary } from "@/server/media/media.provider";
+import {
+  deleteFromCloudinary,
+  moveMediaToFinalFolder,
+} from "@/server/media/media.provider";
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
@@ -29,10 +32,18 @@ export async function createSubCategory(input: CreateSubCategoryInput) {
 
   const slug = await generateUniqueSubCategorySlug(input.name);
 
+  const image = input.image?.publicId.includes("/temp/")
+    ? await moveMediaToFinalFolder(input.image, "subcategories")
+    : input.image;
+
+  if (input.seo?.ogImage?.publicId.includes("/temp/")) {
+    input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
+  }
+
   const subCategory = await SubCategoryModel.create({
     name: input.name,
     slug,
-    image: input.image,
+    image,
     category: input.category,
     description: input.description,
     seo: input.seo,
@@ -150,7 +161,15 @@ export async function updateSubCategory(
     }
   }
 
-  const updateData: any = { ...input };
+  const image = input.image?.publicId.includes("/temp/")
+    ? await moveMediaToFinalFolder(input.image, "subcategories")
+    : input.image;
+
+  if (input.seo?.ogImage?.publicId.includes("/temp/")) {
+    input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
+  }
+
+  const updateData: any = { ...input, image };
 
   if (input.name) {
     updateData.slug = await generateUniqueSubCategorySlug(input.name, id);
@@ -160,10 +179,25 @@ export async function updateSubCategory(
     new: true,
   }).populate("category");
 
-  if (input.image && existing.image?.publicId) {
+  if (
+    input.image &&
+    existing.image?.publicId &&
+    input.image.publicId !== existing.image.publicId
+  ) {
     await deleteFromCloudinary(
       existing.image.publicId,
       existing.image.resourceType
+    );
+  }
+
+  if (
+    input.seo?.ogImage &&
+    existing.seo?.ogImage?.publicId &&
+    input.seo.ogImage.publicId !== existing.seo.ogImage.publicId
+  ) {
+    await deleteFromCloudinary(
+      existing.seo.ogImage.publicId,
+      existing.seo.ogImage.resourceType
     );
   }
 
@@ -194,6 +228,12 @@ export async function deleteSubCategory(id: string) {
     await deleteFromCloudinary(
       subCategory.image.publicId,
       subCategory.image.resourceType
+    );
+  }
+  if (subCategory.seo?.ogImage?.publicId) {
+    await deleteFromCloudinary(
+      subCategory.seo.ogImage.publicId,
+      subCategory.seo.ogImage.resourceType
     );
   }
 

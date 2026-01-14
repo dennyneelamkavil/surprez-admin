@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requirePermission } from "@/server/auth/rbac";
 import { uploadToCloudinary } from "@/server/media/media.provider";
-import { MediaFolder } from "@/server/media/media.types";
+import { TempMediaFolder } from "@/lib/types";
 
 /* ================= UPLOAD ================= */
 
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   ]);
 
   const { searchParams } = new URL(req.url);
-  const folder = searchParams.get("folder") as MediaFolder | null;
+  const folder = searchParams.get("folder") as TempMediaFolder | null;
 
   const formData = await req.formData();
   const file = formData.get("file");

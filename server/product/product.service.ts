@@ -14,7 +14,11 @@ import type {
 
 import { generateUniqueProductSlug } from "@/server/utils/slug.util";
 import { buildSortSpec } from "@/server/utils/build-sort-spec";
-import { deleteFromCloudinary } from "@/server/media/media.provider";
+import {
+  deleteFromCloudinary,
+  finalizeMediaArray,
+  moveMediaToFinalFolder,
+} from "@/server/media/media.provider";
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
@@ -32,8 +36,21 @@ export async function createProduct(input: CreateProductInput) {
     }
   }
 
+  const coverImage = input.coverImage?.publicId.includes("/temp/")
+    ? await moveMediaToFinalFolder(input.coverImage, "products/covers")
+    : input.coverImage;
+  const images = await finalizeMediaArray(input.images, "products/images");
+  const videos = await finalizeMediaArray(input.videos, "products/videos");
+
+  if (input.seo?.ogImage?.publicId.includes("/temp/")) {
+    input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
+  }
+
   const product = await ProductModel.create({
     ...input,
+    coverImage,
+    images,
+    videos,
     slug,
     isActive: input.isActive ?? true,
     isFeatured: input.isFeatured ?? false,
@@ -154,7 +171,17 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     }
   }
 
-  const updateData: any = { ...input };
+  const coverImage = input.coverImage?.publicId.includes("/temp/")
+    ? await moveMediaToFinalFolder(input.coverImage, "products/covers")
+    : input.coverImage;
+  const images = await finalizeMediaArray(input.images, "products/images");
+  const videos = await finalizeMediaArray(input.videos, "products/videos");
+
+  if (input.seo?.ogImage?.publicId.includes("/temp/")) {
+    input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
+  }
+
+  const updateData: any = { ...input, coverImage, images, videos };
 
   if (input.name) {
     updateData.slug = await generateUniqueProductSlug(input.name, id);
@@ -164,16 +191,31 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     new: true,
   }).populate("subcategories");
 
-  if (input.coverImage && existing.coverImage?.publicId) {
+  if (
+    input.coverImage &&
+    existing.coverImage?.publicId &&
+    input.coverImage.publicId !== existing.coverImage.publicId
+  ) {
     await deleteFromCloudinary(
       existing.coverImage.publicId,
       existing.coverImage.resourceType
     );
   }
 
+  if (
+    input.seo?.ogImage &&
+    existing.seo?.ogImage?.publicId &&
+    input.seo.ogImage.publicId !== existing.seo.ogImage.publicId
+  ) {
+    await deleteFromCloudinary(
+      existing.seo.ogImage.publicId,
+      existing.seo.ogImage.resourceType
+    );
+  }
+
   if (input.images) {
     const oldIds = existing.images.map((i: { publicId: string }) => i.publicId);
-    const newIds = input.images.map((i: { publicId: string }) => i.publicId);
+    const newIds = images.map((i) => i.publicId);
 
     const removed = oldIds.filter((id: string) => !newIds.includes(id));
 
@@ -184,7 +226,7 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
 
   if (input.videos) {
     const oldIds = existing.videos.map((v: { publicId: string }) => v.publicId);
-    const newIds = input.videos.map((v: { publicId: string }) => v.publicId);
+    const newIds = videos.map((v) => v.publicId);
 
     const removed = oldIds.filter((id: string) => !newIds.includes(id));
 
@@ -235,6 +277,12 @@ export async function deleteProduct(id: string) {
     await deleteFromCloudinary(
       product.coverImage.publicId,
       product.coverImage.resourceType
+    );
+  }
+  if (product.seo?.ogImage?.publicId) {
+    await deleteFromCloudinary(
+      product.seo.ogImage.publicId,
+      product.seo.ogImage.resourceType
     );
   }
 

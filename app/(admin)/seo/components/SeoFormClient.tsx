@@ -79,7 +79,7 @@ export default function SeoFormClient({ mode, id }: Props) {
   async function handleUploadOgImage(file: File) {
     setUploading(true);
     try {
-      return await uploadMedia(file, "seo");
+      return await uploadMedia(file, "temp/seo");
     } finally {
       setUploading(false);
     }

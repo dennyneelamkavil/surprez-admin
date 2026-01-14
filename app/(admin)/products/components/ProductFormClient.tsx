@@ -133,7 +133,7 @@ export default function ProductFormClient({ mode, id }: Props) {
   async function handleUploadOgImage(file: File) {
     setUploadingSeoImg(true);
     try {
-      return await uploadMedia(file, "seo");
+      return await uploadMedia(file, "temp/seo");
     } finally {
       setUploadingSeoImg(false);
     }
@@ -302,7 +302,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                       setUploading((u) => ({ ...u, cover: true }));
                       clearFieldError("coverImage");
                       setError(null);
-                      const media = await uploadMedia(file, "products/covers");
+                      const media = await uploadMedia(file, "temp/products/covers");
                       setCoverImage(media);
                     } catch (err: any) {
                       setFieldError(
@@ -381,7 +381,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                       setUploading((u) => ({ ...u, images: true }));
                       const uploaded = await Promise.all(
                         files.map((file) =>
-                          uploadMedia(file, "products/images")
+                          uploadMedia(file, "temp/products/images")
                         )
                       );
                       setImages((prev) => [...prev, ...uploaded]);
@@ -408,7 +408,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                       setUploading((u) => ({ ...u, videos: true }));
                       const uploaded = await Promise.all(
                         files.map((file) =>
-                          uploadMedia(file, "products/videos")
+                          uploadMedia(file, "temp/products/videos")
                         )
                       );
                       setVideos((prev) => [...prev, ...uploaded]);

@@ -1,6 +1,6 @@
-import type { MediaFolder } from "@/lib/types";
+import type { TempMediaFolder } from "@/lib/types";
 
-export async function uploadMedia(file: File, folder: MediaFolder) {
+export async function uploadMedia(file: File, folder: TempMediaFolder) {
   const formData = new FormData();
   formData.append("file", file);
 

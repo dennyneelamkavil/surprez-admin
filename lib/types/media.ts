@@ -4,10 +4,20 @@ export interface Media {
   resourceType: "image" | "video";
 }
 
-export type MediaFolder =
+export type TempMediaFolder =
+  | "temp/categories"
+  | "temp/subcategories"
+  | "temp/products/covers"
+  | "temp/products/images"
+  | "temp/products/videos"
+  | "temp/seo";
+
+export type FinalMediaFolder =
   | "categories"
   | "subcategories"
   | "products/covers"
   | "products/images"
   | "products/videos"
   | "seo";
+
+export type MediaFolder = TempMediaFolder | FinalMediaFolder;
