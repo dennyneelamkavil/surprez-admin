@@ -38,8 +38,20 @@ export async function listPageSeos(params?: {
   all?: boolean;
   sortBy?: string;
   sortDir?: string;
+  isActive?: string;
 }) {
   await connectDB();
+
+  if (params?.all) {
+    const pageSeos = await PageSeoModel.find({ isActive: true })
+      .sort({ pageKey: 1 })
+      .lean();
+
+    return {
+      data: pageSeos.map(mapPageSeo),
+      pagination: null,
+    };
+  }
 
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
@@ -59,13 +71,10 @@ export async function listPageSeos(params?: {
     query.pageKey = { $regex: params.search, $options: "i" };
   }
 
-  if (params?.all) {
-    const pageSeos = await PageSeoModel.find(query).sort({ pageKey: 1 }).lean();
-
-    return {
-      data: pageSeos.map(mapPageSeo),
-      pagination: null,
-    };
+  if (params?.isActive === "true") {
+    query.isActive = true;
+  } else if (params?.isActive === "false") {
+    query.isActive = false;
   }
 
   const [pageSeos, total] = await Promise.all([

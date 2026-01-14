@@ -80,8 +80,25 @@ export async function listUsers(params: {
   sortBy?: string;
   sortDir?: string;
   roleId?: string;
+  isActive?: string;
 }) {
   await connectDB();
+
+  if (params?.all) {
+    const users = await UserModel.find({ isActive: true })
+      .populate({
+        path: "role",
+        populate: { path: "permissions" },
+      })
+      .collation({ locale: "en", strength: 2 })
+      .sort({ username: 1 })
+      .lean();
+
+    return {
+      data: users.map(mapUser),
+      pagination: null,
+    };
+  }
 
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(50, params.limit ?? 10);
@@ -111,20 +128,10 @@ export async function listUsers(params: {
     query.role = params.roleId;
   }
 
-  if (params?.all) {
-    const users = await UserModel.find(query)
-      .populate({
-        path: "role",
-        populate: { path: "permissions" },
-      })
-      .collation({ locale: "en", strength: 2 })
-      .sort({ username: 1 })
-      .lean();
-
-    return {
-      data: users.map(mapUser),
-      pagination: null,
-    };
+  if (params?.isActive === "true") {
+    query.isActive = true;
+  } else if (params?.isActive === "false") {
+    query.isActive = false;
   }
 
   const [users, total] = await Promise.all([

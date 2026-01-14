@@ -52,8 +52,21 @@ export async function listCategories(params?: {
   all?: boolean;
   sortBy?: string;
   sortDir?: string;
+  isActive?: string;
 }) {
   await connectDB();
+
+  if (params?.all) {
+    const categories = await CategoryModel.find({ isActive: true })
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
+      .lean();
+
+    return {
+      data: categories.map(mapCategory),
+      pagination: null,
+    };
+  }
 
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
@@ -73,16 +86,10 @@ export async function listCategories(params?: {
     query.name = { $regex: params.search, $options: "i" };
   }
 
-  if (params?.all) {
-    const categories = await CategoryModel.find(query)
-      .collation({ locale: "en", strength: 2 })
-      .sort({ name: 1 })
-      .lean();
-
-    return {
-      data: categories.map(mapCategory),
-      pagination: null,
-    };
+  if (params?.isActive === "true") {
+    query.isActive = true;
+  } else if (params?.isActive === "false") {
+    query.isActive = false;
   }
 
   const [categories, total] = await Promise.all([

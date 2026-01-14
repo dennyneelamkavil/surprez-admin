@@ -29,6 +29,7 @@ export default function UsersListClient() {
   const [item, setItem] = useState<User | null>(null);
   const [toggleItem, setToggleItem] = useState<User | null>(null);
   const [role, setRole] = useState("");
+  const [isActive, setIsActive] = useState("true");
 
   const {
     data: users,
@@ -47,6 +48,7 @@ export default function UsersListClient() {
     defaultSort: { key: "createdAt", direction: "desc" },
     extraParams: () => ({
       roleId: role,
+      isActive,
     }),
   });
   const { data: roles } = useAdminAll<RoleBase>({
@@ -88,6 +90,7 @@ export default function UsersListClient() {
   function clearFilters() {
     setSearch("");
     setRole("");
+    setIsActive("");
     setPage(1);
   }
 
@@ -108,7 +111,7 @@ export default function UsersListClient() {
           setSearch(v);
         }}
         onClear={clearFilters}
-        disableClear={!search && !role}
+        disableClear={!search && !role && !isActive}
       >
         {/* Role filter */}
         <div className="w-full sm:max-w-xs">
@@ -122,6 +125,22 @@ export default function UsersListClient() {
             onChange={(value) => {
               setPage(1);
               setRole(value);
+            }}
+          />
+        </div>
+
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={[
+              { value: "", label: "All" },
+              { value: "true", label: "Active" },
+              { value: "false", label: "Inactive" },
+            ]}
+            value={isActive}
+            placeholder="Select status"
+            onChange={(value) => {
+              setPage(1);
+              setIsActive(value);
             }}
           />
         </div>

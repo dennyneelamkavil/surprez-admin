@@ -38,6 +38,15 @@ export async function listPermissions(params: {
 }) {
   await connectDB();
 
+  if (params?.all) {
+    const permissions = await PermissionModel.find().sort({ key: 1 }).lean();
+
+    return {
+      data: permissions.map(mapPermission),
+      pagination: null,
+    };
+  }
+
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(50, params.limit ?? 10);
   const skip = (page - 1) * limit;
@@ -54,17 +63,6 @@ export async function listPermissions(params: {
 
   if (params.search) {
     query.key = { $regex: params.search, $options: "i" };
-  }
-
-  if (params?.all) {
-    const permissions = await PermissionModel.find(query)
-      .sort({ key: 1 })
-      .lean();
-
-    return {
-      data: permissions.map(mapPermission),
-      pagination: null,
-    };
   }
 
   const [permissions, total] = await Promise.all([

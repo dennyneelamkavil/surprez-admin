@@ -10,6 +10,7 @@ import {
   ListFilters,
   ListHeader,
 } from "@/components/listing";
+import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import { SortableTableHeader } from "@/components/common/SortableTableHeader";
@@ -24,6 +25,7 @@ type CategorySortKey = "name" | "createdAt" | "isActive";
 export default function CategoriesListClient() {
   const [item, setItem] = useState<Category | null>(null);
   const [toggleItem, setToggleItem] = useState<Category | null>(null);
+  const [isActive, setIsActive] = useState("true");
 
   const {
     data: categories,
@@ -40,6 +42,9 @@ export default function CategoriesListClient() {
     endpoint: "categories",
     storageKey: "table:categories",
     defaultSort: { key: "createdAt", direction: "desc" },
+    extraParams: () => ({
+      isActive,
+    }),
   });
 
   async function confirmDelete() {
@@ -92,10 +97,27 @@ export default function CategoriesListClient() {
         }}
         onClear={() => {
           setSearch("");
+          setIsActive("");
           setPage(1);
         }}
-        disableClear={!search}
-      />
+        disableClear={!search && !isActive}
+      >
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={[
+              { value: "", label: "All" },
+              { value: "true", label: "Active" },
+              { value: "false", label: "Inactive" },
+            ]}
+            value={isActive}
+            placeholder="Select status"
+            onChange={(value) => {
+              setPage(1);
+              setIsActive(value);
+            }}
+          />
+        </div>
+      </ListFilters>
 
       {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">

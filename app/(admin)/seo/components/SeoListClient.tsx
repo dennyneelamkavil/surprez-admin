@@ -9,6 +9,7 @@ import {
   ListFilters,
   ListHeader,
 } from "@/components/listing";
+import Select from "@/components/form/Select";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import { SortableTableHeader } from "@/components/common/SortableTableHeader";
@@ -23,6 +24,7 @@ type PageSeoSortKey = "pageKey" | "isActive" | "createdAt";
 export default function SeoListClient() {
   const [item, setItem] = useState<PageSeo | null>(null);
   const [toggleItem, setToggleItem] = useState<PageSeo | null>(null);
+  const [isActive, setIsActive] = useState("true");
 
   const {
     data: pageSeos,
@@ -39,6 +41,9 @@ export default function SeoListClient() {
     endpoint: "seo",
     storageKey: "table:seo",
     defaultSort: { key: "createdAt", direction: "desc" },
+    extraParams: () => ({
+      isActive,
+    }),
   });
 
   async function confirmDelete() {
@@ -86,10 +91,27 @@ export default function SeoListClient() {
         }}
         onClear={() => {
           setSearch("");
+          setIsActive("");
           setPage(1);
         }}
-        disableClear={!search}
-      />
+        disableClear={!search && !isActive}
+      >
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={[
+              { value: "", label: "All" },
+              { value: "true", label: "Active" },
+              { value: "false", label: "Inactive" },
+            ]}
+            value={isActive}
+            placeholder="Select status"
+            onChange={(value) => {
+              setPage(1);
+              setIsActive(value);
+            }}
+          />
+        </div>
+      </ListFilters>
 
       <div className="rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         <div className="overflow-x-auto">

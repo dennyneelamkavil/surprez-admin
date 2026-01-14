@@ -40,18 +40,27 @@ export async function createProductInventory(
 }
 
 /* ================= LIST ================= */
-export async function listProductInventories(params?: { productId?: string }) {
+export async function listProductInventories(params?: {
+  productId?: string;
+  isActive?: string;
+}) {
   await connectDB();
 
   const query: any = {};
   if (params?.productId) query.product = params.productId;
+
+  if (params?.isActive === "true") {
+    query.isActive = true;
+  } else if (params?.isActive === "false") {
+    query.isActive = false;
+  }
 
   const items = await ProductInventoryModel.find(query)
     .populate("product")
     .sort({ createdAt: -1 })
     .lean();
 
-  return items.map(mapProductInventory);
+  return { data: items.map(mapProductInventory), pagination: null };
 }
 
 /* ================= GET ================= */

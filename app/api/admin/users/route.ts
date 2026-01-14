@@ -38,6 +38,7 @@ export async function GET(req: Request) {
     const sortBy = searchParams.get("sortBy") ?? undefined;
     const sortDir = searchParams.get("sortDir") ?? undefined;
     const roleId = searchParams.get("roleId") ?? undefined;
+    const isActive = searchParams.get("isActive") ?? undefined;
 
     const users = await listUsers({
       page,
@@ -47,6 +48,7 @@ export async function GET(req: Request) {
       roleId,
       sortBy,
       sortDir,
+      isActive,
     });
     return NextResponse.json(users);
   } catch (err) {

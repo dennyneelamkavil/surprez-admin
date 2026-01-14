@@ -26,6 +26,7 @@ export default function SubCategoriesListClient() {
   const [item, setItem] = useState<SubCategory | null>(null);
   const [toggleItem, setToggleItem] = useState<SubCategory | null>(null);
   const [category, setCategory] = useState("");
+  const [isActive, setIsActive] = useState("true");
 
   const {
     data: subCategories,
@@ -44,6 +45,7 @@ export default function SubCategoriesListClient() {
     defaultSort: { key: "createdAt", direction: "desc" },
     extraParams: () => ({
       categoryId: category,
+      isActive,
     }),
   });
   const { data: categories } = useAdminAll<CategoryBase>({
@@ -85,6 +87,7 @@ export default function SubCategoriesListClient() {
   function clearFilters() {
     setSearch("");
     setCategory("");
+    setIsActive("");
     setPage(1);
   }
 
@@ -105,7 +108,7 @@ export default function SubCategoriesListClient() {
           setSearch(value);
         }}
         onClear={clearFilters}
-        disableClear={!search && !category}
+        disableClear={!search && !category && !isActive}
       >
         <div className="w-full sm:max-w-xs">
           <Select
@@ -118,6 +121,22 @@ export default function SubCategoriesListClient() {
             onChange={(value) => {
               setPage(1);
               setCategory(value);
+            }}
+          />
+        </div>
+
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={[
+              { value: "", label: "All" },
+              { value: "true", label: "Active" },
+              { value: "false", label: "Inactive" },
+            ]}
+            value={isActive}
+            placeholder="Select status"
+            onChange={(value) => {
+              setPage(1);
+              setIsActive(value);
             }}
           />
         </div>

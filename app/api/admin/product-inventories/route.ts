@@ -35,8 +35,11 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId") ?? undefined;
+    const isActive = searchParams.get("isActive") ?? undefined;
 
-    return NextResponse.json(await listProductInventories({ productId }));
+    return NextResponse.json(
+      await listProductInventories({ productId, isActive })
+    );
   } catch (err) {
     return handleApiError(err);
   }

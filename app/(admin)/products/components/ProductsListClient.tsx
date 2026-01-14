@@ -27,6 +27,7 @@ export default function ProductsListClient() {
   const [toggleItem, setToggleItem] = useState<Product | null>(null);
   const [subcategory, setSubcategory] = useState("");
   const [isFeatured, setIsFeatured] = useState("");
+  const [isActive, setIsActive] = useState("true");
 
   const {
     data: products,
@@ -46,6 +47,7 @@ export default function ProductsListClient() {
     extraParams: () => ({
       subcategoryId: subcategory,
       isFeatured,
+      isActive,
     }),
   });
   const { data: subcats } = useAdminAll<SubCategoryBase>({
@@ -88,6 +90,7 @@ export default function ProductsListClient() {
     setSearch("");
     setSubcategory("");
     setIsFeatured("");
+    setIsActive("");
     setPage(1);
   }
 
@@ -108,7 +111,7 @@ export default function ProductsListClient() {
           setSearch(v);
         }}
         onClear={clearFilters}
-        disableClear={!search && !subcategory && !isFeatured}
+        disableClear={!search && !subcategory && !isFeatured && !isActive}
       >
         {/* Role filter */}
         <div className="w-full sm:max-w-xs">
@@ -139,6 +142,22 @@ export default function ProductsListClient() {
             onChange={(value) => {
               setPage(1);
               setIsFeatured(value);
+            }}
+          />
+        </div>
+
+        <div className="w-full sm:max-w-xs">
+          <Select
+            options={[
+              { value: "", label: "All" },
+              { value: "true", label: "Active" },
+              { value: "false", label: "Inactive" },
+            ]}
+            value={isActive}
+            placeholder="Select status"
+            onChange={(value) => {
+              setPage(1);
+              setIsActive(value);
             }}
           />
         </div>

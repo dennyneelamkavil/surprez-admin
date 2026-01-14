@@ -40,6 +40,7 @@ export async function GET(req: Request) {
     const search = searchParams.get("search") ?? undefined;
     const sortBy = searchParams.get("sortBy") ?? undefined;
     const sortDir = searchParams.get("sortDir") ?? undefined;
+    const isActive = searchParams.get("isActive") ?? undefined;
 
     const pageSeos = await listPageSeos({
       page,
@@ -48,6 +49,7 @@ export async function GET(req: Request) {
       all,
       sortBy,
       sortDir,
+      isActive,
     });
 
     return NextResponse.json(pageSeos);

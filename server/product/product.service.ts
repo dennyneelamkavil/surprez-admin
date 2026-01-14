@@ -69,8 +69,22 @@ export async function listProducts(params?: {
   sortDir?: string;
   subcategoryId?: string;
   isFeatured?: string;
+  isActive?: string;
 }) {
   await connectDB();
+
+  if (params?.all) {
+    const products = await ProductModel.find({ isActive: true })
+      .populate("subcategories")
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
+      .lean();
+
+    return {
+      data: products.map(mapProduct),
+      pagination: null,
+    };
+  }
 
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
@@ -100,17 +114,10 @@ export async function listProducts(params?: {
     query.isFeatured = false;
   }
 
-  if (params?.all) {
-    const products = await ProductModel.find(query)
-      .populate("subcategories")
-      .collation({ locale: "en", strength: 2 })
-      .sort({ name: 1 })
-      .lean();
-
-    return {
-      data: products.map(mapProduct),
-      pagination: null,
-    };
+  if (params?.isActive === "true") {
+    query.isActive = true;
+  } else if (params?.isActive === "false") {
+    query.isActive = false;
   }
 
   const [products, total] = await Promise.all([

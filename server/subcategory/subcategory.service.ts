@@ -62,8 +62,22 @@ export async function listSubCategories(params?: {
   sortBy?: string;
   sortDir?: string;
   categoryId?: string;
+  isActive?: string;
 }) {
   await connectDB();
+
+  if (params?.all) {
+    const subcategories = await SubCategoryModel.find({ isActive: true })
+      .populate("category")
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
+      .lean();
+
+    return {
+      data: subcategories.map(mapSubCategory),
+      pagination: null,
+    };
+  }
 
   const page = Math.max(1, params?.page ?? 1);
   const limit = Math.min(50, params?.limit ?? 10);
@@ -87,17 +101,10 @@ export async function listSubCategories(params?: {
     query.category = params.categoryId;
   }
 
-  if (params?.all) {
-    const subcategories = await SubCategoryModel.find(query)
-      .populate("category")
-      .collation({ locale: "en", strength: 2 })
-      .sort({ name: 1 })
-      .lean();
-
-    return {
-      data: subcategories.map(mapSubCategory),
-      pagination: null,
-    };
+  if (params?.isActive === "true") {
+    query.isActive = true;
+  } else if (params?.isActive === "false") {
+    query.isActive = false;
   }
 
   const [subcategories, total] = await Promise.all([

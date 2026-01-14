@@ -43,6 +43,7 @@ export async function GET(req: Request) {
     const sortDir = searchParams.get("sortDir") ?? undefined;
     const subcategoryId = searchParams.get("subcategoryId") ?? undefined;
     const isFeatured = searchParams.get("isFeatured") ?? undefined;
+    const isActive = searchParams.get("isActive") ?? undefined;
 
     return NextResponse.json(
       await listProducts({
@@ -54,6 +55,7 @@ export async function GET(req: Request) {
         all,
         sortBy,
         sortDir,
+        isActive,
       })
     );
   } catch (err) {

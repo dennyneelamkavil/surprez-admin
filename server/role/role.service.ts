@@ -46,6 +46,19 @@ export async function listRoles(params: {
 }) {
   await connectDB();
 
+  if (params?.all) {
+    const roles = await RoleModel.find()
+      .populate("permissions")
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1 })
+      .lean();
+
+    return {
+      data: roles.map(mapRole),
+      pagination: null,
+    };
+  }
+
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(50, params.limit ?? 10);
   const skip = (page - 1) * limit;
@@ -64,19 +77,6 @@ export async function listRoles(params: {
 
   if (params.search) {
     query.name = { $regex: params.search, $options: "i" };
-  }
-
-  if (params?.all) {
-    const roles = await RoleModel.find(query)
-      .populate("permissions")
-      .collation({ locale: "en", strength: 2 })
-      .sort({ name: 1 })
-      .lean();
-
-    return {
-      data: roles.map(mapRole),
-      pagination: null,
-    };
   }
 
   const [roles, total] = await Promise.all([
