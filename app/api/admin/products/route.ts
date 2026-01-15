@@ -28,9 +28,9 @@ export async function GET(req: Request) {
   try {
     await requirePermission([
       "product:read",
-      "productinventory:read",
-      "productinventory:create",
-      "productinventory:update",
+      "inventory:read",
+      "inventory:create",
+      "inventory:update",
     ]);
 
     const { searchParams } = new URL(req.url);

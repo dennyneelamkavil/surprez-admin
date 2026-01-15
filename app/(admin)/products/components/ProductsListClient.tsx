@@ -280,10 +280,12 @@ export default function ProductsListClient() {
                     <td className="px-5 py-4 text-right">
                       <ListActions
                         viewHref={`/products/${product.id}/view`}
+                        inventoryHref={`/products/${product.id}/inventory`}
                         onToggle={() => setToggleItem(product)}
                         editHref={`/products/${product.id}/edit`}
                         isActive={product.isActive}
                         onDelete={() => setItem(product)}
+                        inventoryPermission="inventory:read"
                         editPermission="product:update"
                         deletePermission="product:delete"
                       />

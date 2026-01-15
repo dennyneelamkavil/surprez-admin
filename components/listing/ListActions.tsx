@@ -1,13 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil, Trash2, ToggleLeft, ToggleRight, Eye } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  ToggleLeft,
+  ToggleRight,
+  Eye,
+  Boxes,
+} from "lucide-react";
 import { Authorized } from "@/components/auth/Authorized";
 import Tooltip from "@/components/ui/tooltip/Tooltip";
 
 type ListActionsProps = {
   viewHref?: string;
   editHref?: string;
+  inventoryHref?: string;
 
   onDelete?: () => void;
   onToggle?: () => void;
@@ -16,6 +24,7 @@ type ListActionsProps = {
 
   editPermission?: string;
   deletePermission?: string;
+  inventoryPermission?: string;
 
   disableDelete?: boolean;
   disableToggle?: boolean;
@@ -25,12 +34,16 @@ type ListActionsProps = {
 export default function ListActions({
   viewHref,
   editHref,
+  inventoryHref,
+
   onDelete,
   onToggle,
+
   isActive,
 
   editPermission,
   deletePermission,
+  inventoryPermission,
 
   disableDelete = false,
   disableToggle = false,
@@ -49,6 +62,20 @@ export default function ListActions({
             <Eye size={16} />
           </Link>
         </Tooltip>
+      )}
+
+      {inventoryHref && inventoryPermission && (
+        <Authorized permission={inventoryPermission}>
+          <Tooltip content="Inventory">
+            <Link
+              href={inventoryHref}
+              aria-label="Inventory"
+              className="inline-flex items-center text-brand-500 hover:text-brand-600"
+            >
+              <Boxes size={16} />
+            </Link>
+          </Tooltip>
+        </Authorized>
       )}
 
       {/* Toggle Active / Inactive */}

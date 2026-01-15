@@ -14,7 +14,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    await requirePermission("productinventory:read");
+    await requirePermission("inventory:read");
     return NextResponse.json(await getProductInventoryById(id));
   } catch (err) {
     return handleApiError(err);
@@ -27,7 +27,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    await requirePermission("productinventory:update");
+    await requirePermission("inventory:update");
 
     const body = await request.json();
     const parsed = UpdateProductInventorySchema.safeParse(body);
@@ -51,7 +51,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await requirePermission("productinventory:delete");
+    await requirePermission("inventory:delete");
     await deleteProductInventory(id);
     return NextResponse.json({ success: true });
   } catch (err) {

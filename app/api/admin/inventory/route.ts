@@ -9,7 +9,7 @@ import { handleApiError } from "@/server/errors/handleApiError";
 
 export async function POST(req: Request) {
   try {
-    await requirePermission("productinventory:create");
+    await requirePermission("inventory:create");
 
     const body = await req.json();
     const parsed = CreateProductInventorySchema.safeParse(body);
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    await requirePermission("productinventory:read");
+    await requirePermission("inventory:read");
 
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId") ?? undefined;
