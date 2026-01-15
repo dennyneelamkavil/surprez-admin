@@ -74,7 +74,8 @@ export default function SubCategoryViewClient({ id }: Props) {
                   <ViewImage
                     label="SubCategory Image"
                     src={subcategory.image.url}
-                    alt={subcategory.name}
+                    alt={subcategory.image.alt ?? subcategory.name}
+                    caption={subcategory.image.caption}
                     size={160}
                   />
                 </div>

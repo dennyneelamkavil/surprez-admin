@@ -210,39 +210,40 @@ export default function CategoryFormClient({ mode, id }: Props) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Image" required htmlFor="image">
-                <FileInput
-                  id="image"
-                  accept="image/*"
-                  error={!!fieldErrors.image}
-                  hint={fieldErrors.image}
-                  disabled={uploading}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
+              <div className="space-y-4">
+                <FormField label="Image" required htmlFor="image">
+                  <FileInput
+                    id="image"
+                    accept="image/*"
+                    error={!!fieldErrors.image}
+                    hint={fieldErrors.image}
+                    disabled={uploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                    try {
-                      setUploading(true);
-                      clearFieldError("image");
-                      setError(null);
-                      const media = await uploadMedia(file, "temp/categories");
-                      setImage(media);
-                    } catch (err: any) {
-                      setFieldError("image", err.message ?? "Upload failed");
-                    } finally {
-                      setUploading(false);
-                    }
-                  }}
-                />
-                {uploading && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Uploading image...
-                  </p>
-                )}
-              </FormField>
+                      try {
+                        setUploading(true);
+                        clearFieldError("image");
+                        setError(null);
+                        const media = await uploadMedia(
+                          file,
+                          "temp/categories"
+                        );
+                        setImage(media);
+                      } catch (err: any) {
+                        setFieldError("image", err.message ?? "Upload failed");
+                      } finally {
+                        setUploading(false);
+                      }
+                    }}
+                  />
+                  {uploading && (
+                    <p className="text-sm text-gray-500">Uploading image...</p>
+                  )}
+                </FormField>
 
-              {image && (
-                <div className="flex items-end">
+                {image && (
                   <Image
                     src={image.url}
                     alt="Category preview"
@@ -250,6 +251,35 @@ export default function CategoryFormClient({ mode, id }: Props) {
                     height={120}
                     className="rounded object-cover border dark:border-gray-800"
                   />
+                )}
+              </div>
+
+              {image && (
+                <div className="space-y-4">
+                  <FormField label="Image Alt Text">
+                    <Input
+                      placeholder="e.g. Toys category image"
+                      value={image.alt ?? ""}
+                      onChange={(e) =>
+                        setImage((prev) =>
+                          prev ? { ...prev, alt: e.target.value } : prev
+                        )
+                      }
+                      hint="Describe the image for SEO & accessibility"
+                    />
+                  </FormField>
+
+                  <FormField label="Image Caption (optional)">
+                    <Input
+                      placeholder="Optional caption shown below the image"
+                      value={image.caption ?? ""}
+                      onChange={(e) =>
+                        setImage((prev) =>
+                          prev ? { ...prev, caption: e.target.value } : prev
+                        )
+                      }
+                    />
+                  </FormField>
                 </div>
               )}
             </div>

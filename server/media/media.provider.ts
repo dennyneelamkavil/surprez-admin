@@ -68,6 +68,8 @@ export async function moveMediaToFinalFolder(
     url: uploaded.secure_url,
     publicId: uploaded.public_id,
     resourceType: uploaded.resource_type as "image" | "video",
+    alt: media.alt,
+    caption: media.caption,
   };
 }
 

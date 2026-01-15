@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 
 import FormField from "@/components/form/FormField";
 import Input from "@/components/form/input/InputField";
@@ -10,7 +11,6 @@ import Switch from "@/components/form/switch/Switch";
 import FileInput from "@/components/form/input/FileInput";
 
 import type { Seo, Media } from "@/lib/types";
-import { ChevronDown } from "lucide-react";
 
 type Props = {
   value: Seo;
@@ -38,6 +38,11 @@ export default function FormSEOSection({
     onChange({ ...value, [key]: val });
   }
 
+  function updateOgImage(patch: Partial<Media>) {
+    if (!value.ogImage) return;
+    update("ogImage", { ...value.ogImage, ...patch });
+  }
+
   return (
     <div className="space-y-6">
       {/* Header (only when collapsible) */}
@@ -59,7 +64,7 @@ export default function FormSEOSection({
       {/* Content */}
       {open && (
         <div className="space-y-8">
-          {/* Row 1 */}
+          {/* Title + Canonical */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField label="SEO Title">
               <Input
@@ -78,7 +83,7 @@ export default function FormSEOSection({
             </FormField>
           </div>
 
-          {/* Row 2 */}
+          {/* Description */}
           <FormField label="SEO Description">
             <TextArea
               rows={3}
@@ -88,7 +93,7 @@ export default function FormSEOSection({
             />
           </FormField>
 
-          {/* Row 3 */}
+          {/* Keywords + Indexing */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField label="SEO Keywords">
               <Input
@@ -120,32 +125,52 @@ export default function FormSEOSection({
           {/* OG Image */}
           {onUploadOgImage && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="OG Image">
-                <FileInput
-                  accept="image/*"
-                  disabled={uploading}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const media = await onUploadOgImage(file);
-                    update("ogImage", media);
-                  }}
-                />
+              <div className="space-y-4">
+                <FormField label="OG Image">
+                  <FileInput
+                    accept="image/*"
+                    disabled={uploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                {uploading && (
-                  <p className="mt-1 text-sm text-gray-500">Uploading image…</p>
-                )}
-              </FormField>
+                      const media = await onUploadOgImage(file);
+                      update("ogImage", media);
+                    }}
+                  />
+                  {uploading && (
+                    <p className="text-sm text-gray-500">Uploading image…</p>
+                  )}
+                </FormField>
 
-              {value.ogImage && (
-                <div className="flex items-end">
+                {value.ogImage && (
                   <Image
                     src={value.ogImage.url}
-                    alt="OG Image Preview"
+                    alt={value.ogImage.alt ?? "OG image preview"}
                     width={160}
                     height={84}
                     className="rounded object-cover border dark:border-gray-800"
                   />
+                )}
+              </div>
+
+              {value.ogImage && (
+                <div className="space-y-4">
+                  <FormField label="Image Alt Text">
+                    <Input
+                      value={value.ogImage.alt ?? ""}
+                      onChange={(e) => updateOgImage({ alt: e.target.value })}
+                    />
+                  </FormField>
+
+                  <FormField label="Image Caption (optional)">
+                    <Input
+                      value={value.ogImage.caption ?? ""}
+                      onChange={(e) =>
+                        updateOgImage({ caption: e.target.value })
+                      }
+                    />
+                  </FormField>
                 </div>
               )}
             </div>

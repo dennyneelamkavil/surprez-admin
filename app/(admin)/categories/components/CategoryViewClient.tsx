@@ -69,7 +69,8 @@ export default function CategoryViewClient({ id }: Props) {
                   <ViewImage
                     label="Category Image"
                     src={category.image.url}
-                    alt={category.name}
+                    alt={category.image.alt ?? category.name}
+                    caption={category.image.caption}
                     size={160}
                   />
                 </div>

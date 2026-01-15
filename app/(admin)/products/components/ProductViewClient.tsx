@@ -90,7 +90,8 @@ export default function ProductViewClient({ id }: Props) {
                   <ViewImage
                     label="Cover Image"
                     src={product.coverImage.url}
-                    alt={product.name}
+                    alt={product.coverImage.alt ?? product.name}
+                    caption={product.coverImage.caption}
                     size={160}
                   />
                 </div>

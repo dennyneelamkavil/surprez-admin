@@ -81,7 +81,8 @@ export default function ViewSEOSection({
               <ViewImage
                 label="OG Image"
                 src={seo.ogImage.url}
-                alt="OG Image"
+                alt={seo.ogImage.alt ?? "OG Image"}
+                caption={seo.ogImage.caption}
                 size={160}
               />
             </div>

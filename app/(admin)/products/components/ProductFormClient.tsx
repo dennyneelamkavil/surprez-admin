@@ -287,42 +287,43 @@ export default function ProductFormClient({ mode, id }: Props) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Cover Image" required htmlFor="coverImage">
-                <FileInput
-                  id="coverImage"
-                  accept="image/*"
-                  error={!!fieldErrors.coverImage}
-                  hint={fieldErrors.coverImage}
-                  disabled={uploading.cover}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
+              <div className="space-y-4">
+                <FormField label="Cover Image" required htmlFor="coverImage">
+                  <FileInput
+                    id="coverImage"
+                    accept="image/*"
+                    error={!!fieldErrors.coverImage}
+                    hint={fieldErrors.coverImage}
+                    disabled={uploading.cover}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                    try {
-                      setUploading((u) => ({ ...u, cover: true }));
-                      clearFieldError("coverImage");
-                      setError(null);
-                      const media = await uploadMedia(file, "temp/products/covers");
-                      setCoverImage(media);
-                    } catch (err: any) {
-                      setFieldError(
-                        "coverImage",
-                        err.message ?? "Upload failed"
-                      );
-                    } finally {
-                      setUploading((u) => ({ ...u, cover: false }));
-                    }
-                  }}
-                />
-                {uploading.cover && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Uploading image...
-                  </p>
-                )}
-              </FormField>
+                      try {
+                        setUploading((u) => ({ ...u, cover: true }));
+                        clearFieldError("coverImage");
+                        setError(null);
+                        const media = await uploadMedia(
+                          file,
+                          "temp/products/covers"
+                        );
+                        setCoverImage(media);
+                      } catch (err: any) {
+                        setFieldError(
+                          "coverImage",
+                          err.message ?? "Upload failed"
+                        );
+                      } finally {
+                        setUploading((u) => ({ ...u, cover: false }));
+                      }
+                    }}
+                  />
+                  {uploading.cover && (
+                    <p className="text-sm text-gray-500">Uploading image...</p>
+                  )}
+                </FormField>
 
-              {coverImage && (
-                <div className="flex items-end">
+                {coverImage && (
                   <Image
                     src={coverImage.url}
                     alt="Cover preview"
@@ -330,6 +331,35 @@ export default function ProductFormClient({ mode, id }: Props) {
                     height={120}
                     className="rounded object-cover border dark:border-gray-800"
                   />
+                )}
+              </div>
+
+              {coverImage && (
+                <div className="space-y-4">
+                  <FormField label="Image Alt Text">
+                    <Input
+                      placeholder="e.g. Dolls, Action Figures, etc."
+                      value={coverImage.alt ?? ""}
+                      onChange={(e) =>
+                        setCoverImage((prev) =>
+                          prev ? { ...prev, alt: e.target.value } : prev
+                        )
+                      }
+                      hint="Describe the image for SEO & accessibility"
+                    />
+                  </FormField>
+
+                  <FormField label="Image Caption (optional)">
+                    <Input
+                      placeholder="Optional caption shown below the image"
+                      value={coverImage.caption ?? ""}
+                      onChange={(e) =>
+                        setCoverImage((prev) =>
+                          prev ? { ...prev, caption: e.target.value } : prev
+                        )
+                      }
+                    />
+                  </FormField>
                 </div>
               )}
             </div>
