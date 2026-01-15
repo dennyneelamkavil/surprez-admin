@@ -50,7 +50,7 @@ export default function FormSEOSection({
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-medium dark:border-gray-800 dark:bg-gray-800/40"
+          className="flex w-full items-center justify-between rounded-lg text-gray-700 dark:text-gray-400 border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-medium dark:border-gray-800 dark:bg-gray-800/40"
         >
           <span>Advanced SEO</span>
           <ChevronDown
@@ -149,6 +149,7 @@ export default function FormSEOSection({
                     alt={value.ogImage.alt ?? "OG image preview"}
                     width={160}
                     height={84}
+                    loading="lazy"
                     className="rounded object-cover border dark:border-gray-800"
                   />
                 )}

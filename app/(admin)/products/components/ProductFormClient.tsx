@@ -16,7 +16,7 @@ import FileInput from "@/components/form/input/FileInput";
 import MultiSelect from "@/components/form/MultiSelect";
 import Switch from "@/components/form/switch/Switch";
 import AttributeEditor from "@/components/form/AttributeEditor";
-import Dropzone from "@/components/form/form-elements/DropZone";
+import ProductMediaManager from "@/components/form/ProductMediaManager";
 import FormSEOSection from "@/components/form/FormSEOSection";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
@@ -395,65 +395,25 @@ export default function ProductFormClient({ mode, id }: Props) {
               </FormField>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <FormField label="Product Images" htmlFor="images">
-                <Dropzone
-                  title="Drop product images here or Browse"
-                  description="PNG, JPG, WebP, etc supported"
-                  multiple
-                  accept={{
-                    "image/png": [],
-                    "image/jpeg": [],
-                    "image/webp": [],
-                  }}
-                  onFiles={async (files) => {
-                    try {
-                      setUploading((u) => ({ ...u, images: true }));
-                      const uploaded = await Promise.all(
-                        files.map((file) =>
-                          uploadMedia(file, "temp/products/images")
-                        )
-                      );
-                      setImages((prev) => [...prev, ...uploaded]);
-                    } catch (err: any) {
-                      setError(err.message);
-                    } finally {
-                      setUploading((u) => ({ ...u, images: false }));
-                    }
-                  }}
-                />
-                {uploading.images && (
-                  <p className="text-sm text-gray-500">Uploading images...</p>
-                )}
-              </FormField>
+            <ProductMediaManager
+              label="Product Images"
+              media={images}
+              type="image"
+              uploadFolder="temp/products/images"
+              onChange={setImages}
+              uploading={uploading.images}
+              setUploading={setUploading}
+            />
 
-              <FormField label="Product Videos" htmlFor="videos">
-                <Dropzone
-                  title="Drop product videos here or Browse"
-                  description="MP4, WebM, MKV, etc supported"
-                  multiple
-                  accept={{ "video/*": [] }}
-                  onFiles={async (files) => {
-                    try {
-                      setUploading((u) => ({ ...u, videos: true }));
-                      const uploaded = await Promise.all(
-                        files.map((file) =>
-                          uploadMedia(file, "temp/products/videos")
-                        )
-                      );
-                      setVideos((prev) => [...prev, ...uploaded]);
-                    } catch (err: any) {
-                      setError(err.message);
-                    } finally {
-                      setUploading((u) => ({ ...u, videos: false }));
-                    }
-                  }}
-                />
-                {uploading.videos && (
-                  <p className="text-sm text-gray-500">Uploading videos...</p>
-                )}
-              </FormField>
-            </div>
+            <ProductMediaManager
+              label="Product Videos"
+              media={videos}
+              type="video"
+              uploadFolder="temp/products/videos"
+              onChange={setVideos}
+              uploading={uploading.videos}
+              setUploading={setUploading}
+            />
 
             <Authorized
               permission={mode === "create" ? "seo:create" : "seo:update"}
