@@ -210,7 +210,7 @@ export default function ProductFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push("/products");
+      router.push(`/products/${id}/view`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -444,7 +444,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                 hasErrors
               }
               backLabel="Cancel"
-              onBack={() => router.push("/products")}
+              onBack={() => router.push(`/products/${id}/view`)}
             />
           </form>
         )}

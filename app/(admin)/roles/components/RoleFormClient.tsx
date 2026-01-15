@@ -135,7 +135,7 @@ export default function RoleFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push("/roles");
+      router.push(`/roles/${id}/view`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -292,7 +292,7 @@ export default function RoleFormClient({ mode, id }: Props) {
               }
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"
-              onBack={() => router.push("/roles")}
+              onBack={() => router.push(`/roles/${id}/view`)}
             />
           </form>
         )}

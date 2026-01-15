@@ -99,7 +99,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push("/permissions");
+      router.push(`/permissions/${id}/view`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -187,7 +187,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
               }
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"
-              onBack={() => router.push("/permissions")}
+              onBack={() => router.push(`/permissions/${id}/view`)}
             />
           </form>
         )}
