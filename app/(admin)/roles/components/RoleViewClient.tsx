@@ -3,9 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-import FormHeader from "@/components/form/FormHeader";
-import FormError from "@/components/form/FormError";
-import FormActions from "@/components/form/FormActions";
+import { FormHeader, FormError, FormActions } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { ViewBadge, ViewField, ViewList, ViewSection } from "@/components/view";

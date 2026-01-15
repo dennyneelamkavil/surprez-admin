@@ -9,7 +9,7 @@ import {
   ListFilters,
   ListHeader,
 } from "@/components/listing";
-import Select from "@/components/form/Select";
+import { Select } from "@/components/form";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import { SortableTableHeader } from "@/components/common/SortableTableHeader";

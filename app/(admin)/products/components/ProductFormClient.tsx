@@ -6,18 +6,21 @@ import Image from "next/image";
 
 import { Authorized } from "@/components/auth/Authorized";
 
-import FormHeader from "@/components/form/FormHeader";
-import FormField from "@/components/form/FormField";
-import FormError from "@/components/form/FormError";
-import FormActions from "@/components/form/FormActions";
-import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
-import FileInput from "@/components/form/input/FileInput";
-import MultiSelect from "@/components/form/MultiSelect";
-import Switch from "@/components/form/switch/Switch";
-import AttributeEditor from "@/components/form/AttributeEditor";
-import ProductMediaManager from "@/components/form/ProductMediaManager";
-import FormSEOSection from "@/components/form/FormSEOSection";
+import {
+  FormHeader,
+  FormField,
+  FormError,
+  FormActions,
+  Input,
+  TextArea,
+  FileInput,
+  MultiSelect,
+  Switch,
+  AttributeEditor,
+  ProductMediaManager,
+  FormSEOSection,
+} from "@/components/form";
+
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";
@@ -25,7 +28,7 @@ import { useFieldErrors, useScrollToTop } from "@/hooks";
 import { uploadMedia } from "@/lib/uploadMedia";
 import { formatSlug } from "@/lib/utils";
 import type { Media, Seo, SubCategoryBase } from "@/lib/types";
-import type { AttributeRow } from "@/components/form/AttributeEditor";
+import type { AttributeRow } from "@/components/form";
 
 type Fields = "name" | "slug" | "coverImage" | "subcategories";
 type Props = {

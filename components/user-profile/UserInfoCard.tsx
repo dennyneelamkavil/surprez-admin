@@ -3,7 +3,7 @@ import React from "react";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
+import Input from "../form/input/Input";
 import Label from "../form/Label";
 
 export default function UserInfoCard() {

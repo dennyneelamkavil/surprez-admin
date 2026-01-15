@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import FormHeader from "@/components/form/FormHeader";
-import FormField from "@/components/form/FormField";
-import FormError from "@/components/form/FormError";
-import FormActions from "@/components/form/FormActions";
-import Switch from "@/components/form/switch/Switch";
-import Select from "@/components/form/Select";
-import FormSEOSection from "@/components/form/FormSEOSection";
+import {
+  FormHeader,
+  FormField,
+  FormError,
+  FormActions,
+  Switch,
+  Select,
+  FormSEOSection,
+} from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";

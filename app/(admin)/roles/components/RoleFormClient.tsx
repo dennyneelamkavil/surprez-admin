@@ -4,13 +4,15 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-import FormHeader from "@/components/form/FormHeader";
-import FormField from "@/components/form/FormField";
-import FormError from "@/components/form/FormError";
-import FormActions from "@/components/form/FormActions";
-import Input from "@/components/form/input/InputField";
-import Checkbox from "@/components/form/input/Checkbox";
-import Switch from "@/components/form/switch/Switch";
+import {
+  FormHeader,
+  FormField,
+  FormError,
+  FormActions,
+  Input,
+  Checkbox,
+  Switch,
+} from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";

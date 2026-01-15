@@ -6,15 +6,17 @@ import Image from "next/image";
 
 import { Authorized } from "@/components/auth/Authorized";
 
-import FormHeader from "@/components/form/FormHeader";
-import FormField from "@/components/form/FormField";
-import FormError from "@/components/form/FormError";
-import FormActions from "@/components/form/FormActions";
-import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
-import FileInput from "@/components/form/input/FileInput";
-import Switch from "@/components/form/switch/Switch";
-import FormSEOSection from "@/components/form/FormSEOSection";
+import {
+  FormHeader,
+  FormField,
+  FormError,
+  FormActions,
+  Input,
+  TextArea,
+  FileInput,
+  Switch,
+  FormSEOSection,
+} from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";

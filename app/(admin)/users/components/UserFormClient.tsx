@@ -6,13 +6,15 @@ import { useSession } from "next-auth/react";
 
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 
-import FormHeader from "@/components/form/FormHeader";
-import FormField from "@/components/form/FormField";
-import FormError from "@/components/form/FormError";
-import FormActions from "@/components/form/FormActions";
-import Input from "@/components/form/input/InputField";
-import Switch from "@/components/form/switch/Switch";
-import Select from "@/components/form/Select";
+import {
+  FormHeader,
+  FormField,
+  FormError,
+  FormActions,
+  Input,
+  Switch,
+  Select,
+} from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";

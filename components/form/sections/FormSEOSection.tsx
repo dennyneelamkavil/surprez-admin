@@ -4,11 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 
-import FormField from "@/components/form/FormField";
-import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
-import Switch from "@/components/form/switch/Switch";
-import FileInput from "@/components/form/input/FileInput";
+import {
+  FormField,
+  Input,
+  TextArea,
+  Switch,
+  FileInput,
+} from "@/components/form";
 
 import type { Seo, Media } from "@/lib/types";
 

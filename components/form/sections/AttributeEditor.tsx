@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/ui/button/Button";
-import Input from "@/components/form/input/InputField";
+import { Input } from "@/components/form";
 
 export type AttributeRow = {
   id: string;

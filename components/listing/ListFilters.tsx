@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@/components/form/input/InputField";
+import { Input } from "@/components/form";
 import Button from "@/components/ui/button/Button";
 
 type ListFiltersProps = {

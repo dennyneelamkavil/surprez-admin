@@ -4,8 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, X } from "lucide-react";
 
-import FileInput from "@/components/form/input/FileInput";
-import Input from "@/components/form/input/InputField";
+import { FileInput, Input } from "@/components/form";
 
 import { uploadMedia } from "@/lib/uploadMedia";
 import type { Media, TempMediaFolder } from "@/lib/types";

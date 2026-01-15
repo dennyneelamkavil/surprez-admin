@@ -8,9 +8,7 @@ import { toast } from "react-toastify";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 
 import Button from "@/components/ui/button/Button";
-import FormField from "@/components/form/FormField";
-import Input from "@/components/form/input/InputField";
-import Checkbox from "@/components/form/input/Checkbox";
+import { FormField, Input, Checkbox } from "@/components/form";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";
 
