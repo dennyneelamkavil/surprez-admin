@@ -175,7 +175,9 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push(`/subcategories/${id}/view`);
+      router.push(
+        mode === "create" ? "/subcategories" : `/subcategories/${id}/view`
+      );
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -368,7 +370,13 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
               }
               primaryDisabled={saving || uploading || hasErrors}
               backLabel="Cancel"
-              onBack={() => router.push(`/subcategories/${id}/view`)}
+              onBack={() =>
+                router.push(
+                  mode === "create"
+                    ? "/subcategories"
+                    : `/subcategories/${id}/view`
+                )
+              }
             />
           </form>
         )}

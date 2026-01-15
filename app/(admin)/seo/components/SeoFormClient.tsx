@@ -118,7 +118,7 @@ export default function SeoFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push(`/seo/${id}/view`);
+      router.push(mode === "create" ? "/seo" : `/seo/${id}/view`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -186,7 +186,9 @@ export default function SeoFormClient({ mode, id }: Props) {
               }
               primaryDisabled={saving || uploading || hasErrors}
               backLabel="Cancel"
-              onBack={() => router.push(`/seo/${id}/view`)}
+              onBack={() =>
+                router.push(mode === "create" ? "/seo" : `/seo/${id}/view`)
+              }
             />
           </form>
         )}
