@@ -12,9 +12,22 @@ export type AttributeRow = {
 type Props = {
   value: AttributeRow[];
   onChange: (value: AttributeRow[]) => void;
+  config?: {
+    keyPlaceholder?: string;
+    valuePlaceholder?: string;
+    addButtonLabel?: string;
+    helperText?: string;
+  };
 };
 
-export default function AttributeEditor({ value, onChange }: Props) {
+export default function AttributeEditor({ value, onChange, config }: Props) {
+  const {
+    keyPlaceholder = "Attribute name",
+    valuePlaceholder = "Value",
+    addButtonLabel = "+ Add Attribute",
+    helperText,
+  } = config || {};
+
   function update(id: string, field: "key" | "value", val: string) {
     onChange(
       value.map((row) => (row.id === id ? { ...row, [field]: val } : row))
@@ -31,15 +44,21 @@ export default function AttributeEditor({ value, onChange }: Props) {
 
   return (
     <div className="space-y-3">
+      {helperText && (
+        <p className="text-sm text-muted-foreground text-gray-500">
+          {helperText}
+        </p>
+      )}
+
       {value.map((row) => (
         <div key={row.id} className="flex gap-2">
           <Input
-            placeholder="Attribute name (e.g. color)"
+            placeholder={keyPlaceholder}
             value={row.key}
             onChange={(e) => update(row.id, "key", e.target.value)}
           />
           <Input
-            placeholder="Value (comma separated for multiple)"
+            placeholder={valuePlaceholder}
             value={row.value}
             onChange={(e) => update(row.id, "value", e.target.value)}
           />
@@ -54,7 +73,7 @@ export default function AttributeEditor({ value, onChange }: Props) {
       ))}
 
       <Button type="button" variant="outline" onClick={add}>
-        + Add Attribute
+        {addButtonLabel}
       </Button>
     </div>
   );

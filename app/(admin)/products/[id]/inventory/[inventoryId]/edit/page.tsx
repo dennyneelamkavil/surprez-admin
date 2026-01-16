@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 };
 
 interface Params {
-  params: { inventoryId: string };
+  params: { id: string; inventoryId: string };
 }
 
 export default async function EditInventoryPage({ params }: Params) {
-  const { inventoryId } = await params;
-  return <InventoryForm mode="edit" inventoryId={inventoryId} />;
+  const { id, inventoryId } = await params;
+  return <InventoryForm mode="edit" productId={id} inventoryId={inventoryId} />;
 }

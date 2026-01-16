@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CreateInventoryPage() {
-  return <InventoryForm mode="create" />;
+interface Params {
+  params: { id: string };
+}
+
+export default async function CreateInventoryPage({ params }: Params) {
+  const { id } = await params;
+  return <InventoryForm mode="create" productId={id} />;
 }

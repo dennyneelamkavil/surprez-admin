@@ -9,6 +9,8 @@ import type {
   CreateProductInventoryInput,
   UpdateProductInventoryInput,
 } from "@/server/product-inventory/product-inventory.validation";
+
+import { buildSortSpec } from "@/server/utils/build-sort-spec";
 import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
@@ -42,12 +44,58 @@ export async function createProductInventory(
 /* ================= LIST ================= */
 export async function listProductInventories(params?: {
   productId?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+  all?: boolean;
+  sortBy?: string;
+  sortDir?: string;
   isActive?: string;
 }) {
   await connectDB();
 
+  if (params?.all) {
+    const products = await ProductInventoryModel.find({
+      product: params.productId,
+      isActive: true,
+    })
+      .populate("product")
+      .collation({ locale: "en", strength: 2 })
+      .sort({ sku: 1 })
+      .lean();
+
+    return {
+      data: products.map(mapProductInventory),
+      pagination: null,
+    };
+  }
+
+  const page = Math.max(1, params?.page ?? 1);
+  const limit = Math.min(50, params?.limit ?? 10);
+  const skip = (page - 1) * limit;
+
+  const { sortSpec, sortBy, sortDir } = buildSortSpec({
+    type: "inventory",
+    sortBy: params?.sortBy,
+    sortDir: params?.sortDir,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
+
   const query: any = {};
+
   if (params?.productId) query.product = params.productId;
+
+  if (params?.search) {
+    const search = params.search.trim();
+    const num = Number(search);
+
+    query.$or = [{ sku: { $regex: search, $options: "i" } }];
+
+    if (!Number.isNaN(num)) {
+      query.$or.push({ "price.mrp": num }, { "price.sellingPrice": num });
+    }
+  }
 
   if (params?.isActive === "true") {
     query.isActive = true;
@@ -55,12 +103,30 @@ export async function listProductInventories(params?: {
     query.isActive = false;
   }
 
-  const items = await ProductInventoryModel.find(query)
-    .populate("product")
-    .sort({ createdAt: -1 })
-    .lean();
+  const [inventories, total] = await Promise.all([
+    ProductInventoryModel.find(query)
+      .populate("product")
+      .collation({ locale: "en", strength: 2 })
+      .sort(sortSpec)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    ProductInventoryModel.countDocuments(query),
+  ]);
 
-  return { data: items.map(mapProductInventory), pagination: null };
+  return {
+    data: inventories.map(mapProductInventory),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+    sort: {
+      by: sortBy,
+      dir: sortDir,
+    },
+  };
 }
 
 /* ================= GET ================= */

@@ -35,10 +35,25 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId") ?? undefined;
+    const all = searchParams.get("all") === "true";
+    const page = Number(searchParams.get("page") ?? 1);
+    const limit = Number(searchParams.get("limit") ?? 10);
+    const search = searchParams.get("search") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortDir = searchParams.get("sortDir") ?? undefined;
     const isActive = searchParams.get("isActive") ?? undefined;
 
     return NextResponse.json(
-      await listProductInventories({ productId, isActive })
+      await listProductInventories({
+        page,
+        limit,
+        search,
+        all,
+        sortBy,
+        sortDir,
+        productId,
+        isActive,
+      })
     );
   } catch (err) {
     return handleApiError(err);

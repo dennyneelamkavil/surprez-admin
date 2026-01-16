@@ -1,53 +1,113 @@
 "use client";
 
-import { ViewField, ViewSection, ViewBadge } from "@/components/view";
-import { FormHeader } from "@/components/form";
+import { useRouter } from "next/navigation";
+
+import { FormHeader, FormError, FormActions } from "@/components/form";
+import FormSkeleton from "@/components/skeletons/FormSkeleton";
+
+import { ViewBadge, ViewField, ViewSection } from "@/components/view";
+
 import { useAdminEntity } from "@/hooks";
 
 import type { ProductInventory } from "@/lib/types";
 
 type Props = {
+  productId?: string;
   inventoryId: string;
 };
 
-export default function InventoryViewClient({ inventoryId }: Props) {
-  const { data, loading, error } = useAdminEntity<ProductInventory>({
+export default function InventoryViewClient({ productId, inventoryId }: Props) {
+  const router = useRouter();
+  const {
+    data: inventory,
+    loading,
+    error,
+  } = useAdminEntity<ProductInventory>({
     endpoint: "inventory",
     id: inventoryId,
   });
 
   return (
     <div className="space-y-6">
-      <FormHeader title="View Inventory" backHref=".." />
+      <FormHeader
+        title="View Inventory"
+        backHref={`/products/${productId}/inventory`}
+      />
 
-      <ViewSection>
-        {loading || error || !data ? null : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <ViewField label="SKU" value={data.sku} mono />
-            <ViewField label="MRP" value={`₹${data.price.mrp}`} mono />
-            <ViewField
-              label="Selling Price"
-              value={`₹${data.price.sellingPrice}`}
-              mono
-            />
-            <ViewField label="Stock" value={String(data.stock)} />
-            <ViewBadge
-              label={data.isActive ? "Active" : "Inactive"}
-              variant={data.isActive ? "success" : "danger"}
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+        {loading ? (
+          <FormSkeleton />
+        ) : error ? (
+          <FormError error={error} />
+        ) : !inventory ? null : (
+          <div className="space-y-6">
+            <div className="sm:sticky top-30 z-10 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/40">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <ViewField label="SKU" value={inventory.sku} mono />
+                <ViewField label="MRP" value={`₹${inventory.price.mrp}`} mono />
+                <ViewField
+                  label="Selling Price"
+                  value={`₹${inventory.price.sellingPrice}`}
+                  mono
+                />
+                <ViewField label="Stock" value={String(inventory.stock)} />
+                <div>
+                  <p className="text-sm text-gray-500 mb-2">Status</p>
+                  <ViewBadge
+                    label={inventory.isActive ? "Active" : "Inactive"}
+                    variant={inventory.isActive ? "success" : "danger"}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {inventory.attributes && (
+              <ViewSection title="Attributes">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {Object.entries(inventory.attributes).map(([key, val]) => (
+                    <div
+                      key={key}
+                      className="rounded-md bg-gray-50 px-3 py-2 text-sm dark:bg-gray-800"
+                    >
+                      <p className="text-xs text-gray-500 dark:text-white/60 uppercase tracking-wide">
+                        {key}
+                      </p>
+                      <p className="font-mono text-gray-900 dark:text-white">
+                        {Array.isArray(val) ? val.join(", ") : val}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </ViewSection>
+            )}
+
+            <ViewSection>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <ViewField
+                  label="Created At"
+                  value={new Date(inventory.createdAt).toLocaleString()}
+                  mono
+                />
+                <ViewField
+                  label="Last Updated"
+                  value={new Date(inventory.updatedAt).toLocaleString()}
+                  mono
+                />
+              </div>
+            </ViewSection>
+
+            <FormActions
+              primaryLabel="Edit Inventory"
+              onPrimary={() =>
+                router.push(
+                  `/products/${productId}/inventory/${inventoryId}/edit`
+                )
+              }
+              onBack={() => router.back()}
             />
           </div>
         )}
-      </ViewSection>
-
-      {data?.attributes && (
-        <ViewSection title="Attributes">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {Object.entries(data.attributes).map(([k, v]) => (
-              <ViewField key={k} label={k} value={String(v)} />
-            ))}
-          </div>
-        </ViewSection>
-      )}
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ export function mapProductInventory(inv: any) {
     sku: inv.sku,
     price: inv.price,
     stock: inv.stock,
-    attributes: Object.fromEntries(inv.attributes ?? []),
+    attributes: inv.attributes ?? {},
     isActive: inv.isActive,
     product: inv.product
       ? {

@@ -5,7 +5,8 @@ type SortType =
   | "user"
   | "permission"
   | "role"
-  | "pageseo";
+  | "pageseo"
+  | "inventory";
 const SORT_FIELD_MAP: Record<SortType, Set<string>> = {
   user: new Set(["username", "fullname", "isActive", "createdAt"]),
   category: new Set(["name", "isActive", "createdAt"]),
@@ -14,6 +15,13 @@ const SORT_FIELD_MAP: Record<SortType, Set<string>> = {
   permission: new Set(["key", "createdAt"]),
   role: new Set(["name", "isSuperAdmin", "createdAt"]),
   pageseo: new Set(["pageKey", "isActive", "createdAt"]),
+  inventory: new Set([
+    "sku",
+    "stock",
+    "price.sellingPrice",
+    "isActive",
+    "createdAt",
+  ]),
 };
 
 export function buildSortSpec({
