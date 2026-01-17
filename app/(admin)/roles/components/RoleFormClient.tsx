@@ -153,10 +153,7 @@ export default function RoleFormClient({ mode, id }: Props) {
   if (currentUserRoleId && id === currentUserRoleId) {
     return (
       <div className="space-y-6">
-        <FormHeader
-          title={mode === "create" ? "Create Role" : "Edit Role"}
-          backHref="/roles"
-        />
+        <FormHeader title={mode === "create" ? "Create Role" : "Edit Role"} />
         <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
           <FormError error={"You cannot edit your own role"} />
         </div>
@@ -166,10 +163,7 @@ export default function RoleFormClient({ mode, id }: Props) {
 
   return (
     <div className="space-y-6">
-      <FormHeader
-        title={mode === "create" ? "Create Role" : "Edit Role"}
-        backHref="/roles"
-      />
+      <FormHeader title={mode === "create" ? "Create Role" : "Edit Role"} />
 
       <div className="rounded-lg border bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (

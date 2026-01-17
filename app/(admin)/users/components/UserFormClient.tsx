@@ -180,10 +180,7 @@ export default function UserFormClient({ mode, id }: Props) {
 
   return (
     <div className="space-y-6">
-      <FormHeader
-        title={mode === "create" ? "Create User" : "Edit User"}
-        backHref="/users"
-      />
+      <FormHeader title={mode === "create" ? "Create User" : "Edit User"} />
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (

@@ -29,7 +29,7 @@ export default function UserViewClient({ id }: Props) {
 
   return (
     <div className="space-y-6">
-      <FormHeader title="View User" backHref="/users" />
+      <FormHeader title="View User" />
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (

@@ -211,7 +211,6 @@ export default function InventoryFormClient({
     <div className="space-y-6">
       <FormHeader
         title={mode === "create" ? "Add Inventory" : "Edit Inventory"}
-        backHref={`/products/${productId}/inventory`}
       />
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">

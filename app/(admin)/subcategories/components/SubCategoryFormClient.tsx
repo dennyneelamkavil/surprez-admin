@@ -191,7 +191,6 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
     <div className="space-y-6">
       <FormHeader
         title={mode === "create" ? "Create SubCategory" : "Edit SubCategory"}
-        backHref="/subcategories"
       />
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">

@@ -5,17 +5,16 @@ import { useRouter } from "next/navigation";
 
 type FormHeaderProps = {
   title: string;
-  backHref: string;
 };
 
-export default function FormHeader({ title, backHref }: FormHeaderProps) {
+export default function FormHeader({ title }: FormHeaderProps) {
   const router = useRouter();
 
   return (
     <div className="flex items-center gap-3">
       <button
         type="button"
-        onClick={() => router.push(backHref)}
+        onClick={() => router.back()}
         className="flex h-9 w-9 items-center justify-center rounded-lg
                    text-gray-600 hover:bg-gray-100
                    dark:text-gray-400 dark:hover:bg-white/5"
