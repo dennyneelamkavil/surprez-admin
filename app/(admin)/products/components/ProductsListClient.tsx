@@ -279,7 +279,7 @@ export default function ProductsListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/products/${product.id}/view`}
+                        viewHref={`/products/${product.id}`}
                         inventoryHref={`/products/${product.id}/inventory`}
                         onToggle={() => setToggleItem(product)}
                         editHref={`/products/${product.id}/edit`}

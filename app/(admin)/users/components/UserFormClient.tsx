@@ -163,7 +163,7 @@ export default function UserFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push(mode === "create" ? "/users" : `/users/${id}/view`);
+      router.push(mode === "create" ? "/users" : `/users/${id}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -329,7 +329,7 @@ export default function UserFormClient({ mode, id }: Props) {
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"
               onBack={() =>
-                router.push(mode === "create" ? "/users" : `/users/${id}/view`)
+                router.push(mode === "create" ? "/users" : `/users/${id}`)
               }
             />
           </form>

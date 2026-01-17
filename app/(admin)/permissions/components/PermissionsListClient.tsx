@@ -141,7 +141,7 @@ export default function PermissionsListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/permissions/${permission.id}/view`}
+                        viewHref={`/permissions/${permission.id}`}
                         editHref={`/permissions/${permission.id}/edit`}
                         onDelete={() => setItem(permission)}
                         editPermission="permission:update"

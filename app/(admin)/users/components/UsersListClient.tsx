@@ -234,7 +234,7 @@ export default function UsersListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/users/${user.id}/view`}
+                        viewHref={`/users/${user.id}`}
                         onToggle={() => setToggleItem(user)}
                         editHref={`/users/${user.id}/edit`}
                         isActive={user.isActive}

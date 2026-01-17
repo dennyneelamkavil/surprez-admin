@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import CategoryViewClient from "../../components/CategoryViewClient";
+import CategoryViewClient from "../components/CategoryViewClient";
 
 export const metadata: Metadata = {
   title: "View Category | Surprez Admin",

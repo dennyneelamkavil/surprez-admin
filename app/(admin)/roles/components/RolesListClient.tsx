@@ -144,7 +144,7 @@ export default function RolesListClient() {
                   </td>
                   <td className="px-5 py-4 text-right">
                     <ListActions
-                      viewHref={`/roles/${role.id}/view`}
+                      viewHref={`/roles/${role.id}`}
                       editHref={`/roles/${role.id}/edit`}
                       onDelete={() => setItem(role)}
                       editPermission="role:update"

@@ -150,7 +150,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push(mode === "create" ? "/categories" : `/categories/${id}/view`);
+      router.push(mode === "create" ? "/categories" : `/categories/${id}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -331,7 +331,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
               backLabel="Cancel"
               onBack={() =>
                 router.push(
-                  mode === "create" ? "/categories" : `/categories/${id}/view`
+                  mode === "create" ? "/categories" : `/categories/${id}`
                 )
               }
             />

@@ -103,7 +103,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
       }
 
       router.push(
-        mode === "create" ? "/permissions" : `/permissions/${id}/view`
+        mode === "create" ? "/permissions" : `/permissions/${id}`
       );
     } catch (err: any) {
       setError(err.message);
@@ -194,7 +194,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
               backLabel="Cancel"
               onBack={() =>
                 router.push(
-                  mode === "create" ? "/permissions" : `/permissions/${id}/view`
+                  mode === "create" ? "/permissions" : `/permissions/${id}`
                 )
               }
             />

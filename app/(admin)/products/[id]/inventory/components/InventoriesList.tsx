@@ -227,7 +227,7 @@ export default function InventoriesList({ productId }: Props) {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/products/${productId}/inventory/${inv.id}/view`}
+                        viewHref={`/products/${productId}/inventory/${inv.id}`}
                         editHref={`/products/${productId}/inventory/${inv.id}/edit`}
                         isActive={inv.isActive}
                         onToggle={() => setToggleItem(inv)}

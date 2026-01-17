@@ -182,7 +182,7 @@ export default function SeoListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/seo/${pageSeo.id}/view`}
+                        viewHref={`/seo/${pageSeo.id}`}
                         editHref={`/seo/${pageSeo.id}/edit`}
                         onToggle={() => setToggleItem(pageSeo)}
                         isActive={pageSeo.isActive}

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import InventoryView from "../../components/InventoryView";
+import InventoryView from "../components/InventoryView";
 
 export const metadata: Metadata = {
   title: "View Product Inventory | Surprez Admin",

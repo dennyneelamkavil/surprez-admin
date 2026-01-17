@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import SeoViewClient from "../../components/SeoViewClient";
+import SeoViewClient from "../components/SeoViewClient";
 
 export const metadata: Metadata = {
   title: "View Seo | Surprez Admin",

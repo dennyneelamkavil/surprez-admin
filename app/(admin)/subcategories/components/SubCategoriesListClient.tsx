@@ -230,7 +230,7 @@ export default function SubCategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/subcategories/${subCat.id}/view`}
+                        viewHref={`/subcategories/${subCat.id}`}
                         onToggle={() => setToggleItem(subCat)}
                         editHref={`/subcategories/${subCat.id}/edit`}
                         isActive={subCat.isActive}

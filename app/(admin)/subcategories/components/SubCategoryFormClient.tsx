@@ -176,7 +176,7 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
       }
 
       router.push(
-        mode === "create" ? "/subcategories" : `/subcategories/${id}/view`
+        mode === "create" ? "/subcategories" : `/subcategories/${id}`
       );
     } catch (err: any) {
       setError(err.message);
@@ -374,7 +374,7 @@ export default function SubCategoryFormClient({ mode, id }: Props) {
                 router.push(
                   mode === "create"
                     ? "/subcategories"
-                    : `/subcategories/${id}/view`
+                    : `/subcategories/${id}`
                 )
               }
             />

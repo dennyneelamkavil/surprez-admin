@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import PermissionViewClient from "../../components/PermissionViewClient";
+import PermissionViewClient from "../components/PermissionViewClient";
 
 export const metadata: Metadata = {
   title: "View Permission | Surprez Admin",

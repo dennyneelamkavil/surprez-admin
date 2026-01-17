@@ -201,7 +201,7 @@ export default function CategoriesListClient() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/categories/${category.id}/view`}
+                        viewHref={`/categories/${category.id}`}
                         onToggle={() => setToggleItem(category)}
                         editHref={`/categories/${category.id}/edit`}
                         isActive={category.isActive}

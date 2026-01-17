@@ -137,7 +137,7 @@ export default function RoleFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push(mode === "create" ? "/roles" : `/roles/${id}/view`);
+      router.push(mode === "create" ? "/roles" : `/roles/${id}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -295,7 +295,7 @@ export default function RoleFormClient({ mode, id }: Props) {
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"
               onBack={() =>
-                router.push(mode === "create" ? "/roles" : `/roles/${id}/view`)
+                router.push(mode === "create" ? "/roles" : `/roles/${id}`)
               }
             />
           </form>
