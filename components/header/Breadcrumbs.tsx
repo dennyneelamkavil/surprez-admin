@@ -5,18 +5,20 @@ import { usePathname } from "next/navigation";
 
 const isMongoId = (value: string) => /^[a-f\d]{24}$/i.test(value);
 
+const trimMongoId = (id: string, start = 3, end = 2) =>
+  `${id.slice(0, start)}…${id.slice(-end)}`;
+
 export default function Breadcrumbs() {
   const pathname = usePathname();
 
   const segments = pathname.split("/").filter(Boolean);
 
-  const filteredSegments = segments.filter((segment) => !isMongoId(segment));
+  const breadcrumbs = segments.map((segment, index) => {
+    const href = "/" + segments.slice(0, index + 1).join("/");
 
-  const breadcrumbs = filteredSegments.map((segment, index) => {
-    const href = "/" + filteredSegments.slice(0, index + 1).join("/");
-    const label = segment
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (l) => l.toUpperCase());
+    const label = isMongoId(segment)
+      ? trimMongoId(segment)
+      : segment.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
     return { href, label };
   });
