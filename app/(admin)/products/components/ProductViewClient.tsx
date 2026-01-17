@@ -166,6 +166,8 @@ export default function ProductViewClient({ id }: Props) {
             <FormActions
               primaryLabel="Edit Product"
               onPrimary={() => router.push(`/products/${id}/edit`)}
+              secondaryLabel="View Inventory"
+              onSecondary={() => router.push(`/products/${id}/inventory`)}
               onBack={() => router.back()}
             />
           </div>
