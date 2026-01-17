@@ -6,11 +6,11 @@ type FormActionsProps = {
   primaryLabel?: string;
   onPrimary?: () => void;
   primaryDisabled?: boolean;
-  primarytype?: "submit" | "button";
+  primaryType?: "submit" | "button";
 
   secondaryLabel?: string;
   onSecondary?: () => void;
-  secondarytype?: "submit" | "button";
+  secondaryType?: "submit" | "button";
 
   backLabel?: string;
   onBack?: () => void;
@@ -20,11 +20,11 @@ export default function FormActions({
   primaryLabel,
   onPrimary,
   primaryDisabled = false,
-  primarytype = "submit",
+  primaryType = "submit",
 
   secondaryLabel,
   onSecondary,
-  secondarytype = "button",
+  secondaryType = "button",
 
   backLabel = "Back",
   onBack,
@@ -32,13 +32,17 @@ export default function FormActions({
   return (
     <div className="flex gap-3 pt-6 border-t dark:border-gray-800">
       {primaryLabel && (
-        <Button type={primarytype} disabled={primaryDisabled} onClick={onPrimary}>
+        <Button
+          type={primaryType}
+          disabled={primaryDisabled}
+          onClick={onPrimary}
+        >
           {primaryLabel}
         </Button>
       )}
 
       {secondaryLabel && onSecondary && (
-        <Button variant="outline" type={secondarytype} onClick={onSecondary}>
+        <Button variant="outline" type={secondaryType} onClick={onSecondary}>
           {secondaryLabel}
         </Button>
       )}
