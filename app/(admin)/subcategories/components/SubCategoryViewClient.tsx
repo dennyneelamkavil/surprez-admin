@@ -115,7 +115,7 @@ export default function SubCategoryViewClient({ id }: Props) {
             <FormActions
               primaryLabel="Edit SubCategory"
               onPrimary={() => router.push(`/subcategories/${id}/edit`)}
-              onBack={() => router.push("/subcategories")}
+              onBack={() => router.back()}
             />
           </div>
         )}

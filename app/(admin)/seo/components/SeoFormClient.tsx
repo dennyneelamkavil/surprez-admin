@@ -110,7 +110,7 @@ export default function SeoFormClient({ mode, id }: Props) {
             seo,
             isActive,
           }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -181,14 +181,12 @@ export default function SeoFormClient({ mode, id }: Props) {
                 saving
                   ? "Saving..."
                   : mode === "create"
-                  ? "Create Page SEO"
-                  : "Update Page SEO"
+                    ? "Create Page SEO"
+                    : "Update Page SEO"
               }
               primaryDisabled={saving || uploading || hasErrors}
               backLabel="Cancel"
-              onBack={() =>
-                router.push(mode === "create" ? "/seo" : `/seo/${id}`)
-              }
+              onBack={() => router.back()}
             />
           </form>
         )}

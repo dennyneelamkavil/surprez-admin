@@ -142,7 +142,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
             seo,
             isActive,
           }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -230,7 +230,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
                         setError(null);
                         const media = await uploadMedia(
                           file,
-                          "temp/categories"
+                          "temp/categories",
                         );
                         setImage(media);
                       } catch (err: any) {
@@ -264,7 +264,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
                       value={image.alt ?? ""}
                       onChange={(e) =>
                         setImage((prev) =>
-                          prev ? { ...prev, alt: e.target.value } : prev
+                          prev ? { ...prev, alt: e.target.value } : prev,
                         )
                       }
                       hint="Describe the image for SEO & accessibility"
@@ -277,7 +277,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
                       value={image.caption ?? ""}
                       onChange={(e) =>
                         setImage((prev) =>
-                          prev ? { ...prev, caption: e.target.value } : prev
+                          prev ? { ...prev, caption: e.target.value } : prev,
                         )
                       }
                     />
@@ -324,16 +324,12 @@ export default function CategoryFormClient({ mode, id }: Props) {
                 saving
                   ? "Saving..."
                   : mode === "create"
-                  ? "Create Category"
-                  : "Update Category"
+                    ? "Create Category"
+                    : "Update Category"
               }
               primaryDisabled={saving || uploading || hasErrors}
               backLabel="Cancel"
-              onBack={() =>
-                router.push(
-                  mode === "create" ? "/categories" : `/categories/${id}`
-                )
-              }
+              onBack={() => router.back()}
             />
           </form>
         )}

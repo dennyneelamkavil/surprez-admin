@@ -79,7 +79,7 @@ export default function InventoryFormClient({
             id: crypto.randomUUID(),
             key,
             value: Array.isArray(val) ? val.join(", ") : String(val),
-          }))
+          })),
         );
       }
     } catch (err: any) {
@@ -161,7 +161,7 @@ export default function InventoryFormClient({
         acc[key.trim()] = value.trim();
         return acc;
       },
-      {}
+      {},
     );
 
     const payload = {
@@ -185,7 +185,7 @@ export default function InventoryFormClient({
           method: mode === "create" ? "POST" : "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -196,7 +196,7 @@ export default function InventoryFormClient({
       router.push(
         mode === "create"
           ? `/products/${productId}/inventory`
-          : `/products/${productId}/inventory/${inventoryId}`
+          : `/products/${productId}/inventory/${inventoryId}`,
       );
     } catch (err: any) {
       setError(err.message);
@@ -297,8 +297,8 @@ export default function InventoryFormClient({
                 saving
                   ? "Saving..."
                   : mode === "create"
-                  ? "Create Inventory"
-                  : "Update Inventory"
+                    ? "Create Inventory"
+                    : "Update Inventory"
               }
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"

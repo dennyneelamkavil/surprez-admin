@@ -107,7 +107,7 @@ export default function CategoryViewClient({ id }: Props) {
             <FormActions
               primaryLabel="Edit Category"
               onPrimary={() => router.push(`/categories/${id}/edit`)}
-              onBack={() => router.push("/categories")}
+              onBack={() => router.back()}
             />
           </div>
         )}

@@ -100,7 +100,7 @@ export default function InventoryViewClient({ productId, inventoryId }: Props) {
               primaryLabel="Edit Inventory"
               onPrimary={() =>
                 router.push(
-                  `/products/${productId}/inventory/${inventoryId}/edit`
+                  `/products/${productId}/inventory/${inventoryId}/edit`,
                 )
               }
               onBack={() => router.back()}

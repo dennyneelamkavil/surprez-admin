@@ -84,16 +84,19 @@ export default function RoleFormClient({ mode, id }: Props) {
 
   const ACTIONS = ["read", "create", "update", "delete"] as const;
 
-  const groupedPermissions = permissions.reduce((acc, perm) => {
-    const [module, action] = perm.key.split(":");
+  const groupedPermissions = permissions.reduce(
+    (acc, perm) => {
+      const [module, action] = perm.key.split(":");
 
-    if (!ACTIONS.includes(action as any)) return acc;
+      if (!ACTIONS.includes(action as any)) return acc;
 
-    if (!acc[module]) acc[module] = {};
-    acc[module][action] = perm;
+      if (!acc[module]) acc[module] = {};
+      acc[module][action] = perm;
 
-    return acc;
-  }, {} as Record<string, Record<string, PermissionBase>>);
+      return acc;
+    },
+    {} as Record<string, Record<string, PermissionBase>>,
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -129,7 +132,7 @@ export default function RoleFormClient({ mode, id }: Props) {
             isSuperAdmin,
             permissions: isSuperAdmin ? [] : selected,
           }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -261,8 +264,8 @@ export default function RoleFormClient({ mode, id }: Props) {
                                             checked
                                               ? [...prev, permission.id]
                                               : prev.filter(
-                                                  (id) => id !== permission.id
-                                                )
+                                                  (id) => id !== permission.id,
+                                                ),
                                           );
                                           setError(null);
                                         }}
@@ -275,7 +278,7 @@ export default function RoleFormClient({ mode, id }: Props) {
                               );
                             })}
                           </tr>
-                        )
+                        ),
                       )}
                     </tbody>
                   </table>
@@ -289,14 +292,12 @@ export default function RoleFormClient({ mode, id }: Props) {
                 saving
                   ? "Saving..."
                   : mode === "create"
-                  ? "Create Role"
-                  : "Update Role"
+                    ? "Create Role"
+                    : "Update Role"
               }
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"
-              onBack={() =>
-                router.push(mode === "create" ? "/roles" : `/roles/${id}`)
-              }
+              onBack={() => router.back()}
             />
           </form>
         )}

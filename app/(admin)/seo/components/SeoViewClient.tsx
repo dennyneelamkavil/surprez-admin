@@ -63,7 +63,7 @@ export default function SeoViewClient({ id }: Props) {
             <FormActions
               primaryLabel="Edit Page SEO"
               onPrimary={() => router.push(`/seo/${id}/edit`)}
-              onBack={() => router.push("/seo")}
+              onBack={() => router.back()}
             />
           </div>
         )}

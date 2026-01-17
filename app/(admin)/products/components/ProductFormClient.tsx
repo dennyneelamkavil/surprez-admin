@@ -109,7 +109,7 @@ export default function ProductFormClient({ mode, id }: Props) {
             id: crypto.randomUUID(),
             key,
             value: Array.isArray(val) ? val.join(", ") : String(val),
-          }))
+          })),
         );
       }
     } catch (err: any) {
@@ -183,7 +183,7 @@ export default function ProductFormClient({ mode, id }: Props) {
           : value;
         return acc;
       },
-      {}
+      {},
     );
 
     try {
@@ -205,7 +205,7 @@ export default function ProductFormClient({ mode, id }: Props) {
             seo,
             isActive,
           }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -308,13 +308,13 @@ export default function ProductFormClient({ mode, id }: Props) {
                         setError(null);
                         const media = await uploadMedia(
                           file,
-                          "temp/products/covers"
+                          "temp/products/covers",
                         );
                         setCoverImage(media);
                       } catch (err: any) {
                         setFieldError(
                           "coverImage",
-                          err.message ?? "Upload failed"
+                          err.message ?? "Upload failed",
                         );
                       } finally {
                         setUploading((u) => ({ ...u, cover: false }));
@@ -345,7 +345,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                       value={coverImage.alt ?? ""}
                       onChange={(e) =>
                         setCoverImage((prev) =>
-                          prev ? { ...prev, alt: e.target.value } : prev
+                          prev ? { ...prev, alt: e.target.value } : prev,
                         )
                       }
                       hint="Describe the image for SEO & accessibility"
@@ -358,7 +358,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                       value={coverImage.caption ?? ""}
                       onChange={(e) =>
                         setCoverImage((prev) =>
-                          prev ? { ...prev, caption: e.target.value } : prev
+                          prev ? { ...prev, caption: e.target.value } : prev,
                         )
                       }
                     />
@@ -446,8 +446,8 @@ export default function ProductFormClient({ mode, id }: Props) {
                 saving
                   ? "Saving..."
                   : mode === "create"
-                  ? "Create Product"
-                  : "Update Product"
+                    ? "Create Product"
+                    : "Update Product"
               }
               primaryDisabled={
                 saving ||
@@ -457,11 +457,7 @@ export default function ProductFormClient({ mode, id }: Props) {
                 hasErrors
               }
               backLabel="Cancel"
-              onBack={() =>
-                router.push(
-                  mode === "create" ? "/products" : `/products/${id}`
-                )
-              }
+              onBack={() => router.back()}
             />
           </form>
         )}

@@ -155,7 +155,7 @@ export default function UserFormClient({ mode, id }: Props) {
             role,
             isActive,
           }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -323,14 +323,12 @@ export default function UserFormClient({ mode, id }: Props) {
                 saving
                   ? "Saving..."
                   : mode === "create"
-                  ? "Create User"
-                  : "Update User"
+                    ? "Create User"
+                    : "Update User"
               }
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"
-              onBack={() =>
-                router.push(mode === "create" ? "/users" : `/users/${id}`)
-              }
+              onBack={() => router.back()}
             />
           </form>
         )}

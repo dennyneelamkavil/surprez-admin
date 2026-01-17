@@ -79,7 +79,7 @@ export default function UserViewClient({ id }: Props) {
             <FormActions
               primaryLabel="Edit User"
               onPrimary={() => router.push(`/users/${id}/edit`)}
-              onBack={() => router.push("/users")}
+              onBack={() => router.back()}
             />
           </div>
         )}

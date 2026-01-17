@@ -82,7 +82,7 @@ export default function RoleViewClient({ id }: Props) {
             <FormActions
               primaryLabel="Edit Role"
               onPrimary={() => router.push(`/roles/${id}/edit`)}
-              onBack={() => router.push("/roles")}
+              onBack={() => router.back()}
               primaryDisabled={id === currentUserRoleId}
             />
           </div>

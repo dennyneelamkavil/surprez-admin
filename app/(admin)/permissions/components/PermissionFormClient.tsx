@@ -94,7 +94,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
           method: mode === "create" ? "POST" : "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key, description }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -102,9 +102,7 @@ export default function PermissionFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push(
-        mode === "create" ? "/permissions" : `/permissions/${id}`
-      );
+      router.push(mode === "create" ? "/permissions" : `/permissions/${id}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -187,16 +185,12 @@ export default function PermissionFormClient({ mode, id }: Props) {
                 saving
                   ? "Saving..."
                   : mode === "create"
-                  ? "Create Permission"
-                  : "Update Permission"
+                    ? "Create Permission"
+                    : "Update Permission"
               }
               primaryDisabled={saving || hasErrors}
               backLabel="Cancel"
-              onBack={() =>
-                router.push(
-                  mode === "create" ? "/permissions" : `/permissions/${id}`
-                )
-              }
+              onBack={() => router.back()}
             />
           </form>
         )}

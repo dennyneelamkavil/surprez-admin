@@ -68,7 +68,7 @@ export default function PermissionViewClient({ id }: Props) {
             <FormActions
               primaryLabel="Edit Permission"
               onPrimary={() => router.push(`/permissions/${id}/edit`)}
-              onBack={() => router.push("/permissions")}
+              onBack={() => router.back()}
             />
           </div>
         )}
