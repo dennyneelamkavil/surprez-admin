@@ -1,3 +1,4 @@
+export { default as ViewActions } from "./ViewActions";
 export { default as ViewBadge } from "./ViewBadge";
 export { default as ViewField } from "./ViewField";
 export { default as ViewImage } from "./ViewImage";

@@ -2,10 +2,15 @@
 
 import { useRouter } from "next/navigation";
 
-import { FormHeader, FormError, FormActions } from "@/components/form";
+import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { ViewBadge, ViewField, ViewSection } from "@/components/view";
+import {
+  ViewActions,
+  ViewBadge,
+  ViewField,
+  ViewSection,
+} from "@/components/view";
 
 import { useAdminEntity } from "@/hooks";
 
@@ -93,8 +98,9 @@ export default function InventoryViewClient({ productId, inventoryId }: Props) {
               </div>
             </ViewSection>
 
-            <FormActions
+            <ViewActions
               primaryLabel="Edit Inventory"
+              primaryPermission="inventory:update"
               onPrimary={() =>
                 router.push(
                   `/products/${productId}/inventory/${inventoryId}/edit`,

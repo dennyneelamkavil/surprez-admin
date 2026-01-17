@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 
-import { FormHeader, FormError, FormActions } from "@/components/form";
+import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import {
+  ViewActions,
   ViewBadge,
   ViewField,
   ViewSection,
@@ -60,8 +61,9 @@ export default function SeoViewClient({ id }: Props) {
 
             <ViewSEOSection seo={data.seo} />
 
-            <FormActions
+            <ViewActions
               primaryLabel="Edit Page SEO"
+              primaryPermission="seo:update"
               onPrimary={() => router.push(`/seo/${id}/edit`)}
               onBack={() => router.back()}
             />

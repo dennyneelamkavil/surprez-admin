@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 
 import { Authorized } from "@/components/auth/Authorized";
 
-import { FormHeader, FormError, FormActions } from "@/components/form";
+import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import {
+  ViewActions,
   ViewBadge,
   ViewField,
   ViewImage,
@@ -163,10 +164,12 @@ export default function ProductViewClient({ id }: Props) {
               </div>
             </ViewSection>
 
-            <FormActions
+            <ViewActions
               primaryLabel="Edit Product"
+              primaryPermission="product:update"
               onPrimary={() => router.push(`/products/${id}/edit`)}
               secondaryLabel="View Inventory"
+              secondaryPermission="inventory:read"
               onSecondary={() => router.push(`/products/${id}/inventory`)}
               onBack={() => router.back()}
             />

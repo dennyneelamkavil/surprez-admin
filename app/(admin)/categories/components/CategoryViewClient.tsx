@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 
 import { Authorized } from "@/components/auth/Authorized";
 
-import { FormHeader, FormError, FormActions } from "@/components/form";
+import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import {
+  ViewActions,
   ViewBadge,
   ViewField,
   ViewImage,
@@ -104,8 +105,9 @@ export default function CategoryViewClient({ id }: Props) {
               </div>
             </ViewSection>
 
-            <FormActions
+            <ViewActions
               primaryLabel="Edit Category"
+              primaryPermission="category:update"
               onPrimary={() => router.push(`/categories/${id}/edit`)}
               onBack={() => router.back()}
             />

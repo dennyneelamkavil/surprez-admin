@@ -3,10 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-import { FormHeader, FormError, FormActions } from "@/components/form";
+import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { ViewBadge, ViewField, ViewList, ViewSection } from "@/components/view";
+import {
+  ViewActions,
+  ViewBadge,
+  ViewField,
+  ViewList,
+  ViewSection,
+} from "@/components/view";
 
 import { useAdminEntity } from "@/hooks";
 
@@ -79,11 +85,12 @@ export default function RoleViewClient({ id }: Props) {
               </div>
             </ViewSection>
 
-            <FormActions
+            <ViewActions
               primaryLabel="Edit Role"
+              primaryPermission="role:update"
               onPrimary={() => router.push(`/roles/${id}/edit`)}
-              onBack={() => router.back()}
               primaryDisabled={id === currentUserRoleId}
+              onBack={() => router.back()}
             />
           </div>
         )}

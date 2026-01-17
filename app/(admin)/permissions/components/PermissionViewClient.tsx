@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 
-import { FormHeader, FormError, FormActions } from "@/components/form";
+import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
-import { ViewField, ViewSection } from "@/components/view";
+import { ViewActions, ViewField, ViewSection } from "@/components/view";
 
 import { useAdminEntity } from "@/hooks";
 
@@ -65,8 +65,9 @@ export default function PermissionViewClient({ id }: Props) {
               </div>
             </ViewSection>
 
-            <FormActions
+            <ViewActions
               primaryLabel="Edit Permission"
+              primaryPermission="permission:update"
               onPrimary={() => router.push(`/permissions/${id}/edit`)}
               onBack={() => router.back()}
             />
