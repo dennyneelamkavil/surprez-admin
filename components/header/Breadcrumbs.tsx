@@ -23,6 +23,8 @@ export default function Breadcrumbs() {
     return { href, label };
   });
 
+  const showEllipsis = breadcrumbs.length > 3;
+
   return (
     <nav
       aria-label="Breadcrumb"
@@ -35,20 +37,38 @@ export default function Breadcrumbs() {
           </Link>
         </li>
 
-        {breadcrumbs.map((crumb, i) => (
-          <li key={crumb.href} className="flex items-center gap-2">
+        {/* Ellipsis (mobile only) */}
+        {showEllipsis && (
+          <li className="flex items-center gap-2 md:hidden text-gray-400">
             <span>/</span>
-            {i === breadcrumbs.length - 1 ? (
-              <span className="text-gray-700 dark:text-gray-200">
-                {crumb.label}
-              </span>
-            ) : (
-              <Link href={crumb.href} className="hover:text-brand-500">
-                {crumb.label}
-              </Link>
-            )}
+            <span>…</span>
           </li>
-        ))}
+        )}
+
+        {breadcrumbs.map((crumb, i) => {
+          const isMobileHidden =
+            breadcrumbs.length > 3 && i < breadcrumbs.length - 3;
+
+          return (
+            <li
+              key={crumb.href}
+              className={`items-center gap-2 ${
+                isMobileHidden ? "hidden sm:flex" : "flex"
+              }`}
+            >
+              <span>/</span>
+              {i === breadcrumbs.length - 1 ? (
+                <span className="text-gray-700 dark:text-gray-200">
+                  {crumb.label}
+                </span>
+              ) : (
+                <Link href={crumb.href} className="hover:text-brand-500">
+                  {crumb.label}
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );
