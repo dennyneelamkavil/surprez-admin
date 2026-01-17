@@ -9,10 +9,11 @@ const ReviewSchema = new Schema(
       required: true,
       index: true,
     },
-    user: {
+    customer: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Customer",
       required: true,
+      index: true,
     },
     rating: {
       type: Number,
@@ -28,7 +29,9 @@ const ReviewSchema = new Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+ReviewSchema.index({ product: 1, customer: 1 }, { unique: true });
 
 export const ReviewModel = models.Review || model("Review", ReviewSchema);
