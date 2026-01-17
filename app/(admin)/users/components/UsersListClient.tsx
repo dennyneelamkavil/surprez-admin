@@ -63,9 +63,7 @@ export default function UsersListClient() {
       errorMessage: "Failed to delete user",
     });
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setItem(null);
   }
 
@@ -81,9 +79,7 @@ export default function UsersListClient() {
       }
     );
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setToggleItem(null);
   }
 

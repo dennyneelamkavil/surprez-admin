@@ -55,9 +55,7 @@ export default function CategoriesListClient() {
       errorMessage: "Failed to delete category",
     });
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setItem(null);
   }
 
@@ -73,9 +71,7 @@ export default function CategoriesListClient() {
       }
     );
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setToggleItem(null);
   }
 

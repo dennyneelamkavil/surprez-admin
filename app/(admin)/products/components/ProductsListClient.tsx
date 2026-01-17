@@ -62,9 +62,7 @@ export default function ProductsListClient() {
       errorMessage: "Failed to delete product",
     });
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setItem(null);
   }
 
@@ -80,9 +78,7 @@ export default function ProductsListClient() {
       }
     );
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setToggleItem(null);
   }
 

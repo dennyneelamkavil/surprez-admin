@@ -48,9 +48,7 @@ export default function PermissionsListClient() {
       errorMessage: "Failed to delete permission",
     });
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setItem(null);
   }
 

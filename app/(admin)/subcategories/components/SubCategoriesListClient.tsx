@@ -60,9 +60,7 @@ export default function SubCategoriesListClient() {
       errorMessage: "Failed to delete subcategory",
     });
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setItem(null);
   }
 
@@ -78,9 +76,7 @@ export default function SubCategoriesListClient() {
       }
     );
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setToggleItem(null);
   }
 

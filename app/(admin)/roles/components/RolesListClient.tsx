@@ -52,9 +52,7 @@ export default function RolesListClient() {
       errorMessage: "Failed to delete role",
     });
 
-    if (success) {
-      refetch();
-    }
+    if (success) refetch();
     setItem(null);
   }
 
