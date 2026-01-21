@@ -122,7 +122,7 @@ export default function ProductViewClient({ id }: Props) {
             )}
 
             {product.attributes && (
-              <ViewSection title="Attributes">
+              <ViewSection title="Variants">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {Object.entries(product.attributes).map(([key, val]) => (
                     <div

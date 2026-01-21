@@ -375,14 +375,14 @@ export default function ProductFormClient({ mode, id }: Props) {
               />
             </FormField>
 
-            <FormField label="Attributes">
+            <FormField label="Variants">
               <AttributeEditor
                 value={attributes}
                 onChange={setAttributes}
                 config={{
-                  keyPlaceholder: "Attribute (e.g. material, brand)",
+                  keyPlaceholder: "Variant (e.g. material, brand)",
                   valuePlaceholder: "Value (comma separated)",
-                  addButtonLabel: "+ Add Product Attribute",
+                  addButtonLabel: "+ Add Product Variant",
                   helperText:
                     "Used for product-level attributes like brand, material, or warranty.",
                 }}
