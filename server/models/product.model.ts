@@ -5,6 +5,7 @@ import { SeoSchema } from "@/server/seo/seo.schema";
 
 const ProductSchema = new Schema(
   {
+    // basic details
     name: {
       type: String,
       required: true,
@@ -16,12 +17,29 @@ const ProductSchema = new Schema(
       unique: true,
       index: true,
     },
+    brand: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    modelNumber: {
+      type: String,
+      trim: true,
+    },
+    countryOfOrigin: {
+      type: String,
+      required: true,
+    },
+
+    // media
     coverImage: {
       type: MediaSchema,
       required: true,
     },
     images: [MediaSchema],
     videos: [MediaSchema],
+
+    // sub categories and description
     subcategories: [
       {
         type: Schema.Types.ObjectId,
@@ -32,6 +50,8 @@ const ProductSchema = new Schema(
     description: {
       type: String,
     },
+
+    // variants
     attributes: {
       type: Schema.Types.Mixed,
       /*
@@ -45,6 +65,31 @@ const ProductSchema = new Schema(
         }
       */
     },
+
+    // features and specifications
+    keyFeatures: {
+      type: [String],
+      required: true,
+    },
+    ingredientsOrMaterial: {
+      type: String,
+      trim: true,
+    },
+
+    // instructions and warnings
+    usageInstructions: String,
+    safetyWarnings: String,
+
+    // policies
+    warranty: {
+      period: String,
+      details: String,
+    },
+    returnPolicy: {
+      type: String,
+    },
+
+    // rating
     rating: {
       average: {
         type: Number,
@@ -55,6 +100,8 @@ const ProductSchema = new Schema(
         default: 0,
       },
     },
+
+    // status
     isActive: {
       type: Boolean,
       default: true,
@@ -63,11 +110,13 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    // SEO
     seo: {
       type: SeoSchema,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const ProductModel = models.Product || model("Product", ProductSchema);
