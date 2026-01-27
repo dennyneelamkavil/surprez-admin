@@ -21,6 +21,14 @@ export interface ProductRating {
 }
 
 /**
+ * Product warranty info
+ */
+export interface ProductWarranty {
+  period?: string;
+  details?: string;
+}
+
+/**
  * Flexible product attributes
  * Key-value based, varies by category
  */
@@ -34,16 +42,33 @@ export type ProductAttributes = Record<
  * Represents populated API response
  */
 export interface Product extends ProductBase {
+  brand: string;
+  modelNumber?: string;
+  countryOfOrigin: string;
+
   coverImage: Media;
   images: Media[];
   videos: Media[];
-  subcategories: SubCategoryBase[]; // populated
+
+  subcategories: SubCategoryBase[];
   description?: string;
   attributes?: ProductAttributes;
+
+  keyFeatures: string[];
+  ingredientsOrMaterial?: string;
+
+  usageInstructions?: string;
+  safetyWarnings?: string;
+
+  warranty?: ProductWarranty;
+  returnPolicy?: string;
+
   rating: ProductRating;
-  seo?: Seo;
+
   isActive: boolean;
   isFeatured: boolean;
+
+  seo?: Seo;
   createdAt: string;
   updatedAt: string;
 }

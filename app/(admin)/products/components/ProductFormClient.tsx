@@ -30,7 +30,15 @@ import { formatSlug } from "@/lib/utils";
 import type { Media, Seo, SubCategoryBase } from "@/lib/types";
 import type { AttributeRow } from "@/components/form";
 
-type Fields = "name" | "slug" | "coverImage" | "subcategories";
+type Fields =
+  | "name"
+  | "slug"
+  | "coverImage"
+  | "subcategories"
+  | "brand"
+  | "countryOfOrigin"
+  | "keyFeatures";
+
 type Props = {
   mode: "create" | "edit";
   id?: string;
@@ -44,6 +52,20 @@ export default function ProductFormClient({ mode, id }: Props) {
   const [description, setDescription] = useState("");
   const [seo, setSeo] = useState<Seo>({});
   const [uploadingSeoImg, setUploadingSeoImg] = useState(false);
+
+  const [brand, setBrand] = useState("");
+  const [modelNumber, setModelNumber] = useState("");
+  const [countryOfOrigin, setCountryOfOrigin] = useState("");
+
+  const [keyFeatures, setKeyFeatures] = useState<AttributeRow[]>([]);
+  const [ingredientsOrMaterial, setIngredientsOrMaterial] = useState("");
+
+  const [usageInstructions, setUsageInstructions] = useState("");
+  const [safetyWarnings, setSafetyWarnings] = useState("");
+
+  const [warrantyPeriod, setWarrantyPeriod] = useState("");
+  const [warrantyDetails, setWarrantyDetails] = useState("");
+  const [returnPolicy, setReturnPolicy] = useState("");
 
   const [coverImage, setCoverImage] = useState<Media | null>(null);
   const [images, setImages] = useState<Media[]>([]);
@@ -102,6 +124,29 @@ export default function ProductFormClient({ mode, id }: Props) {
       setIsFeatured(data.isFeatured);
       setSeo(data.seo ?? {});
       setIsActive(data.isActive);
+
+      setBrand(data.brand ?? "");
+      setModelNumber(data.modelNumber ?? "");
+      setCountryOfOrigin(data.countryOfOrigin ?? "");
+
+      setIngredientsOrMaterial(data.ingredientsOrMaterial ?? "");
+
+      setUsageInstructions(data.usageInstructions ?? "");
+      setSafetyWarnings(data.safetyWarnings ?? "");
+
+      setWarrantyPeriod(data.warranty?.period ?? "");
+      setWarrantyDetails(data.warranty?.details ?? "");
+      setReturnPolicy(data.returnPolicy ?? "");
+
+      if (data.keyFeatures) {
+        setKeyFeatures(
+          Object.entries(data.keyFeatures).map(([key, val]) => ({
+            id: crypto.randomUUID(),
+            key,
+            value: Array.isArray(val) ? val.join(", ") : String(val),
+          })),
+        );
+      }
 
       if (data.attributes) {
         setAttributes(
@@ -170,10 +215,29 @@ export default function ProductFormClient({ mode, id }: Props) {
       hasError = true;
     }
 
+    if (!brand) {
+      setFieldError("brand", "Brand is required");
+      hasError = true;
+    }
+
+    if (!countryOfOrigin) {
+      setFieldError("countryOfOrigin", "Country of origin is required");
+      hasError = true;
+    }
+
+    if (!keyFeatures.length) {
+      setFieldError("keyFeatures", "At least one key feature is required");
+      hasError = true;
+    }
+
     if (hasError) {
       setSaving(false);
       return;
     }
+
+    const keyFeaturesPayload = keyFeatures
+      .map((f) => f.value?.trim())
+      .filter(Boolean);
 
     const attributesPayload = attributes.reduce<Record<string, any>>(
       (acc, { key, value }) => {
@@ -204,6 +268,18 @@ export default function ProductFormClient({ mode, id }: Props) {
             attributes: attributesPayload,
             seo,
             isActive,
+            brand,
+            modelNumber,
+            countryOfOrigin,
+            keyFeatures: keyFeaturesPayload,
+            ingredientsOrMaterial,
+            usageInstructions,
+            safetyWarnings,
+            warranty: {
+              period: warrantyPeriod,
+              details: warrantyDetails,
+            },
+            returnPolicy,
           }),
         },
       );
@@ -271,6 +347,42 @@ export default function ProductFormClient({ mode, id }: Props) {
                   />
                 </FormField>
               )}
+
+              <FormField label="Brand" required>
+                <Input
+                  placeholder="Nike, Samsung, Generic"
+                  value={brand}
+                  onChange={(e) => {
+                    clearFieldError("brand");
+                    setError(null);
+                    setBrand(e.target.value);
+                  }}
+                  error={!!fieldErrors.brand}
+                  hint={fieldErrors.brand}
+                />
+              </FormField>
+
+              <FormField label="Model Number">
+                <Input
+                  placeholder="Product model number"
+                  value={modelNumber}
+                  onChange={(e) => setModelNumber(e.target.value)}
+                />
+              </FormField>
+
+              <FormField label="Country of Origin" required>
+                <Input
+                  placeholder="India"
+                  value={countryOfOrigin}
+                  onChange={(e) => {
+                    clearFieldError("countryOfOrigin");
+                    setError(null);
+                    setCountryOfOrigin(e.target.value);
+                  }}
+                  error={!!fieldErrors.countryOfOrigin}
+                  hint={fieldErrors.countryOfOrigin}
+                />
+              </FormField>
 
               <FormField label="SubCategories" required>
                 <MultiSelect
@@ -375,6 +487,18 @@ export default function ProductFormClient({ mode, id }: Props) {
               />
             </FormField>
 
+            <FormField label="Key Features" required>
+              <AttributeEditor
+                value={keyFeatures}
+                onChange={setKeyFeatures}
+                config={{
+                  keyPlaceholder: "Feature",
+                  valuePlaceholder: "e.g. Lightweight design",
+                  addButtonLabel: "+ Add Feature",
+                }}
+              />
+            </FormField>
+
             <FormField label="Variants">
               <AttributeEditor
                 value={attributes}
@@ -386,6 +510,15 @@ export default function ProductFormClient({ mode, id }: Props) {
                   helperText:
                     "Used for product-level attributes like brand, material, or warranty.",
                 }}
+              />
+            </FormField>
+
+            <FormField label="Ingredients / Material">
+              <TextArea
+                placeholder="Cotton, Plastic, Active ingredients, etc."
+                rows={2}
+                value={ingredientsOrMaterial}
+                onChange={setIngredientsOrMaterial}
               />
             </FormField>
 
@@ -426,6 +559,52 @@ export default function ProductFormClient({ mode, id }: Props) {
               uploading={uploading.videos}
               setUploading={setUploading}
             />
+
+            <FormField label="Usage Instructions">
+              <TextArea
+                rows={2}
+                placeholder="How to use this product"
+                value={usageInstructions}
+                onChange={setUsageInstructions}
+              />
+            </FormField>
+
+            <FormField label="Safety Warnings">
+              <TextArea
+                rows={2}
+                placeholder="Warnings or precautions"
+                value={safetyWarnings}
+                onChange={setSafetyWarnings}
+              />
+            </FormField>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Warranty Period">
+                <Input
+                  placeholder="1 Year, 6 Months"
+                  value={warrantyPeriod}
+                  onChange={(e) => setWarrantyPeriod(e.target.value)}
+                />
+              </FormField>
+
+              <FormField label="Warranty Details">
+                <TextArea
+                  rows={2}
+                  placeholder="Warranty terms and coverage"
+                  value={warrantyDetails}
+                  onChange={setWarrantyDetails}
+                />
+              </FormField>
+            </div>
+
+            <FormField label="Return Policy">
+              <TextArea
+                rows={2}
+                placeholder="7-day replacement only"
+                value={returnPolicy}
+                onChange={setReturnPolicy}
+              />
+            </FormField>
 
             <Authorized
               permission={mode === "create" ? "seo:create" : "seo:update"}

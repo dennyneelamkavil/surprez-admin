@@ -83,6 +83,19 @@ export default function ProductViewClient({ id }: Props) {
             />
 
             <ViewSection>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <ViewField label="Brand" value={product.brand} />
+                {product.modelNumber && (
+                  <ViewField label="Model Number" value={product.modelNumber} />
+                )}
+                <ViewField
+                  label="Country of Origin"
+                  value={product.countryOfOrigin}
+                />
+              </div>
+            </ViewSection>
+
+            <ViewSection>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* LEFT */}
                 <div className="space-y-6">
@@ -121,6 +134,21 @@ export default function ProductViewClient({ id }: Props) {
               </div>
             )}
 
+            {product.ingredientsOrMaterial && (
+              <ViewField
+                label="Ingredients / Material"
+                value={product.ingredientsOrMaterial}
+              />
+            )}
+
+            {product.keyFeatures &&
+              Object.keys(product.keyFeatures).length > 0 && (
+                <ViewList
+                  label="Key Features"
+                  items={Object.values(product.keyFeatures)}
+                />
+              )}
+
             {product.attributes && (
               <ViewSection title="Variants">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -137,6 +165,52 @@ export default function ProductViewClient({ id }: Props) {
                       </p>
                     </div>
                   ))}
+                </div>
+              </ViewSection>
+            )}
+
+            {(product.usageInstructions || product.safetyWarnings) && (
+              <ViewSection>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {product.usageInstructions && (
+                    <ViewField
+                      label="Usage Instructions"
+                      value={product.usageInstructions}
+                    />
+                  )}
+                  {product.safetyWarnings && (
+                    <ViewField
+                      label="Safety Warnings"
+                      value={product.safetyWarnings}
+                    />
+                  )}
+                </div>
+              </ViewSection>
+            )}
+
+            {(product.warranty?.period ||
+              product.warranty?.details ||
+              product.returnPolicy) && (
+              <ViewSection>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {product.warranty?.period && (
+                    <ViewField
+                      label="Warranty Period"
+                      value={product.warranty.period}
+                    />
+                  )}
+                  {product.warranty?.details && (
+                    <ViewField
+                      label="Warranty Details"
+                      value={product.warranty.details}
+                    />
+                  )}
+                  {product.returnPolicy && (
+                    <ViewField
+                      label="Return Policy"
+                      value={product.returnPolicy}
+                    />
+                  )}
                 </div>
               </ViewSection>
             )}
