@@ -108,7 +108,7 @@ export default function FormSEOSection({
                     keywordsValue
                       .split(",")
                       .map((k) => k.trim())
-                      .filter(Boolean)
+                      .filter(Boolean),
                   );
                   setKeywordsDraft(null);
                 }}

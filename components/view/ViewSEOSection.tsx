@@ -33,7 +33,7 @@ export default function ViewSEOSection({
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="mb-4 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium dark:border-gray-800 dark:bg-gray-800/40"
+          className="mb-4 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium dark:border-gray-800 dark:bg-gray-800/40 dark:text-gray-400"
         >
           <span>SEO</span>
           <ChevronDown
