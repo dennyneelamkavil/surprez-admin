@@ -8,6 +8,7 @@ import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import {
+  CollapsibleViewSection,
   ViewActions,
   ViewBadge,
   ViewField,
@@ -213,6 +214,92 @@ export default function ProductViewClient({ id }: Props) {
                   )}
                 </div>
               </ViewSection>
+            )}
+
+            {product.compliance && (
+              <CollapsibleViewSection
+                title="Tax & Compliance"
+                description="Legal, tax, and regulatory information for this product"
+                collapsible
+              >
+                <div className="space-y-6">
+                  {/* GST & HSN */}
+                  <ViewSection>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {product.compliance.gstin && (
+                        <ViewField
+                          label="GSTIN"
+                          value={product.compliance.gstin}
+                          mono
+                        />
+                      )}
+
+                      <ViewField
+                        label="HSN Code"
+                        value={product.compliance.hsnCode}
+                        mono
+                      />
+                    </div>
+                  </ViewSection>
+
+                  {/* Manufacturer / Packer */}
+                  {(product.compliance.manufacturerDetails?.name ||
+                    product.compliance.manufacturerDetails?.address) && (
+                    <ViewSection title="Manufacturer / Packer Details">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {product.compliance.manufacturerDetails?.name && (
+                          <ViewField
+                            label="Name"
+                            value={product.compliance.manufacturerDetails.name}
+                          />
+                        )}
+
+                        {product.compliance.manufacturerDetails?.address && (
+                          <ViewField
+                            label="Address"
+                            value={
+                              product.compliance.manufacturerDetails.address
+                            }
+                          />
+                        )}
+                      </div>
+                    </ViewSection>
+                  )}
+
+                  {/* Certifications */}
+                  {product.compliance.certifications &&
+                    product.compliance.certifications.length > 0 && (
+                      <ViewSection title="Certifications / Licenses">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {product.compliance.certifications.map(
+                            (cert: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className="rounded-md bg-gray-50 px-3 py-2 text-sm dark:bg-gray-800"
+                              >
+                                <p className="text-xs text-gray-500 dark:text-white/60 uppercase tracking-wide">
+                                  {cert.type}
+                                </p>
+                                <p className="font-mono text-gray-900 dark:text-white">
+                                  {cert.licenseNumber}
+                                </p>
+
+                                {cert.validTill && (
+                                  <p className="mt-1 text-xs text-gray-500">
+                                    Valid till:{" "}
+                                    {new Date(
+                                      cert.validTill,
+                                    ).toLocaleDateString()}
+                                  </p>
+                                )}
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </ViewSection>
+                    )}
+                </div>
+              </CollapsibleViewSection>
             )}
 
             <Authorized permission="seo:read">

@@ -30,6 +30,8 @@ export function mapProduct(product: any) {
     warranty: product.warranty,
     returnPolicy: product.returnPolicy,
 
+    compliance: product.compliance,
+
     rating: product.rating,
     isActive: product.isActive,
     isFeatured: product.isFeatured,

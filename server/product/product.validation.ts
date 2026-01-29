@@ -13,6 +13,24 @@ const ProductAttributesValidation = z.record(
   z.union([z.string(), z.number(), z.boolean(), z.array(z.string())]),
 );
 
+const ProductCertificationValidation = z.object({
+  type: z.string().min(1), // FSSAI, BIS, COSMETIC, etc.
+  licenseNumber: z.string().optional(),
+  validTill: z.string().datetime().optional(),
+});
+
+const ManufacturerDetailsValidation = z.object({
+  name: z.string().optional(),
+  address: z.string().optional(),
+});
+
+const ProductComplianceValidation = z.object({
+  gstin: z.string().optional(),
+  hsnCode: z.string().min(1).optional(),
+  manufacturerDetails: ManufacturerDetailsValidation.optional(),
+  certifications: z.array(ProductCertificationValidation).optional(),
+});
+
 export const CreateProductSchema = z.object({
   name: z.string().min(2),
   brand: z.string().min(1),
@@ -36,6 +54,8 @@ export const CreateProductSchema = z.object({
 
   warranty: WarrantyValidation.optional(),
   returnPolicy: z.string().optional(),
+
+  compliance: ProductComplianceValidation.optional(),
 
   isActive: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
@@ -67,6 +87,8 @@ export const UpdateProductSchema = z.object({
 
   warranty: WarrantyValidation.optional(),
   returnPolicy: z.string().optional(),
+
+  compliance: ProductComplianceValidation.optional(),
 
   isActive: z.boolean().optional(),
   isFeatured: z.boolean().optional(),

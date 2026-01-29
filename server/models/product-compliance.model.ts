@@ -12,7 +12,6 @@ const ProductComplianceSchema = new Schema(
     gstin: String,
     hsnCode: {
       type: String,
-      required: true,
     },
     manufacturerDetails: {
       name: String,

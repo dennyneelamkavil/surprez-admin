@@ -2,6 +2,7 @@ import "server-only";
 
 import { connectDB } from "@/server/db";
 import { ProductModel } from "@/server/models/product.model";
+import { ProductComplianceModel } from "@/server/models/product-compliance.model";
 import { SubCategoryModel } from "@/server/models/subcategory.model";
 import { ProductInventoryModel } from "@/server/models/product-inventory.model";
 import { ReviewModel } from "@/server/models/review.model";
@@ -46,8 +47,10 @@ export async function createProduct(input: CreateProductInput) {
     input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
   }
 
+  const { compliance, ...productInput } = input;
+
   const product = await ProductModel.create({
-    ...input,
+    ...productInput,
     coverImage,
     images,
     videos,
@@ -55,6 +58,14 @@ export async function createProduct(input: CreateProductInput) {
     isActive: input.isActive ?? true,
     isFeatured: input.isFeatured ?? false,
   });
+
+  // create compliance if provided
+  if (compliance) {
+    await ProductComplianceModel.create({
+      product: product._id,
+      ...compliance,
+    });
+  }
 
   return mapProduct(await product.populate("subcategories"));
 }
@@ -157,7 +168,15 @@ export async function getProductById(id: string) {
   if (!product) {
     throw new AppError("Product not found", 404);
   }
-  return mapProduct(product);
+
+  const compliance = await ProductComplianceModel.findOne({
+    product: product._id,
+  }).lean();
+
+  return mapProduct({
+    ...product,
+    compliance,
+  });
 }
 
 /* ================= UPDATE ================= */
@@ -188,7 +207,9 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     input.seo.ogImage = await moveMediaToFinalFolder(input.seo.ogImage, "seo");
   }
 
-  const updateData: any = { ...input, coverImage, images, videos };
+  const { compliance, ...updateInput } = input;
+
+  const updateData: any = { ...updateInput, coverImage, images, videos };
 
   if (input.name) {
     updateData.slug = await generateUniqueProductSlug(input.name, id);
@@ -198,6 +219,21 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     new: true,
   }).populate("subcategories");
 
+  if (compliance) {
+    await ProductComplianceModel.findOneAndUpdate(
+      { product: id },
+      {
+        product: id,
+        ...compliance,
+      },
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      },
+    );
+  }
+
   if (
     input.coverImage &&
     existing.coverImage?.publicId &&
@@ -205,7 +241,7 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
   ) {
     await deleteFromCloudinary(
       existing.coverImage.publicId,
-      existing.coverImage.resourceType
+      existing.coverImage.resourceType,
     );
   }
 
@@ -216,7 +252,7 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
   ) {
     await deleteFromCloudinary(
       existing.seo.ogImage.publicId,
-      existing.seo.ogImage.resourceType
+      existing.seo.ogImage.resourceType,
     );
   }
 
@@ -255,7 +291,7 @@ export async function deleteProduct(id: string) {
   if (hasInventory) {
     throw new AppError(
       "Cannot delete product: inventories exist for this product",
-      409
+      409,
     );
   }
   const hasReviews = await ReviewModel.exists?.({
@@ -264,7 +300,7 @@ export async function deleteProduct(id: string) {
   if (hasReviews) {
     throw new AppError(
       "Cannot delete product: reviews exist for this product",
-      409
+      409,
     );
   }
 
@@ -272,6 +308,8 @@ export async function deleteProduct(id: string) {
   if (!product) {
     throw new AppError("Product not found", 404);
   }
+
+  await ProductComplianceModel.deleteOne({ product: id });
 
   // delete images, videos and cover image from cloudinary
   for (const img of product.images ?? []) {
@@ -283,13 +321,13 @@ export async function deleteProduct(id: string) {
   if (product.coverImage?.publicId) {
     await deleteFromCloudinary(
       product.coverImage.publicId,
-      product.coverImage.resourceType
+      product.coverImage.resourceType,
     );
   }
   if (product.seo?.ogImage?.publicId) {
     await deleteFromCloudinary(
       product.seo.ogImage.publicId,
-      product.seo.ogImage.resourceType
+      product.seo.ogImage.resourceType,
     );
   }
 

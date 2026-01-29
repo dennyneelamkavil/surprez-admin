@@ -19,6 +19,7 @@ import {
   AttributeEditor,
   ProductMediaManager,
   FormSEOSection,
+  CollapsibleFormSection,
 } from "@/components/form";
 
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
@@ -66,6 +67,12 @@ export default function ProductFormClient({ mode, id }: Props) {
   const [warrantyPeriod, setWarrantyPeriod] = useState("");
   const [warrantyDetails, setWarrantyDetails] = useState("");
   const [returnPolicy, setReturnPolicy] = useState("");
+
+  const [gstin, setGstin] = useState("");
+  const [hsnCode, setHsnCode] = useState("");
+  const [manufacturerName, setManufacturerName] = useState("");
+  const [manufacturerAddress, setManufacturerAddress] = useState("");
+  const [certifications, setCertifications] = useState<AttributeRow[]>([]);
 
   const [coverImage, setCoverImage] = useState<Media | null>(null);
   const [images, setImages] = useState<Media[]>([]);
@@ -154,6 +161,23 @@ export default function ProductFormClient({ mode, id }: Props) {
             id: crypto.randomUUID(),
             key,
             value: Array.isArray(val) ? val.join(", ") : String(val),
+          })),
+        );
+      }
+
+      setGstin(data.compliance?.gstin ?? "");
+      setHsnCode(data.compliance?.hsnCode ?? "");
+      setManufacturerName(data.compliance?.manufacturerDetails?.name ?? "");
+      setManufacturerAddress(
+        data.compliance?.manufacturerDetails?.address ?? "",
+      );
+
+      if (data.compliance?.certifications) {
+        setCertifications(
+          data.compliance.certifications.map((c: any) => ({
+            id: crypto.randomUUID(),
+            key: c.type,
+            value: c.licenseNumber,
           })),
         );
       }
@@ -250,6 +274,13 @@ export default function ProductFormClient({ mode, id }: Props) {
       {},
     );
 
+    const certificationsPayload = certifications
+      .filter((c) => c.key && c.value)
+      .map((c) => ({
+        type: c.key.trim(),
+        licenseNumber: c.value.trim(),
+      }));
+
     try {
       const res = await fetch(
         mode === "create" ? "/api/admin/products" : `/api/admin/products/${id}`,
@@ -280,6 +311,15 @@ export default function ProductFormClient({ mode, id }: Props) {
               details: warrantyDetails,
             },
             returnPolicy,
+            compliance: {
+              gstin,
+              hsnCode,
+              manufacturerDetails: {
+                name: manufacturerName,
+                address: manufacturerAddress,
+              },
+              certifications: certificationsPayload,
+            },
           }),
         },
       );
@@ -605,6 +645,63 @@ export default function ProductFormClient({ mode, id }: Props) {
                 onChange={setReturnPolicy}
               />
             </FormField>
+
+            <CollapsibleFormSection
+              title="Tax & Compliance"
+              description="Legal, tax, and regulatory information for this product"
+              collapsible
+            >
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField label="GSTIN">
+                    <Input
+                      placeholder="GST Identification Number"
+                      value={gstin}
+                      onChange={(e) => setGstin(e.target.value)}
+                    />
+                  </FormField>
+
+                  <FormField label="HSN Code">
+                    <Input
+                      placeholder="HSN Code"
+                      value={hsnCode}
+                      onChange={(e) => setHsnCode(e.target.value)}
+                    />
+                  </FormField>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField label="Manufacturer / Packer Name">
+                    <Input
+                      placeholder="Company or Manufacturer Name"
+                      value={manufacturerName}
+                      onChange={(e) => setManufacturerName(e.target.value)}
+                    />
+                  </FormField>
+
+                  <FormField label="Manufacturer / Packer Address">
+                    <TextArea
+                      rows={2}
+                      placeholder="Full address"
+                      value={manufacturerAddress}
+                      onChange={setManufacturerAddress}
+                    />
+                  </FormField>
+                </div>
+
+                <FormField label="Certifications / Licenses">
+                  <AttributeEditor
+                    value={certifications}
+                    onChange={setCertifications}
+                    config={{
+                      keyPlaceholder: "Type (e.g. FSSAI, BIS)",
+                      valuePlaceholder: "License Number",
+                      addButtonLabel: "+ Add Certification",
+                    }}
+                  />
+                </FormField>
+              </div>
+            </CollapsibleFormSection>
 
             <Authorized
               permission={mode === "create" ? "seo:create" : "seo:update"}

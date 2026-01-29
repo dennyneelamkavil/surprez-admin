@@ -3,6 +3,25 @@ import type { Seo } from "./seo";
 import type { SubCategoryBase } from "./subcategory";
 
 /**
+ * Product compliance & regulatory information
+ */
+export interface ProductCompliance {
+  gstin?: string;
+  hsnCode?: string;
+
+  manufacturerDetails?: {
+    name?: string;
+    address?: string;
+  };
+
+  certifications?: {
+    type: string; // FSSAI, BIS, COSMETIC, etc.
+    licenseNumber?: string;
+    validTill?: string; // ISO date string
+  }[];
+}
+
+/**
  * Lightweight product reference
  * Used for lists, relations, and selectors
  */
@@ -62,6 +81,8 @@ export interface Product extends ProductBase {
 
   warranty?: ProductWarranty;
   returnPolicy?: string;
+
+  compliance?: ProductCompliance;
 
   rating: ProductRating;
 
