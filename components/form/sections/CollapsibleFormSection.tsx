@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 
 type Props = {
   title: string;
+  description?: string;
   children: ReactNode;
   collapsible?: boolean;
   defaultOpen?: boolean;
@@ -13,6 +14,7 @@ type Props = {
 
 export default function CollapsibleFormSection({
   title,
+  description,
   children,
   collapsible = false,
   defaultOpen = false,
@@ -27,11 +29,22 @@ export default function CollapsibleFormSection({
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-700 dark:border-gray-800 dark:bg-gray-800/40 dark:text-gray-400"
+          className="flex w-full items-start justify-between gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-left dark:border-gray-800 dark:bg-gray-800/40"
         >
-          <span>{title}</span>
+          <div className="space-y-0.5">
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {title}
+            </div>
+
+            {description && (
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {description}
+              </div>
+            )}
+          </div>
+
           <ChevronDown
-            className={`h-4 w-4 transition-transform ${
+            className={`mt-1 h-4 w-4 shrink-0 transition-transform text-gray-500 ${
               open ? "rotate-180" : ""
             }`}
           />
