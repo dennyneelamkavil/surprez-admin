@@ -6,6 +6,7 @@ import type { ProductBase } from "./product";
 export interface ProductInventoryPrice {
   mrp: number;
   sellingPrice: number;
+  currency?: string;
 }
 
 /**
@@ -14,8 +15,35 @@ export interface ProductInventoryPrice {
 export type ProductInventoryAttributes = Record<string, string>;
 
 /**
+ * Shipping dimensions
+ */
+export interface ProductInventoryDimensions {
+  length?: number;
+  width?: number;
+  height?: number;
+  unit?: string;
+}
+
+/**
+ * Shipping weight
+ */
+export interface ProductInventoryWeight {
+  value?: number;
+  unit?: string;
+}
+
+/**
+ * Shipping details per SKU
+ */
+export interface ProductInventoryShipping {
+  dimensions?: ProductInventoryDimensions;
+  weight?: ProductInventoryWeight;
+  handlingTime: number;
+  shippingTemplate?: string;
+}
+
+/**
  * Lightweight inventory reference
- * (rarely needed, but included for consistency)
  */
 export interface ProductInventoryBase {
   id: string;
@@ -28,10 +56,16 @@ export interface ProductInventoryBase {
  * Represents populated API response
  */
 export interface ProductInventory extends ProductInventoryBase {
-  product: ProductBase; // populated
+  product: ProductBase;
+
   price: ProductInventoryPrice;
   stock: number;
+
   attributes?: ProductInventoryAttributes;
+
+  barcode?: string;
+  shipping?: ProductInventoryShipping;
+
   createdAt: string;
   updatedAt: string;
 }

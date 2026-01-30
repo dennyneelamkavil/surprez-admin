@@ -77,7 +77,7 @@ export default function InventoriesList({ productId }: Props) {
       {
         successMessage: "Inventory status updated",
         errorMessage: "Failed to update inventory",
-      }
+      },
     );
 
     if (success) refetch();
@@ -205,13 +205,13 @@ export default function InventoriesList({ productId }: Props) {
                       {inv.sku}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                      ₹{inv.price.sellingPrice}
+                      {inv.price.currency} {inv.price.sellingPrice}
                       {inv.price.mrp !== inv.price.sellingPrice && (
                         <>
                           {" "}
                           /{" "}
                           <span className="line-through text-gray-400">
-                            ₹{inv.price.mrp}
+                            {inv.price.currency} {inv.price.mrp}
                           </span>
                         </>
                       )}

@@ -6,6 +6,7 @@ import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import {
+  CollapsibleViewSection,
   ViewActions,
   ViewBadge,
   ViewField,
@@ -45,8 +46,16 @@ export default function InventoryViewClient({ productId, inventoryId }: Props) {
           <div className="space-y-6">
             <div className="sm:sticky top-30 z-10 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/40">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <ViewField label="SKU" value={inventory.sku} mono />
-                <ViewField label="MRP" value={`₹${inventory.price.mrp}`} mono />
+                <ViewField
+                  label="MRP"
+                  value={`${inventory.price.currency ?? "INR"} ${inventory.price.mrp}`}
+                  mono
+                />
+                <ViewField
+                  label="Selling Price"
+                  value={`${inventory.price.currency ?? "INR"} ${inventory.price.sellingPrice}`}
+                  mono
+                />
                 <ViewField
                   label="Selling Price"
                   value={`₹${inventory.price.sellingPrice}`}
@@ -62,6 +71,10 @@ export default function InventoryViewClient({ productId, inventoryId }: Props) {
                 </div>
               </div>
             </div>
+
+            {inventory.barcode && (
+              <ViewField label="Barcode" value={inventory.barcode} mono />
+            )}
 
             {inventory.attributes && (
               <ViewSection title="Attributes">
@@ -81,6 +94,56 @@ export default function InventoryViewClient({ productId, inventoryId }: Props) {
                   ))}
                 </div>
               </ViewSection>
+            )}
+
+            {inventory.shipping && (
+              <CollapsibleViewSection
+                title="Shipping Information"
+                description="Package size, weight, and handling details."
+                collapsible
+              >
+                <ViewSection>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Dimensions */}
+                    {inventory.shipping.dimensions && (
+                      <ViewField
+                        label="Dimensions"
+                        value={`${inventory.shipping.dimensions.length ?? "-"} × ${
+                          inventory.shipping.dimensions.width ?? "-"
+                        } × ${inventory.shipping.dimensions.height ?? "-"} ${
+                          inventory.shipping.dimensions.unit ?? "cm"
+                        }`}
+                        mono
+                      />
+                    )}
+
+                    {/* Weight */}
+                    {inventory.shipping.weight && (
+                      <ViewField
+                        label="Weight"
+                        value={`${inventory.shipping.weight.value ?? "-"} ${
+                          inventory.shipping.weight.unit ?? "kg"
+                        }`}
+                        mono
+                      />
+                    )}
+
+                    {/* Handling Time */}
+                    <ViewField
+                      label="Handling Time"
+                      value={`${inventory.shipping.handlingTime} day(s)`}
+                    />
+
+                    {/* Shipping Template */}
+                    {inventory.shipping.shippingTemplate && (
+                      <ViewField
+                        label="Shipping Template"
+                        value={inventory.shipping.shippingTemplate}
+                      />
+                    )}
+                  </div>
+                </ViewSection>
+              </CollapsibleViewSection>
             )}
 
             <ViewSection>

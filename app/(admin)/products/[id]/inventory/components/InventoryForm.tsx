@@ -11,6 +11,7 @@ import {
   Input,
   Switch,
   AttributeEditor,
+  CollapsibleFormSection,
 } from "@/components/form";
 
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
@@ -29,6 +30,9 @@ type Props = {
 function isValidPriceInput(value: string) {
   return /^\d*\.?\d{0,2}$/.test(value);
 }
+function isValidNumberInput(value: string) {
+  return /^\d*\.?\d*$/.test(value);
+}
 
 export default function InventoryFormClient({
   mode,
@@ -40,8 +44,22 @@ export default function InventoryFormClient({
   const [sku, setSku] = useState("");
   const [mrp, setMrp] = useState("");
   const [sellingPrice, setSellingPrice] = useState("");
+  const [currency, setCurrency] = useState("INR");
   const [stock, setStock] = useState("");
   const [attributes, setAttributes] = useState<AttributeRow[]>([]);
+
+  const [barcode, setBarcode] = useState("");
+
+  const [length, setLength] = useState("");
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
+  const [dimensionUnit, setDimensionUnit] = useState("cm");
+
+  const [weight, setWeight] = useState("");
+  const [weightUnit, setWeightUnit] = useState("kg");
+
+  const [handlingTime, setHandlingTime] = useState("");
+  const [shippingTemplate, setShippingTemplate] = useState("");
 
   const [isActive, setIsActive] = useState(true);
 
@@ -70,7 +88,22 @@ export default function InventoryFormClient({
       setSku(data.sku);
       setMrp(String(data.price.mrp));
       setSellingPrice(String(data.price.sellingPrice));
+      setCurrency(data.price?.currency ?? "INR");
       setStock(String(data.stock));
+
+      setBarcode(data.barcode ?? "");
+
+      setLength(String(data.shipping?.dimensions?.length ?? ""));
+      setWidth(String(data.shipping?.dimensions?.width ?? ""));
+      setHeight(String(data.shipping?.dimensions?.height ?? ""));
+      setDimensionUnit(data.shipping?.dimensions?.unit ?? "cm");
+
+      setWeight(String(data.shipping?.weight?.value ?? ""));
+      setWeightUnit(data.shipping?.weight?.unit ?? "kg");
+
+      setHandlingTime(String(data.shipping?.handlingTime ?? ""));
+      setShippingTemplate(data.shipping?.shippingTemplate ?? "");
+
       setIsActive(data.isActive);
 
       if (data.attributes) {
@@ -120,6 +153,16 @@ export default function InventoryFormClient({
     setStock(value);
   }
 
+  function handleNumberChange(
+    setter: React.Dispatch<React.SetStateAction<string>>,
+  ) {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (!isValidNumberInput(value)) return;
+      setter(value);
+    };
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -167,12 +210,33 @@ export default function InventoryFormClient({
     const payload = {
       product: productId,
       sku,
+      barcode,
       price: {
         mrp: Number(mrp),
         sellingPrice: Number(finalSellingPrice),
+        currency,
       },
       stock: Number(stock),
       attributes: attributesPayload,
+      shipping: {
+        dimensions:
+          length || width || height
+            ? {
+                length: Number(length),
+                width: Number(width),
+                height: Number(height),
+                unit: dimensionUnit,
+              }
+            : undefined,
+        weight: weight
+          ? {
+              value: Number(weight),
+              unit: weightUnit,
+            }
+          : undefined,
+        handlingTime: Number(handlingTime),
+        shippingTemplate,
+      },
       isActive,
     };
 
@@ -222,26 +286,37 @@ export default function InventoryFormClient({
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && <FormError error={error} />}
 
-            <FormField label="SKU" required htmlFor="sku">
-              <Input
-                id="sku"
-                value={sku}
-                onChange={(e) => {
-                  clearFieldError("sku");
-                  setError(null);
-                  setSku(e.target.value);
-                }}
-                error={!!fieldErrors.sku}
-                hint={fieldErrors.sku}
-                autoFocus
-              />
-            </FormField>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="SKU" required htmlFor="sku">
+                <Input
+                  id="sku"
+                  value={sku}
+                  onChange={(e) => {
+                    clearFieldError("sku");
+                    setError(null);
+                    setSku(e.target.value);
+                  }}
+                  error={!!fieldErrors.sku}
+                  hint={fieldErrors.sku}
+                  autoFocus
+                />
+              </FormField>
+
+              <FormField label="Barcode">
+                <Input
+                  placeholder="EAN / UPC / ISBN"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                />
+              </FormField>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField label="MRP" required htmlFor="mrp">
                 <Input
                   id="mrp"
                   value={mrp}
+                  inputMode="decimal"
                   onChange={handleMrpChange}
                   error={!!fieldErrors.mrp}
                   hint={fieldErrors.mrp}
@@ -252,9 +327,18 @@ export default function InventoryFormClient({
                 <Input
                   id="sellingPrice"
                   value={sellingPrice}
+                  inputMode="decimal"
                   onChange={handleSellingPriceChange}
                   error={!!fieldErrors.sellingPrice}
                   hint={fieldErrors.sellingPrice}
+                />
+              </FormField>
+
+              <FormField label="Currency">
+                <Input
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value.toUpperCase())}
+                  placeholder="INR"
                 />
               </FormField>
             </div>
@@ -264,6 +348,7 @@ export default function InventoryFormClient({
                 id="stock"
                 value={stock}
                 onChange={handleStockChange}
+                inputMode="decimal"
                 error={!!fieldErrors.stock}
                 hint={fieldErrors.stock}
               />
@@ -282,6 +367,62 @@ export default function InventoryFormClient({
                 }}
               />
             </FormField>
+
+            <CollapsibleFormSection
+              title="Shipping Information"
+              description="Package size, weight, and handling details."
+              collapsible
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField label="Length (cm)">
+                  <Input
+                    value={length}
+                    inputMode="decimal"
+                    onChange={handleNumberChange(setLength)}
+                  />
+                </FormField>
+
+                <FormField label="Width (cm)">
+                  <Input
+                    value={width}
+                    inputMode="decimal"
+                    onChange={handleNumberChange(setWidth)}
+                  />
+                </FormField>
+
+                <FormField label="Height (cm)">
+                  <Input
+                    value={height}
+                    inputMode="decimal"
+                    onChange={handleNumberChange(setHeight)}
+                  />
+                </FormField>
+
+                <FormField label="Weight (kg)">
+                  <Input
+                    value={weight}
+                    inputMode="decimal"
+                    onChange={handleNumberChange(setWeight)}
+                  />
+                </FormField>
+
+                <FormField label="Handling Time (days)">
+                  <Input
+                    value={handlingTime}
+                    inputMode="decimal"
+                    onChange={handleNumberChange(setHandlingTime)}
+                  />
+                </FormField>
+
+                <FormField label="Shipping Template">
+                  <Input
+                    placeholder="Standard / Express"
+                    value={shippingTemplate}
+                    onChange={(e) => setShippingTemplate(e.target.value)}
+                  />
+                </FormField>
+              </div>
+            </CollapsibleFormSection>
 
             <FormField label="Status">
               <Switch

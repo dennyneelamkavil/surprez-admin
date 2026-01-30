@@ -15,7 +15,6 @@ const ShippingSchema = new Schema(
     },
     handlingTime: {
       type: Number, // days
-      required: true,
     },
     shippingTemplate: {
       type: String, // reference key

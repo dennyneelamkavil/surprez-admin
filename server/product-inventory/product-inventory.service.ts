@@ -15,7 +15,7 @@ import { AppError } from "@/server/errors/AppError";
 
 /* ================= CREATE ================= */
 export async function createProductInventory(
-  input: CreateProductInventoryInput
+  input: CreateProductInventoryInput,
 ) {
   await connectDB();
 
@@ -146,7 +146,7 @@ export async function getProductInventoryById(id: string) {
 /* ================= UPDATE ================= */
 export async function updateProductInventory(
   id: string,
-  input: UpdateProductInventoryInput
+  input: UpdateProductInventoryInput,
 ) {
   await connectDB();
 
