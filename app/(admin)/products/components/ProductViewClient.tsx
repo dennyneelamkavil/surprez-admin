@@ -170,50 +170,62 @@ export default function ProductViewClient({ id }: Props) {
               </ViewSection>
             )}
 
-            {(product.usageInstructions || product.safetyWarnings) && (
-              <ViewSection>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {product.usageInstructions && (
-                    <ViewField
-                      label="Usage Instructions"
-                      value={product.usageInstructions}
-                    />
-                  )}
-                  {product.safetyWarnings && (
-                    <ViewField
-                      label="Safety Warnings"
-                      value={product.safetyWarnings}
-                    />
-                  )}
-                </div>
-              </ViewSection>
-            )}
-
-            {(product.warranty?.period ||
+            {(product.usageInstructions ||
+              product.safetyWarnings ||
+              product.warranty?.period ||
               product.warranty?.details ||
               product.returnPolicy) && (
-              <ViewSection>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {product.warranty?.period && (
-                    <ViewField
-                      label="Warranty Period"
-                      value={product.warranty.period}
-                    />
-                  )}
-                  {product.warranty?.details && (
-                    <ViewField
-                      label="Warranty Details"
-                      value={product.warranty.details}
-                    />
-                  )}
-                  {product.returnPolicy && (
-                    <ViewField
-                      label="Return Policy"
-                      value={product.returnPolicy}
-                    />
-                  )}
-                </div>
-              </ViewSection>
+              <CollapsibleViewSection
+                title="Usage, Warranty & Returns"
+                description="Instructions for use, safety information, warranty coverage, and return or replacement policies."
+                collapsible
+              >
+                {(product.usageInstructions || product.safetyWarnings) && (
+                  <ViewSection>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {product.usageInstructions && (
+                        <ViewField
+                          label="Usage Instructions"
+                          value={product.usageInstructions}
+                        />
+                      )}
+                      {product.safetyWarnings && (
+                        <ViewField
+                          label="Safety Warnings"
+                          value={product.safetyWarnings}
+                        />
+                      )}
+                    </div>
+                  </ViewSection>
+                )}
+
+                {(product.warranty?.period ||
+                  product.warranty?.details ||
+                  product.returnPolicy) && (
+                  <ViewSection>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {product.warranty?.period && (
+                        <ViewField
+                          label="Warranty Period"
+                          value={product.warranty.period}
+                        />
+                      )}
+                      {product.warranty?.details && (
+                        <ViewField
+                          label="Warranty Details"
+                          value={product.warranty.details}
+                        />
+                      )}
+                      {product.returnPolicy && (
+                        <ViewField
+                          label="Return Policy"
+                          value={product.returnPolicy}
+                        />
+                      )}
+                    </div>
+                  </ViewSection>
+                )}
+              </CollapsibleViewSection>
             )}
 
             {product.compliance && (

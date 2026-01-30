@@ -600,51 +600,57 @@ export default function ProductFormClient({ mode, id }: Props) {
               setUploading={setUploading}
             />
 
-            <FormField label="Usage Instructions">
-              <TextArea
-                rows={2}
-                placeholder="How to use this product"
-                value={usageInstructions}
-                onChange={setUsageInstructions}
-              />
-            </FormField>
-
-            <FormField label="Safety Warnings">
-              <TextArea
-                rows={2}
-                placeholder="Warnings or precautions"
-                value={safetyWarnings}
-                onChange={setSafetyWarnings}
-              />
-            </FormField>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Warranty Period">
-                <Input
-                  placeholder="1 Year, 6 Months"
-                  value={warrantyPeriod}
-                  onChange={(e) => setWarrantyPeriod(e.target.value)}
-                />
-              </FormField>
-
-              <FormField label="Warranty Details">
+            <CollapsibleFormSection
+              title="Usage, Warranty & Returns"
+              description="Instructions for use, safety information, warranty coverage, and return or replacement policies."
+              collapsible
+            >
+              <FormField label="Usage Instructions">
                 <TextArea
                   rows={2}
-                  placeholder="Warranty terms and coverage"
-                  value={warrantyDetails}
-                  onChange={setWarrantyDetails}
+                  placeholder="How to use this product"
+                  value={usageInstructions}
+                  onChange={setUsageInstructions}
                 />
               </FormField>
-            </div>
 
-            <FormField label="Return Policy">
-              <TextArea
-                rows={2}
-                placeholder="7-day replacement only"
-                value={returnPolicy}
-                onChange={setReturnPolicy}
-              />
-            </FormField>
+              <FormField label="Safety Warnings">
+                <TextArea
+                  rows={2}
+                  placeholder="Warnings or precautions"
+                  value={safetyWarnings}
+                  onChange={setSafetyWarnings}
+                />
+              </FormField>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField label="Warranty Period">
+                  <Input
+                    placeholder="1 Year, 6 Months"
+                    value={warrantyPeriod}
+                    onChange={(e) => setWarrantyPeriod(e.target.value)}
+                  />
+                </FormField>
+
+                <FormField label="Warranty Details">
+                  <TextArea
+                    rows={2}
+                    placeholder="Warranty terms and coverage"
+                    value={warrantyDetails}
+                    onChange={setWarrantyDetails}
+                  />
+                </FormField>
+              </div>
+
+              <FormField label="Return Policy">
+                <TextArea
+                  rows={2}
+                  placeholder="7-day replacement only"
+                  value={returnPolicy}
+                  onChange={setReturnPolicy}
+                />
+              </FormField>
+            </CollapsibleFormSection>
 
             <CollapsibleFormSection
               title="Tax & Compliance"
