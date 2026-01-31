@@ -115,6 +115,13 @@ const ProductSchema = new Schema(
     seo: {
       type: SeoSchema,
     },
+
+    seller: {
+      type: Schema.Types.ObjectId,
+      ref: "Seller",
+      required: true,
+      index: true,
+    },
   },
   { timestamps: true },
 );
