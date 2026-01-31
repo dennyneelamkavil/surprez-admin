@@ -1,13 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCustomerProductDetail } from "@/server/customer/product/product-detail.service";
 import { handleApiError } from "@/server/errors/handleApiError";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { slug: string } },
+  req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
-    return NextResponse.json(await getCustomerProductDetail(params.slug));
+    const { slug } = await params;
+
+    return NextResponse.json(await getCustomerProductDetail(slug));
   } catch (err) {
     return handleApiError(err);
   }
