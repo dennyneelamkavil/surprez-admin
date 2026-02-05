@@ -38,7 +38,7 @@ const SellerSchema = new Schema(
     sellerType: {
       type: String,
       enum: ["vendor", "craft_maker"],
-      required: true,
+      default: "vendor",
       index: true,
     },
 
@@ -73,8 +73,7 @@ const SellerSchema = new Schema(
     },
 
     businessAddress: {
-      addressLine1: String,
-      addressLine2: String,
+      address: String,
       city: String,
       state: String,
       pincode: String,

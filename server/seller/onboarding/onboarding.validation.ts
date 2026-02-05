@@ -20,8 +20,7 @@ export const SellerOnboardingSchema = z.object({
   gstin: z.string().optional(),
 
   businessAddress: z.object({
-    addressLine1: z.string(),
-    addressLine2: z.string().optional(),
+    address: z.string(),
     city: z.string(),
     state: z.string(),
     pincode: z.string(),
