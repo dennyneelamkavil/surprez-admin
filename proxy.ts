@@ -38,15 +38,41 @@ const PERMISSION_ROUTES: Array<{
 
 const AUTH_PAGES = ["/signin"];
 
+/* ================= CORS CONFIG ================= */
+const ALLOWED_ORIGIN =
+  process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_ADMIN_URL || "*";
+
+function withCors(res: NextResponse) {
+  res.headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.headers.set(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS",
+  );
+  res.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization",
+  );
+  res.headers.set("Access-Control-Allow-Credentials", "true");
+  return res;
+}
+
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  /* ================= API CORS HANDLING ================= */
+  // Handle preflight requests FIRST
+  if (req.method === "OPTIONS" && pathname.startsWith("/api")) {
+    return withCors(new NextResponse(null, { status: 204 }));
+  }
+
+  // For all API routes, just pass through with CORS headers
+  if (pathname.startsWith("/api")) {
+    return withCors(NextResponse.next());
+  }
+
+  /* ================= AUTHENTICATION ================= */
   // Ignore static & internal routes
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.includes(".")
-  ) {
+  if (pathname.startsWith("/_next") || pathname.includes(".")) {
     return NextResponse.next();
   }
 
