@@ -34,11 +34,31 @@ const SellerSchema = new Schema(
       required: true,
     },
 
+    /* ================= SELLER TYPE ================= */
+    sellerType: {
+      type: String,
+      enum: ["vendor", "craft_maker"],
+      required: true,
+      index: true,
+    },
+
     /* ================= BUSINESS ================= */
     businessName: {
       type: String,
       required: true,
       trim: true,
+    },
+
+    businessType: {
+      type: String,
+      enum: [
+        "individual",
+        "proprietorship",
+        "partnership",
+        "llp",
+        "private_limited",
+        "public_limited",
+      ],
     },
 
     legalName: {
