@@ -8,12 +8,12 @@ import { useSession } from "next-auth/react";
 import { hasPermission } from "@/lib/authorization";
 import { useSidebar } from "@/context/SidebarContext";
 import {
-  Boxes,
   Home,
   Layers,
   Package,
   Search,
   ShieldCheck,
+  Store,
   Tags,
   UserCircle,
   UserCog,
@@ -70,6 +70,17 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    label: "Marketplace",
+    items: [
+      {
+        icon: <Store />,
+        name: "Sellers",
+        path: "/sellers",
+        permission: "seller:read",
+      },
+    ],
+  },
+  {
     label: "Access Control",
     items: [
       {
@@ -118,7 +129,7 @@ const AppSidebar: React.FC = () => {
 
   const isActive = useCallback(
     (path: string) => pathname === path || pathname.startsWith(`${path}/`),
-    [pathname]
+    [pathname],
   );
 
   const handleNavClick = () => {
@@ -134,8 +145,8 @@ const AppSidebar: React.FC = () => {
           isExpanded || isMobileOpen
             ? "w-[290px]"
             : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
+              ? "w-[290px]"
+              : "w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
@@ -206,7 +217,8 @@ const AppSidebar: React.FC = () => {
           {navGroups.map((group) => {
             // Filter items by permission
             const visibleItems = group.items.filter(
-              (item) => !item.permission || hasPermission(role, item.permission)
+              (item) =>
+                !item.permission || hasPermission(role, item.permission),
             );
 
             if (visibleItems.length === 0) return null;

@@ -6,7 +6,8 @@ type SortType =
   | "permission"
   | "role"
   | "pageseo"
-  | "inventory";
+  | "inventory"
+  | "seller";
 const SORT_FIELD_MAP: Record<SortType, Set<string>> = {
   user: new Set(["username", "fullname", "isActive", "createdAt"]),
   category: new Set(["name", "isActive", "createdAt"]),
@@ -20,6 +21,18 @@ const SORT_FIELD_MAP: Record<SortType, Set<string>> = {
     "stock",
     "price.sellingPrice",
     "isActive",
+    "createdAt",
+  ]),
+  seller: new Set([
+    "businessName",
+    "email",
+    "sellerType",
+    "businessType",
+    "legalName",
+    "status",
+    "isActive",
+    "lastLoginAt",
+    "approvedAt",
     "createdAt",
   ]),
 };
