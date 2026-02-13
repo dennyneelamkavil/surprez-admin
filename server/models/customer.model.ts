@@ -46,7 +46,7 @@ const AddressSchema = new Schema(
       default: false,
     },
   },
-  { _id: false },
+  { timestamps: true },
 );
 
 const CustomerSchema = new Schema(
