@@ -15,6 +15,10 @@ import type {
 
 const CUSTOMER_JWT_SECRET = process.env.CUSTOMER_JWT_SECRET!;
 
+const OTP_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const OTP_MAX_REQUESTS = 5;
+const OTP_COOLDOWN_MS = 30 * 1000; // 30 seconds
+
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -22,21 +26,52 @@ function generateOtp() {
 export async function requestOtp(input: RequestOtpInput) {
   await connectDB();
 
-  // const otp = generateOtp();
+  const now = new Date();
 
+  let otpDoc = await OtpModel.findOne({
+    destination: input.phone,
+    type: "phone",
+  });
+
+  // ===== RATE LIMITING =====
+
+  if (otpDoc) {
+    const windowAge = now.getTime() - otpDoc.windowStart.getTime();
+
+    // Reset window if expired
+    if (windowAge > OTP_WINDOW_MS) {
+      otpDoc.requestCount = 0;
+      otpDoc.windowStart = now;
+    }
+
+    // Max requests check
+    if (otpDoc.requestCount >= OTP_MAX_REQUESTS) {
+      throw new AppError("Too many OTP requests. Try again later.", 429);
+    }
+
+    // Cooldown check
+    const lastRequestAge = now.getTime() - otpDoc.updatedAt.getTime();
+
+    if (lastRequestAge < OTP_COOLDOWN_MS) {
+      throw new AppError("Please wait before requesting another OTP.", 429);
+    }
+  }
+
+  // ===== GENERATE OTP =====
+  // const otp = generateOtp();
   const otp = "123456"; // fixed OTP for testing, replace with generateOtp() in production
   const otpHash = await bcrypt.hash(otp, 10);
 
-  await OtpModel.findOneAndUpdate(
+  otpDoc = await OtpModel.findOneAndUpdate(
     { destination: input.phone, type: "phone" },
     {
       otpHash,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      expiresAt: new Date(now.getTime() + 5 * 60 * 1000),
       verified: false,
-      windowStart: new Date(),
-      requestCount: 1,
+      windowStart: otpDoc?.windowStart ?? now,
+      requestCount: (otpDoc?.requestCount ?? 0) + 1,
     },
-    { upsert: true },
+    { upsert: true, new: true },
   );
 
   // TODO: integrate SMS provider
@@ -57,14 +92,14 @@ export async function verifyOtp(input: VerifyOtpInput) {
     throw new AppError("OTP expired or invalid", 400);
   }
 
-  const incomingHash = await bcrypt.hash(input.otp, 10);
+  const isValid = await bcrypt.compare(input.otp, otpDoc.otpHash);
 
-  if (incomingHash !== otpDoc.otpHash) {
+  if (!isValid) {
     throw new AppError("Invalid OTP", 400);
   }
 
-  otpDoc.verified = true;
-  await otpDoc.save();
+  // Delete OTP after success
+  await otpDoc.deleteOne();
 
   let customer = await CustomerModel.findOne({
     phone: input.phone,
