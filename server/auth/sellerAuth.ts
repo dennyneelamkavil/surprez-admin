@@ -1,6 +1,7 @@
 import "server-only";
 import jwt from "jsonwebtoken";
 
+import { connectDB } from "@/server/db";
 import { SellerModel } from "@/server/models/seller.model";
 import { AppError } from "@/server/errors/AppError";
 
@@ -14,6 +15,8 @@ type SellerTokenPayload = {
 };
 
 export async function requireSellerAuth(req: Request) {
+  await connectDB();
+
   const authHeader = req.headers.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

@@ -55,13 +55,14 @@ export async function updateAddress(
   const address = customer.addresses.id(addressId);
   if (!address) throw new AppError("Address not found", 404);
 
-  if (input.isDefault) {
+  if (input?.isDefault === true) {
     customer.addresses.forEach((a: (typeof customer.addresses)[number]) => {
       a.isDefault = false;
     });
   }
 
-  Object.assign(address, input);
+  address.set(input);
+
   await customer.save();
 
   return customer.addresses.map(mapAddress);

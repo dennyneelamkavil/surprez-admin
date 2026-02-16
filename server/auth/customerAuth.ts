@@ -1,6 +1,7 @@
 import "server-only";
 import jwt from "jsonwebtoken";
 
+import { connectDB } from "@/server/db";
 import { CustomerModel } from "@/server/models/customer.model";
 import { AppError } from "@/server/errors/AppError";
 
@@ -14,6 +15,8 @@ type CustomerTokenPayload = {
 };
 
 export async function requireCustomerAuth(req: Request) {
+  await connectDB();
+
   const authHeader = req.headers.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

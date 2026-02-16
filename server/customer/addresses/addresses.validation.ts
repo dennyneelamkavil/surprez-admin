@@ -16,5 +16,5 @@ const BaseAddressSchema = z.object({
 export const CreateAddressSchema = BaseAddressSchema;
 export type CreateAddressInput = z.infer<typeof CreateAddressSchema>;
 
-export const UpdateAddressSchema = BaseAddressSchema;
+export const UpdateAddressSchema = BaseAddressSchema.partial();
 export type UpdateAddressInput = z.infer<typeof UpdateAddressSchema>;
