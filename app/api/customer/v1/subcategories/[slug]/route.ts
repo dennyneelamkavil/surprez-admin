@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCustomerSubCategoryDetail } from "@/server/customer/subcategory/subcategory-detail.service";
+import { getCustomerSubCategoryDetail } from "@/server/customer/subcategory/subcategory.service";
 import { handleApiError } from "@/server/errors/handleApiError";
 
 export async function GET(
