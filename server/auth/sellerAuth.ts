@@ -10,8 +10,6 @@ const SELLER_JWT_SECRET = process.env.SELLER_JWT_SECRET!;
 type SellerTokenPayload = {
   sub: string;
   type: "seller";
-  iat: number;
-  exp: number;
 };
 
 export async function requireSellerAuth(req: Request) {

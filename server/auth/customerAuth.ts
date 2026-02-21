@@ -10,8 +10,6 @@ const CUSTOMER_JWT_SECRET = process.env.CUSTOMER_JWT_SECRET!;
 type CustomerTokenPayload = {
   sub: string;
   type: "customer";
-  iat: number;
-  exp: number;
 };
 
 export async function requireCustomerAuth(req: Request) {
