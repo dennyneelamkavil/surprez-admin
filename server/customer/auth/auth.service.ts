@@ -62,13 +62,18 @@ export async function requestOtp(input: RequestOtpInput) {
   const otp = "123456"; // fixed OTP for testing, replace with generateOtp() in production
   const otpHash = await bcrypt.hash(otp, 10);
 
+  const windowStart =
+    otpDoc && now.getTime() - otpDoc.windowStart.getTime() <= OTP_WINDOW_MS
+      ? otpDoc.windowStart
+      : now;
+
   otpDoc = await OtpModel.findOneAndUpdate(
     { destination: input.phone, type: "phone" },
     {
       otpHash,
       expiresAt: new Date(now.getTime() + 5 * 60 * 1000),
       verified: false,
-      windowStart: otpDoc?.windowStart ?? now,
+      windowStart,
       requestCount: (otpDoc?.requestCount ?? 0) + 1,
     },
     { upsert: true, new: true },
