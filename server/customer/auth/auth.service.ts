@@ -110,6 +110,10 @@ export async function verifyOtp(input: VerifyOtpInput) {
     phone: input.phone,
   });
 
+  if (customer && !customer.isActive) {
+    throw new AppError("Account disabled", 403);
+  }
+
   let isNewUser = false;
 
   if (!customer) {
