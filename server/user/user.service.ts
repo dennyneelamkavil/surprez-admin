@@ -85,7 +85,10 @@ export async function listUsers(params: {
   await connectDB();
 
   if (params?.all) {
-    const users = await UserModel.find({ isActive: true })
+    const users = await UserModel.find({
+      username: { $ne: "superadmin" },
+      isActive: true,
+    })
       .populate({
         path: "role",
         populate: { path: "permissions" },

@@ -47,7 +47,7 @@ export async function listRoles(params: {
   await connectDB();
 
   if (params?.all) {
-    const roles = await RoleModel.find()
+    const roles = await RoleModel.find({ name: { $ne: "superadmin" } })
       .populate("permissions")
       .collation({ locale: "en", strength: 2 })
       .sort({ name: 1 })
@@ -133,7 +133,7 @@ export async function updateRole(id: string, input: UpdateRoleInput) {
   if (id === currentUserRoleId) {
     throw new AppError(
       "You cannot modify the role currently assigned to you",
-      403
+      403,
     );
   }
 
@@ -171,7 +171,7 @@ export async function deleteRole(id: string) {
   if (id === currentUserRoleId) {
     throw new AppError(
       "You cannot delete the role currently assigned to you",
-      403
+      403,
     );
   }
 
@@ -191,7 +191,7 @@ export async function deleteRole(id: string) {
   if (roleInUse) {
     throw new AppError(
       "Cannot delete role: one or more users are assigned to this role",
-      409
+      409,
     );
   }
 
