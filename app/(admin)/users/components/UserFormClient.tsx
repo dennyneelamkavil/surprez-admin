@@ -19,6 +19,7 @@ import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";
 
+import { isValidEmail } from "@/lib/utils";
 import type { RoleBase } from "@/lib/types";
 
 type Fields = "username" | "fullname" | "email" | "password" | "role";
@@ -130,7 +131,7 @@ export default function UserFormClient({ mode, id }: Props) {
       hasError = true;
     }
 
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (email && !isValidEmail(email)) {
       setFieldError("email", "Invalid email address");
       hasError = true;
     }

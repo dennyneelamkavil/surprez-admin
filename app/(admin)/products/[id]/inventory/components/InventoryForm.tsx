@@ -18,6 +18,11 @@ import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import { useFieldErrors, useScrollToTop } from "@/hooks";
 
+import {
+  isDigitsOnly,
+  isValidNumberInput,
+  isValidPriceInput,
+} from "@/lib/utils";
 import type { AttributeRow } from "@/components/form";
 
 type Fields = "sku" | "stock" | "mrp" | "sellingPrice";
@@ -26,13 +31,6 @@ type Props = {
   productId?: string;
   inventoryId?: string;
 };
-
-function isValidPriceInput(value: string) {
-  return /^\d*\.?\d{0,2}$/.test(value);
-}
-function isValidNumberInput(value: string) {
-  return /^\d*\.?\d*$/.test(value);
-}
 
 export default function InventoryFormClient({
   mode,
@@ -146,7 +144,7 @@ export default function InventoryFormClient({
 
   function handleStockChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
-    if (!/^\d*$/.test(value)) return;
+    if (!isDigitsOnly(value)) return;
 
     clearFieldError("stock");
     setError(null);

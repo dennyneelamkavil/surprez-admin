@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const isMongoId = (value: string) => /^[a-f\d]{24}$/i.test(value);
+import { isMongoId } from "@/lib/utils";
 
 const trimMongoId = (id: string, start = 3, end = 2) =>
   `${id.slice(0, start)}…${id.slice(-end)}`;
