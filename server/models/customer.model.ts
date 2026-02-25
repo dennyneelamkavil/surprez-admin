@@ -87,7 +87,6 @@ const CustomerSchema = new Schema(
 );
 
 CustomerSchema.index({ phone: 1, isActive: 1 });
-CustomerSchema.index({ email: 1 });
 
 export const CustomerModel =
   models.Customer || model("Customer", CustomerSchema);

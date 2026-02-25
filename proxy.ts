@@ -42,6 +42,10 @@ const PERMISSION_ROUTES: Array<{
     path: /^\/sellers/,
     permission: "seller:read",
   },
+  {
+    path: /^\/customers/,
+    permission: "customer:read",
+  },
 ];
 
 const AUTH_PAGES = ["/signin"];

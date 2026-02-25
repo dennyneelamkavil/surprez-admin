@@ -24,5 +24,5 @@ export type { Permission, PermissionBase } from "./permission";
 export type { Role, RoleBase, RoleWithPermissionKeys } from "./role";
 
 export type { User, UserBase } from "./user";
-
+export type { Customer, CustomerBase } from "./customer";
 export type { Seller, SellerBase } from "./seller";

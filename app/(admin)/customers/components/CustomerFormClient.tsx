@@ -2,9 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-
-import { Authorized } from "@/components/auth/Authorized";
 
 import {
   FormHeader,
@@ -12,43 +9,32 @@ import {
   FormError,
   FormActions,
   Input,
-  TextArea,
-  FileInput,
   Switch,
-  FormSEOSection,
+  CollapsibleFormSection,
 } from "@/components/form";
-import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
+import FormSkeleton from "@/components/skeletons/FormSkeleton";
 import { useFieldErrors, useScrollToTop } from "@/hooks";
 
-import { uploadMedia } from "@/lib/uploadMedia";
-import { formatSlug } from "@/lib/utils";
-import type { Media, Seo } from "@/lib/types";
-
-type Fields = "name" | "slug" | "image";
+type Fields = "phone";
 
 type Props = {
   mode: "create" | "edit";
   id?: string;
 };
 
-export default function CategoryFormClient({ mode, id }: Props) {
+export default function CustomerFormClient({ mode, id }: Props) {
   const router = useRouter();
 
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [seo, setSeo] = useState<Seo>({});
-  const [uploadingSeoImg, setUploadingSeoImg] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
 
-  const [image, setImage] = useState<Media | null>(null);
-  const [uploading, setUploading] = useState(false);
-
+  const [addresses, setAddresses] = useState<any[]>([]);
   const [isActive, setIsActive] = useState(true);
 
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
 
@@ -57,46 +43,33 @@ export default function CategoryFormClient({ mode, id }: Props) {
 
   useScrollToTop(error || fieldErrors);
 
-  const fetchCategory = useCallback(async () => {
+  const fetchCustomer = useCallback(async () => {
     if (!id) return;
 
     try {
-      const res = await fetch(`/api/admin/categories/${id}`, {
+      const res = await fetch(`/api/admin/customers/${id}`, {
         cache: "no-store",
       });
 
-      if (!res.ok) throw new Error("Failed to load category");
+      if (!res.ok) throw new Error("Failed to load customer");
 
       const data = await res.json();
-      setName(data.name);
-      setSlug(data.slug);
-      setImage(data.image);
-      setDescription(data.description ?? "");
-      setSeo(data.seo ?? {});
+
+      setPhone(data.phone);
+      setEmail(data.email ?? "");
+      setFullName(data.fullName ?? "");
+      setAddresses(data.addresses ?? []);
       setIsActive(data.isActive);
     } catch (err: any) {
-      setEditError(err.message ?? "Failed to load category");
+      setEditError(err.message ?? "Failed to load customer");
     } finally {
       setLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
-    if (mode === "edit") fetchCategory();
-  }, [mode, fetchCategory]);
-
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSlug(formatSlug(e.target.value));
-  };
-
-  async function handleUploadOgImage(file: File) {
-    setUploadingSeoImg(true);
-    try {
-      return await uploadMedia(file, "temp/seo");
-    } finally {
-      setUploadingSeoImg(false);
-    }
-  }
+    if (mode === "edit") fetchCustomer();
+  }, [mode, fetchCustomer]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -104,24 +77,8 @@ export default function CategoryFormClient({ mode, id }: Props) {
     setError(null);
     clearAllFieldErrors();
 
-    let hasError = false;
-
-    if (!name) {
-      setFieldError("name", "Name is required");
-      hasError = true;
-    }
-
-    if (mode === "edit" && !slug) {
-      setFieldError("slug", "Slug is required");
-      hasError = true;
-    }
-
-    if (!image) {
-      setFieldError("image", "Image is required");
-      hasError = true;
-    }
-
-    if (hasError) {
+    if (!phone) {
+      setFieldError("phone", "Phone is required");
       setSaving(false);
       return;
     }
@@ -129,17 +86,16 @@ export default function CategoryFormClient({ mode, id }: Props) {
     try {
       const res = await fetch(
         mode === "create"
-          ? "/api/admin/categories"
-          : `/api/admin/categories/${id}`,
+          ? "/api/admin/customers"
+          : `/api/admin/customers/${id}`,
         {
           method: mode === "create" ? "POST" : "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name,
-            slug,
-            image,
-            description,
-            seo,
+            phone,
+            email,
+            fullName,
+            addresses,
             isActive,
           }),
         },
@@ -150,7 +106,7 @@ export default function CategoryFormClient({ mode, id }: Props) {
         throw new Error(data?.error ?? "Save failed");
       }
 
-      router.push(mode === "create" ? "/categories" : `/categories/${id}`);
+      router.push(mode === "create" ? "/customers" : `/customers/${id}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -158,12 +114,10 @@ export default function CategoryFormClient({ mode, id }: Props) {
     }
   }
 
-  const hasErrors = Object.values(fieldErrors).some(Boolean) || !!error;
-
   return (
     <div className="space-y-6">
       <FormHeader
-        title={mode === "create" ? "Create Category" : "Edit Category"}
+        title={mode === "create" ? "Create Customer" : "Edit Customer"}
       />
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
@@ -176,126 +130,36 @@ export default function CategoryFormClient({ mode, id }: Props) {
             {error && <FormError error={error} />}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Category Name" required htmlFor="name">
+              <FormField label="Phone" required>
                 <Input
-                  id="name"
-                  placeholder="Toys"
-                  value={name}
+                  value={phone}
                   onChange={(e) => {
-                    clearFieldError("name");
+                    clearFieldError("phone");
                     setError(null);
-                    setName(e.target.value);
+                    setPhone(e.target.value);
                   }}
-                  error={!!fieldErrors.name}
-                  hint={fieldErrors.name}
+                  error={!!fieldErrors.phone}
+                  hint={fieldErrors.phone}
                   autoFocus
                 />
               </FormField>
 
-              {mode === "edit" && (
-                <FormField label="Slug" required htmlFor="slug">
-                  <Input
-                    id="slug"
-                    placeholder="toys"
-                    value={slug}
-                    onChange={(e) => {
-                      clearFieldError("slug");
-                      setError(null);
-                      handleSlugChange(e);
-                    }}
-                    error={!!fieldErrors.slug}
-                    hint={fieldErrors.slug}
-                  />
-                </FormField>
-              )}
-            </div>
+              <FormField label="Email">
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </FormField>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <FormField label="Image" required htmlFor="image">
-                  <FileInput
-                    id="image"
-                    accept="image/*"
-                    error={!!fieldErrors.image}
-                    hint={fieldErrors.image}
-                    disabled={uploading}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
+              <FormField label="Full Name">
+                <Input
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </FormField>
 
-                      try {
-                        setUploading(true);
-                        clearFieldError("image");
-                        setError(null);
-                        const media = await uploadMedia(
-                          file,
-                          "temp/categories",
-                        );
-                        setImage(media);
-                      } catch (err: any) {
-                        setFieldError("image", err.message ?? "Upload failed");
-                      } finally {
-                        setUploading(false);
-                      }
-                    }}
-                  />
-                  {uploading && (
-                    <p className="text-sm text-gray-500">Uploading image...</p>
-                  )}
-                </FormField>
-
-                {image && (
-                  <Image
-                    src={image.url}
-                    alt="Category preview"
-                    width={120}
-                    height={120}
-                    className="rounded object-cover border dark:border-gray-800"
-                  />
-                )}
-              </div>
-
-              {image && (
-                <div className="space-y-4">
-                  <FormField label="Image Alt Text">
-                    <Input
-                      placeholder="e.g. Toys category image"
-                      value={image.alt ?? ""}
-                      onChange={(e) =>
-                        setImage((prev) =>
-                          prev ? { ...prev, alt: e.target.value } : prev,
-                        )
-                      }
-                      hint="Describe the image for SEO & accessibility"
-                    />
-                  </FormField>
-
-                  <FormField label="Image Caption (optional)">
-                    <Input
-                      placeholder="Optional caption shown below the image"
-                      value={image.caption ?? ""}
-                      onChange={(e) =>
-                        setImage((prev) =>
-                          prev ? { ...prev, caption: e.target.value } : prev,
-                        )
-                      }
-                    />
-                  </FormField>
-                </div>
-              )}
-            </div>
-
-            <FormField label="Description" htmlFor="description">
-              <TextArea
-                rows={3}
-                placeholder="A brief description about this category."
-                value={description}
-                onChange={setDescription}
-              />
-            </FormField>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Category Status">
+              <FormField label="Active">
                 <Switch
                   label={isActive ? "Active" : "Inactive"}
                   defaultChecked={isActive}
@@ -304,30 +168,46 @@ export default function CategoryFormClient({ mode, id }: Props) {
               </FormField>
             </div>
 
-            <Authorized
-              permission={mode === "create" ? "seo:create" : "seo:update"}
-            >
-              <FormSEOSection
-                value={seo}
-                onChange={setSeo}
-                uploading={uploadingSeoImg}
-                onUploadOgImage={handleUploadOgImage}
-                collapsible
-                defaultOpen={false}
-              />
-            </Authorized>
+            <CollapsibleFormSection title="Addresses">
+              {addresses.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  No addresses added by customer.
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {addresses.map((addr, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-md bg-gray-50 p-4 text-sm"
+                    >
+                      <p className="font-medium">{addr.name}</p>
+                      <p>{addr.phone}</p>
+                      <p>{addr.addressLine1}</p>
+                      {addr.addressLine2 && <p>{addr.addressLine2}</p>}
+                      <p>
+                        {addr.city}, {addr.state} - {addr.pincode}
+                      </p>
+                      <p>{addr.country}</p>
+                      {addr.isDefault && (
+                        <p className="text-green-600 text-xs mt-1">
+                          Default Address
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CollapsibleFormSection>
 
-            {/* Actions */}
             <FormActions
               primaryLabel={
                 saving
                   ? "Saving..."
                   : mode === "create"
-                    ? "Create Category"
-                    : "Update Category"
+                    ? "Create Customer"
+                    : "Update Customer"
               }
-              primaryDisabled={saving || uploading || hasErrors}
-              backLabel="Cancel"
+              primaryDisabled={saving || !phone || !!error}
               onBack={() => router.back()}
             />
           </form>

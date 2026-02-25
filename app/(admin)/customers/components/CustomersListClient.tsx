@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
 import AlertModal from "@/components/ui/alert/AlertModal";
 import {
@@ -16,19 +15,19 @@ import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import { SortableTableHeader } from "@/components/common/SortableTableHeader";
 
 import { useAdminTable } from "@/hooks";
-
-import type { Category } from "@/lib/types";
 import { deleteAction, toggleAction } from "@/lib/actions";
 
-type CategorySortKey = "name" | "createdAt" | "isActive";
+import type { Customer } from "@/lib/types";
 
-export default function CategoriesListClient() {
-  const [item, setItem] = useState<Category | null>(null);
-  const [toggleItem, setToggleItem] = useState<Category | null>(null);
+type CustomerSortKey = "fullName" | "isActive" | "createdAt";
+
+export default function CustomersListClient() {
+  const [item, setItem] = useState<Customer | null>(null);
+  const [toggleItem, setToggleItem] = useState<Customer | null>(null);
   const [isActive, setIsActive] = useState("true");
 
   const {
-    data: categories,
+    data: customers,
     loading,
     error,
     pagination,
@@ -38,9 +37,9 @@ export default function CategoriesListClient() {
     sortState,
     onSortChange,
     refetch,
-  } = useAdminTable<Category, CategorySortKey>({
-    endpoint: "categories",
-    storageKey: "table:categories",
+  } = useAdminTable<Customer, CustomerSortKey>({
+    endpoint: "customers",
+    storageKey: "table:customers",
     defaultSort: { key: "createdAt", direction: "desc" },
     extraParams: () => ({
       isActive,
@@ -50,9 +49,9 @@ export default function CategoriesListClient() {
   async function confirmDelete() {
     if (!item) return;
 
-    const success = await deleteAction(`/api/admin/categories/${item.id}`, {
-      successMessage: "Category deleted successfully",
-      errorMessage: "Failed to delete category",
+    const success = await deleteAction(`/api/admin/customers/${item.id}`, {
+      successMessage: "Customer deleted successfully",
+      errorMessage: "Failed to delete customer",
     });
 
     if (success) refetch();
@@ -63,39 +62,39 @@ export default function CategoriesListClient() {
     if (!toggleItem) return;
 
     const success = await toggleAction(
-      `/api/admin/categories/${toggleItem.id}`,
+      `/api/admin/customers/${toggleItem.id}`,
       { isActive: !toggleItem.isActive },
       {
-        successMessage: "Category status updated",
-        errorMessage: "Failed to update category status",
-      }
+        successMessage: "Customer status updated",
+        errorMessage: "Failed to update customer status",
+      },
     );
 
     if (success) refetch();
     setToggleItem(null);
   }
 
+  function clearFilters() {
+    setSearch("");
+    setIsActive("");
+    setPage(1);
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <ListHeader
-        title="Categories"
-        actionLabel="Create Category"
-        actionHref="/categories/create"
-        createPermission="category:create"
+        title="Customers"
+        actionLabel="Create Customer"
+        actionHref="/customers/create"
+        createPermission="customer:create"
       />
-
       <ListFilters
         search={search}
         onSearchChange={(v) => {
           setPage(1);
           setSearch(v);
         }}
-        onClear={() => {
-          setSearch("");
-          setIsActive("");
-          setPage(1);
-        }}
+        onClear={clearFilters}
         disableClear={!search && !isActive}
       >
         <div className="w-full sm:max-w-xs">
@@ -106,7 +105,7 @@ export default function CategoriesListClient() {
               { value: "false", label: "Inactive" },
             ]}
             value={isActive}
-            placeholder="Select status"
+            placeholder="Status"
             onChange={(value) => {
               setPage(1);
               setIsActive(value);
@@ -114,16 +113,14 @@ export default function CategoriesListClient() {
           />
         </div>
       </ListFilters>
-
-      {/* Card */}
       <div className="rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         <div className="overflow-x-auto">
           <table className="w-full table-auto">
             <thead className="border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <SortableTableHeader<CategorySortKey>
-                    columnKey="name"
+                  <SortableTableHeader<CustomerSortKey>
+                    columnKey="fullName"
                     label="Name"
                     activeKey={sortState.key}
                     direction={sortState.direction}
@@ -131,10 +128,16 @@ export default function CategoriesListClient() {
                   />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Image
+                  Phone
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <SortableTableHeader<CategorySortKey>
+                  Email
+                </th>
+                <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Wishlist
+                </th>
+                <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <SortableTableHeader<CustomerSortKey>
                     columnKey="isActive"
                     label="Status"
                     activeKey={sortState.key}
@@ -143,7 +146,7 @@ export default function CategoriesListClient() {
                   />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <SortableTableHeader<CategorySortKey>
+                  <SortableTableHeader<CustomerSortKey>
                     columnKey="createdAt"
                     label="Created"
                     activeKey={sortState.key}
@@ -159,51 +162,51 @@ export default function CategoriesListClient() {
 
             <tbody>
               {loading ? (
-                <TableSkeleton columns={5} />
+                <TableSkeleton columns={7} />
               ) : error ? (
-                <ListError error={error} columns={5} />
-              ) : categories.length === 0 ? (
+                <ListError error={error} columns={7} />
+              ) : customers.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={7}
                     className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
                   >
-                    No categories found
+                    No customers found
                   </td>
                 </tr>
               ) : (
-                categories.map((category) => (
+                customers.map((customer) => (
                   <tr
-                    key={category.id}
+                    key={customer.id}
                     className="border-b border-gray-200 dark:border-gray-800"
                   >
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
+                      {customer.fullName ?? "-"}
+                    </td>
                     <td className="px-5 py-4 font-mono text-sm text-gray-800 dark:text-white/90">
-                      {category.name}
+                      {customer.phone}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                      <Image
-                        src={category.image.url}
-                        alt={category.name}
-                        width={50}
-                        height={50}
-                        className="rounded object-cover"
-                      />
+                      {customer.email ?? "-"}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                      {category.isActive ? "Active" : "Inactive"}
+                      {customer.wishlist?.length ?? 0}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                      {new Date(category.createdAt).toLocaleDateString()}
+                      {customer.isActive ? "Active" : "Inactive"}
+                    </td>
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
+                      {new Date(customer.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-4 text-right">
                       <ListActions
-                        viewHref={`/categories/${category.id}`}
-                        onToggle={() => setToggleItem(category)}
-                        editHref={`/categories/${category.id}/edit`}
-                        isActive={category.isActive}
-                        onDelete={() => setItem(category)}
-                        editPermission="category:update"
-                        deletePermission="category:delete"
+                        viewHref={`/customers/${customer.id}`}
+                        editHref={`/customers/${customer.id}/edit`}
+                        onToggle={() => setToggleItem(customer)}
+                        isActive={customer.isActive}
+                        onDelete={() => setItem(customer)}
+                        editPermission="customer:update"
+                        deletePermission="customer:delete"
                       />
                     </td>
                   </tr>
@@ -213,7 +216,6 @@ export default function CategoriesListClient() {
           </table>
         </div>
 
-        {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-end p-4">
             <Pagination
@@ -224,12 +226,11 @@ export default function CategoriesListClient() {
           </div>
         )}
       </div>
-
       <AlertModal
-        isOpen={!!item?.id}
+        isOpen={!!item}
         variant="danger"
-        title={`Delete Category: ${item?.name}?`}
-        message="If you just want to hide this category from users, consider marking it as inactive instead."
+        title={`Delete Customer: ${item?.phone}?`}
+        message="If you just want to block the customer, consider deactivating the customer"
         confirmText="Delete"
         onClose={() => setItem(null)}
         onConfirm={confirmDelete}
@@ -242,12 +243,10 @@ export default function CategoriesListClient() {
       <AlertModal
         isOpen={!!toggleItem}
         variant="warning"
-        title={`${toggleItem?.isActive ? "Deactivate" : "Activate"} Category: ${
-          toggleItem?.name
-        }?`}
+        title={`${toggleItem?.isActive ? "Deactivate" : "Activate"} Customer: ${toggleItem?.fullName}?`}
         message={`This action will ${
           toggleItem?.isActive ? "deactivate" : "activate"
-        } this category.`}
+        } this customer.`}
         confirmText={toggleItem?.isActive ? "Deactivate" : "Activate"}
         onClose={() => setToggleItem(null)}
         onConfirm={confirmToggleStatus}

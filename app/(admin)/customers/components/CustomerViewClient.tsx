@@ -2,113 +2,121 @@
 
 import { useRouter } from "next/navigation";
 
-import { Authorized } from "@/components/auth/Authorized";
-
 import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
 
 import {
   ViewActions,
-  ViewBadge,
   ViewField,
-  ViewImage,
   ViewSection,
-  ViewSEOSection,
+  ViewBadge,
+  CollapsibleViewSection,
 } from "@/components/view";
 
 import { useAdminEntity } from "@/hooks";
-
-import type { Category } from "@/lib/types";
+import type { Customer } from "@/lib/types";
 
 type Props = {
   id: string;
 };
 
-export default function CategoryViewClient({ id }: Props) {
+export default function CustomerViewClient({ id }: Props) {
   const router = useRouter();
 
   const {
-    data: category,
+    data: customer,
     loading,
     error,
-  } = useAdminEntity<Category>({
-    endpoint: "categories",
+  } = useAdminEntity<Customer>({
+    endpoint: "customers",
     id,
   });
 
   return (
     <div className="space-y-6">
-      <FormHeader title="View Category" />
-
+      <FormHeader title="View Customer" />
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
           <FormSkeleton />
         ) : error ? (
           <FormError error={error} />
-        ) : !category ? null : (
+        ) : !customer ? null : (
           <div className="space-y-6">
-            <div className="sm:sticky top-30 z-10 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/40">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <ViewField label="Category" value={category.name} mono />
-                <ViewField label="Slug" value={category.slug} mono />
-
-                <div>
-                  <p className="text-sm text-gray-500 mb-2">Status</p>
-                  <ViewBadge
-                    label={category.isActive ? "Active" : "Inactive"}
-                    variant={category.isActive ? "success" : "danger"}
-                  />
-                </div>
-              </div>
-            </div>
-
             <ViewSection>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="space-y-6">
-                  <ViewImage
-                    label="Category Image"
-                    src={category.image.url}
-                    alt={category.image.alt ?? category.name}
-                    caption={category.image.caption}
-                    size={160}
+              <div className="sm:sticky top-30 z-10 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/40">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <ViewField
+                    label="Full Name"
+                    value={customer.fullName ?? "-"}
                   />
+                  <ViewField label="Phone" value={customer.phone} mono />
+                  <ViewField label="Email" value={customer.email ?? "-"} />
+                  <div>
+                    <p className="text-sm text-gray-500 mb-2">Status</p>
+                    <ViewBadge
+                      label={customer.isActive ? "Active" : "Inactive"}
+                      variant={customer.isActive ? "success" : "danger"}
+                    />
+                  </div>
                 </div>
               </div>
             </ViewSection>
 
-            {category.description && (
-              <div className="mt-6">
-                <ViewField label="Description" value={category.description} />
-              </div>
+            {customer.addresses && (
+              <CollapsibleViewSection title="Addresses" collapsible>
+                <div className="space-y-4">
+                  {customer.addresses.map((addr) => (
+                    <div
+                      key={addr.id}
+                      className="rounded-md bg-gray-50 p-4 text-sm"
+                    >
+                      <p className="font-medium">{addr.name}</p>
+                      <p>{addr.phone}</p>
+                      <p>{addr.addressLine1}</p>
+                      {addr.addressLine2 && <p>{addr.addressLine2}</p>}
+                      <p>
+                        {addr.city}, {addr.state} - {addr.pincode}
+                      </p>
+                      <p>{addr.country}</p>
+                      {addr.isDefault && (
+                        <p className="text-green-600 text-xs mt-1">
+                          Default Address
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleViewSection>
             )}
 
-            <Authorized permission="seo:read">
-              <ViewSEOSection
-                seo={category.seo}
-                collapsible
-                defaultOpen={false}
-              />
-            </Authorized>
-
             <ViewSection>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <ViewField
+                  label="Last Login"
+                  value={
+                    customer?.lastLoginAt
+                      ? new Date(customer.lastLoginAt).toLocaleString()
+                      : "-"
+                  }
+                  mono
+                />
                 <ViewField
                   label="Created At"
-                  value={new Date(category.createdAt).toLocaleString()}
+                  value={new Date(customer.createdAt).toLocaleString()}
                   mono
                 />
                 <ViewField
                   label="Last Updated"
-                  value={new Date(category.updatedAt).toLocaleString()}
+                  value={new Date(customer.updatedAt).toLocaleString()}
                   mono
                 />
               </div>
             </ViewSection>
 
             <ViewActions
-              primaryLabel="Edit Category"
-              primaryPermission="category:update"
-              onPrimary={() => router.push(`/categories/${id}/edit`)}
+              primaryLabel="Edit Customer"
+              primaryPermission="customer:update"
+              onPrimary={() => router.push(`/customers/${id}/edit`)}
               onBack={() => router.back()}
             />
           </div>

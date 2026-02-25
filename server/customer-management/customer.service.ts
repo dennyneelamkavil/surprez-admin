@@ -105,7 +105,7 @@ export async function listCustomers(params?: {
 export async function getCustomerById(id: string) {
   await connectDB();
 
-  const customer = await CustomerModel.findById(id).populate("wishlist").lean();
+  const customer = await CustomerModel.findById(id).lean();
 
   if (!customer) {
     throw new AppError("Customer not found", 404);
