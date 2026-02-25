@@ -7,7 +7,8 @@ type SortType =
   | "role"
   | "pageseo"
   | "inventory"
-  | "seller";
+  | "seller"
+  | "customer";
 const SORT_FIELD_MAP: Record<SortType, Set<string>> = {
   user: new Set(["username", "fullname", "isActive", "createdAt"]),
   category: new Set(["name", "isActive", "createdAt"]),
@@ -35,6 +36,7 @@ const SORT_FIELD_MAP: Record<SortType, Set<string>> = {
     "approvedAt",
     "createdAt",
   ]),
+  customer: new Set(["fullName", "isActive", "lastLoginAt", "createdAt"]),
 };
 
 export function buildSortSpec({
