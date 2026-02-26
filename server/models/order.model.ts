@@ -92,6 +92,11 @@ const OrderSchema = new Schema(
       ],
       default: "placed",
     },
+    seller: {
+      type: Schema.Types.ObjectId,
+      ref: "Seller",
+      index: true,
+    },
   },
   { timestamps: true },
 );
