@@ -1,4 +1,6 @@
 import type { CustomerBase } from "./customer";
+import { ProductBase } from "./product";
+import { ProductInventoryBase } from "./product-inventory";
 import { SellerBase } from "./seller";
 
 /**
@@ -14,8 +16,8 @@ export interface OrderItemPrice {
  * Single item inside an order
  */
 export interface OrderItem {
-  product: string; // Product ID
-  inventory: string; // ProductInventory ID
+  product: ProductBase;
+  inventory: ProductInventoryBase;
   quantity: number;
 
   price: OrderItemPrice;

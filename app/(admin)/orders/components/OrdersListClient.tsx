@@ -1,34 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
-import AlertModal from "@/components/ui/alert/AlertModal";
-import {
-  ListActions,
-  ListError,
-  ListFilters,
-  ListHeader,
-} from "@/components/listing";
-import { Select } from "@/components/form";
+import { ListHeader, ListFilters, ListError } from "@/components/listing";
+import { Select, Input } from "@/components/form";
 import Pagination from "@/components/pagination/Pagination";
 import TableSkeleton from "@/components/skeletons/TableSkeleton";
 import { SortableTableHeader } from "@/components/common/SortableTableHeader";
 
 import { useAdminTable } from "@/hooks";
+import type { Order } from "@/lib/types";
 
-import type { Category } from "@/lib/types";
-import { deleteAction, toggleAction } from "@/lib/actions";
+type OrderSortKey =
+  | "orderNumber"
+  | "orderStatus"
+  | "paymentStatus"
+  | "createdAt";
 
-type CategorySortKey = "name" | "createdAt" | "isActive";
-
-export default function CategoriesListClient() {
-  const [item, setItem] = useState<Category | null>(null);
-  const [toggleItem, setToggleItem] = useState<Category | null>(null);
-  const [isActive, setIsActive] = useState("true");
+export default function OrdersListClient() {
+  const [orderStatus, setOrderStatus] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
+  const [sellerId, setSellerId] = useState("");
+  const [customerId, setCustomerId] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const {
-    data: categories,
+    data: orders,
     loading,
     error,
     pagination,
@@ -37,115 +35,137 @@ export default function CategoriesListClient() {
     setSearch,
     sortState,
     onSortChange,
-    refetch,
-  } = useAdminTable<Category, CategorySortKey>({
-    endpoint: "categories",
-    storageKey: "table:categories",
+  } = useAdminTable<Order, OrderSortKey>({
+    endpoint: "orders",
+    storageKey: "table:orders",
     defaultSort: { key: "createdAt", direction: "desc" },
     extraParams: () => ({
-      isActive,
+      orderStatus,
+      paymentStatus,
+      sellerId,
+      customerId,
+      fromDate,
+      toDate,
     }),
   });
 
-  async function confirmDelete() {
-    if (!item) return;
-
-    const success = await deleteAction(`/api/admin/categories/${item.id}`, {
-      successMessage: "Category deleted successfully",
-      errorMessage: "Failed to delete category",
-    });
-
-    if (success) refetch();
-    setItem(null);
-  }
-
-  async function confirmToggleStatus() {
-    if (!toggleItem) return;
-
-    const success = await toggleAction(
-      `/api/admin/categories/${toggleItem.id}`,
-      { isActive: !toggleItem.isActive },
-      {
-        successMessage: "Category status updated",
-        errorMessage: "Failed to update category status",
-      }
-    );
-
-    if (success) refetch();
-    setToggleItem(null);
+  function clearFilters() {
+    setSearch("");
+    setOrderStatus("");
+    setPaymentStatus("");
+    setSellerId("");
+    setCustomerId("");
+    setFromDate("");
+    setToDate("");
+    setPage(1);
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <ListHeader
-        title="Categories"
-        actionLabel="Create Category"
-        actionHref="/categories/create"
-        createPermission="category:create"
-      />
-
+      <ListHeader title="Orders" />
       <ListFilters
         search={search}
         onSearchChange={(v) => {
           setPage(1);
           setSearch(v);
         }}
-        onClear={() => {
-          setSearch("");
-          setIsActive("");
-          setPage(1);
-        }}
-        disableClear={!search && !isActive}
+        onClear={clearFilters}
       >
-        <div className="w-full sm:max-w-xs">
-          <Select
-            options={[
-              { value: "", label: "All" },
-              { value: "true", label: "Active" },
-              { value: "false", label: "Inactive" },
-            ]}
-            value={isActive}
-            placeholder="Select status"
-            onChange={(value) => {
-              setPage(1);
-              setIsActive(value);
-            }}
-          />
-        </div>
-      </ListFilters>
+        <Select
+          options={[
+            { value: "", label: "All Order Status" },
+            { value: "placed", label: "Placed" },
+            { value: "confirmed", label: "Confirmed" },
+            { value: "packed", label: "Packed" },
+            { value: "shipped", label: "Shipped" },
+            { value: "delivered", label: "Delivered" },
+            { value: "cancelled", label: "Cancelled" },
+          ]}
+          value={orderStatus}
+          onChange={(v) => {
+            setPage(1);
+            setOrderStatus(v);
+          }}
+        />
 
-      {/* Card */}
+        <Select
+          options={[
+            { value: "", label: "All Payment Status" },
+            { value: "pending", label: "Pending" },
+            { value: "paid", label: "Paid" },
+            { value: "failed", label: "Failed" },
+            { value: "refunded", label: "Refunded" },
+          ]}
+          value={paymentStatus}
+          onChange={(v) => {
+            setPage(1);
+            setPaymentStatus(v);
+          }}
+        />
+
+        <Input
+          type="date"
+          value={fromDate}
+          onChange={(e) => {
+            setPage(1);
+            setFromDate(e.target.value);
+          }}
+        />
+
+        <Input
+          type="date"
+          value={toDate}
+          onChange={(e) => {
+            setPage(1);
+            setToDate(e.target.value);
+          }}
+        />
+      </ListFilters>
       <div className="rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         <div className="overflow-x-auto">
           <table className="w-full table-auto">
             <thead className="border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <SortableTableHeader<CategorySortKey>
-                    columnKey="name"
-                    label="Name"
+                  <SortableTableHeader<OrderSortKey>
+                    columnKey="orderNumber"
+                    label="Order"
                     activeKey={sortState.key}
                     direction={sortState.direction}
                     onSort={onSortChange}
                   />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Image
+                  Customer
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <SortableTableHeader<CategorySortKey>
-                    columnKey="isActive"
-                    label="Status"
+                  Seller
+                </th>
+                <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Amount
+                </th>
+                <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <SortableTableHeader<OrderSortKey>
+                    columnKey="orderStatus"
+                    label="Order Status"
                     activeKey={sortState.key}
                     direction={sortState.direction}
                     onSort={onSortChange}
                   />
                 </th>
                 <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <SortableTableHeader<CategorySortKey>
+                  <SortableTableHeader<OrderSortKey>
+                    columnKey="paymentStatus"
+                    label="Payment Status"
+                    activeKey={sortState.key}
+                    direction={sortState.direction}
+                    onSort={onSortChange}
+                  />
+                </th>
+                <th className="px-5 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <SortableTableHeader<OrderSortKey>
                     columnKey="createdAt"
-                    label="Created"
+                    label="Date"
                     activeKey={sortState.key}
                     direction={sortState.direction}
                     onSort={onSortChange}
@@ -159,52 +179,47 @@ export default function CategoriesListClient() {
 
             <tbody>
               {loading ? (
-                <TableSkeleton columns={5} />
+                <TableSkeleton columns={7} />
               ) : error ? (
-                <ListError error={error} columns={5} />
-              ) : categories.length === 0 ? (
+                <ListError error={error} columns={7} />
+              ) : orders.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={7}
                     className="px-5 py-6 text-center text-gray-800 dark:text-white/90"
                   >
-                    No categories found
+                    No orders found
                   </td>
                 </tr>
               ) : (
-                categories.map((category) => (
+                orders.map((order) => (
                   <tr
-                    key={category.id}
-                    className="border-b border-gray-200 dark:border-gray-800"
+                    key={order.id}
+                    className="border-b border-gray-200 dark:border-gray-800 cursor-pointer"
+                    onClick={() =>
+                      (window.location.href = `/orders/${order.id}`)
+                    }
                   >
                     <td className="px-5 py-4 font-mono text-sm text-gray-800 dark:text-white/90">
-                      {category.name}
+                      {order.orderNumber}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                      <Image
-                        src={category.image.url}
-                        alt={category.name}
-                        width={50}
-                        height={50}
-                        className="rounded object-cover"
-                      />
+                      {order.customer?.phone}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                      {category.isActive ? "Active" : "Inactive"}
+                      {order.seller?.businessName}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                      {new Date(category.createdAt).toLocaleDateString()}
+                      ₹ {order.totals?.payableTotal}
                     </td>
-                    <td className="px-5 py-4 text-right">
-                      <ListActions
-                        viewHref={`/categories/${category.id}`}
-                        onToggle={() => setToggleItem(category)}
-                        editHref={`/categories/${category.id}/edit`}
-                        isActive={category.isActive}
-                        onDelete={() => setItem(category)}
-                        editPermission="category:update"
-                        deletePermission="category:delete"
-                      />
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90 capitalize">
+                      {order.orderStatus}
+                    </td>
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90 capitalize">
+                      {order.paymentStatus}
+                    </td>
+                    <td className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
+                      {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
                 ))
@@ -213,7 +228,6 @@ export default function CategoriesListClient() {
           </table>
         </div>
 
-        {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-end p-4">
             <Pagination
@@ -224,34 +238,6 @@ export default function CategoriesListClient() {
           </div>
         )}
       </div>
-
-      <AlertModal
-        isOpen={!!item?.id}
-        variant="danger"
-        title={`Delete Category: ${item?.name}?`}
-        message="If you just want to hide this category from users, consider marking it as inactive instead."
-        confirmText="Delete"
-        onClose={() => setItem(null)}
-        onConfirm={confirmDelete}
-        secondaryText="Deactivate Instead"
-        onSecondary={() => {
-          setToggleItem(item);
-          setItem(null);
-        }}
-      />
-      <AlertModal
-        isOpen={!!toggleItem}
-        variant="warning"
-        title={`${toggleItem?.isActive ? "Deactivate" : "Activate"} Category: ${
-          toggleItem?.name
-        }?`}
-        message={`This action will ${
-          toggleItem?.isActive ? "deactivate" : "activate"
-        } this category.`}
-        confirmText={toggleItem?.isActive ? "Deactivate" : "Activate"}
-        onClose={() => setToggleItem(null)}
-        onConfirm={confirmToggleStatus}
-      />
     </div>
   );
 }

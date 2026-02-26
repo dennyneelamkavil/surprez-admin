@@ -2,115 +2,130 @@
 
 import { useRouter } from "next/navigation";
 
-import { Authorized } from "@/components/auth/Authorized";
-
 import { FormHeader, FormError } from "@/components/form";
 import FormSkeleton from "@/components/skeletons/FormSkeleton";
-
 import {
-  ViewActions,
-  ViewBadge,
-  ViewField,
-  ViewImage,
   ViewSection,
-  ViewSEOSection,
+  ViewField,
+  ViewBadge,
+  ViewActions,
 } from "@/components/view";
 
 import { useAdminEntity } from "@/hooks";
-
-import type { Category } from "@/lib/types";
+import type { Order } from "@/lib/types";
 
 type Props = {
   id: string;
 };
 
-export default function CategoryViewClient({ id }: Props) {
+export default function OrderViewClient({ id }: Props) {
   const router = useRouter();
 
   const {
-    data: category,
+    data: order,
     loading,
     error,
-  } = useAdminEntity<Category>({
-    endpoint: "categories",
+  } = useAdminEntity<Order>({
+    endpoint: "orders",
     id,
   });
 
   return (
     <div className="space-y-6">
-      <FormHeader title="View Category" />
-
+      <FormHeader title="View Order" />
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
         {loading ? (
           <FormSkeleton />
         ) : error ? (
           <FormError error={error} />
-        ) : !category ? null : (
+        ) : !order ? null : (
           <div className="space-y-6">
             <div className="sm:sticky top-30 z-10 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/40">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <ViewField label="Category" value={category.name} mono />
-                <ViewField label="Slug" value={category.slug} mono />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <ViewField
+                  label="Order Number"
+                  value={order.orderNumber}
+                  mono
+                />
 
-                <div>
-                  <p className="text-sm text-gray-500 mb-2">Status</p>
-                  <ViewBadge
-                    label={category.isActive ? "Active" : "Inactive"}
-                    variant={category.isActive ? "success" : "danger"}
-                  />
-                </div>
+                <ViewField label="Customer" value={order.customer?.phone} />
+
+                <ViewField label="Seller" value={order.seller?.businessName} />
+
+                <ViewSection title="Status">
+                  <div className="flex gap-6">
+                    <ViewBadge label={order.orderStatus} variant="info" />
+                    <ViewBadge
+                      label={order.paymentStatus}
+                      variant={
+                        order.paymentStatus === "paid" ? "success" : "warning"
+                      }
+                    />
+                  </div>
+                </ViewSection>
               </div>
             </div>
 
-            <ViewSection>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="space-y-6">
-                  <ViewImage
-                    label="Category Image"
-                    src={category.image.url}
-                    alt={category.image.alt ?? category.name}
-                    caption={category.image.caption}
-                    size={160}
-                  />
-                </div>
+            <ViewSection title="Items">
+              <div className="space-y-4">
+                {order.items.map((item, idx) => (
+                  <div key={idx} className="rounded-md bg-gray-50 p-4 text-sm">
+                    <p className="font-medium">{item.product?.name}</p>
+                    <p>SKU: {item.inventory?.sku}</p>
+                    <p>Qty: {item.quantity}</p>
+                    <p>
+                      ₹ {item.price.sellingPrice} × {item.quantity}
+                    </p>
+                  </div>
+                ))}
               </div>
             </ViewSection>
 
-            {category.description && (
-              <div className="mt-6">
-                <ViewField label="Description" value={category.description} />
-              </div>
-            )}
-
-            <Authorized permission="seo:read">
-              <ViewSEOSection
-                seo={category.seo}
-                collapsible
-                defaultOpen={false}
-              />
-            </Authorized>
-
-            <ViewSection>
+            <ViewSection title="Totals">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <ViewField
-                  label="Created At"
-                  value={new Date(category.createdAt).toLocaleString()}
-                  mono
+                  label="MRP Total"
+                  value={`₹ ${order.totals?.mrpTotal}`}
                 />
                 <ViewField
-                  label="Last Updated"
-                  value={new Date(category.updatedAt).toLocaleString()}
-                  mono
+                  label="Selling Total"
+                  value={`₹ ${order.totals?.sellingTotal}`}
+                />
+                <ViewField
+                  label="Discount"
+                  value={`₹ ${order.totals?.discountTotal}`}
+                />
+                <ViewField
+                  label="Payable"
+                  value={`₹ ${order.totals?.payableTotal}`}
                 />
               </div>
             </ViewSection>
 
-            <ViewActions
-              primaryLabel="Edit Category"
-              primaryPermission="category:update"
-              onPrimary={() => router.push(`/categories/${id}/edit`)}
-              onBack={() => router.back()}
-            />
+            <ViewSection title="Delivery Address">
+              <div className="space-y-2 text-sm">
+                <p>{order.deliveryAddress?.name}</p>
+                <p>{order.deliveryAddress?.phone}</p>
+                <p>{order.deliveryAddress?.addressLine1}</p>
+                {order.deliveryAddress?.addressLine2 && (
+                  <p>{order.deliveryAddress.addressLine2}</p>
+                )}
+                <p>
+                  {order.deliveryAddress?.city}, {order.deliveryAddress?.state}{" "}
+                  - {order.deliveryAddress?.pincode}
+                </p>
+                <p>{order.deliveryAddress?.country}</p>
+              </div>
+            </ViewSection>
+
+            <ViewSection>
+              <ViewField
+                label="Created At"
+                value={new Date(order.createdAt).toLocaleString()}
+              />
+            </ViewSection>
+
+            <ViewActions onBack={() => router.back()} />
           </div>
         )}
       </div>

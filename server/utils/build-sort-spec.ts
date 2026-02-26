@@ -38,13 +38,7 @@ const SORT_FIELD_MAP: Record<SortType, Set<string>> = {
     "createdAt",
   ]),
   customer: new Set(["fullName", "isActive", "lastLoginAt", "createdAt"]),
-  order: new Set([
-    "seller",
-    "customer",
-    "paymentStatus",
-    "orderStatus",
-    "createdAt",
-  ]),
+  order: new Set(["orderNumber", "paymentStatus", "orderStatus", "createdAt"]),
 };
 
 export function buildSortSpec({
