@@ -3,12 +3,12 @@ import { Schema, model, models } from "mongoose";
 
 const PaymentSchema = new Schema(
   {
-    order: {
-      type: Schema.Types.ObjectId,
-      ref: "Order",
-      required: true,
-      index: true,
-    },
+    orders: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Order",
+      },
+    ],
     customer: {
       type: Schema.Types.ObjectId,
       ref: "Customer",
