@@ -60,11 +60,17 @@ export async function listOrders(params?: {
 
   if (params?.fromDate || params?.toDate) {
     query.createdAt = {};
+
     if (params.fromDate) {
-      query.createdAt.$gte = new Date(params.fromDate);
+      const from = new Date(params.fromDate);
+      from.setHours(0, 0, 0, 0);
+      query.createdAt.$gte = from;
     }
+
     if (params.toDate) {
-      query.createdAt.$lte = new Date(params.toDate);
+      const to = new Date(params.toDate);
+      to.setHours(23, 59, 59, 999);
+      query.createdAt.$lte = to;
     }
   }
 

@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { hasPermission } from "@/lib/authorization";
 import { useSidebar } from "@/context/SidebarContext";
 import {
+  ClipboardList,
   Home,
   Layers,
   Package,
@@ -84,6 +85,12 @@ const navGroups: NavGroup[] = [
         name: "Customers",
         path: "/customers",
         permission: "customer:read",
+      },
+      {
+        icon: <ClipboardList />,
+        name: "Orders",
+        path: "/orders",
+        permission: "order:read",
       },
     ],
   },
