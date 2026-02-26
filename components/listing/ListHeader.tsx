@@ -6,8 +6,8 @@ import { Authorized } from "../auth/Authorized";
 
 type ListHeaderProps = {
   title: string;
-  actionLabel: string;
-  actionHref: string;
+  actionLabel?: string;
+  actionHref?: string;
   createPermission?: string;
 };
 
@@ -17,11 +17,21 @@ export default function ListHeader({
   actionHref,
   createPermission,
 }: ListHeaderProps) {
-  const ActionButton = (
-    <Link href={actionHref}>
-      <Button variant="primary">{actionLabel}</Button>
-    </Link>
-  );
+  const renderActionButton = () => {
+    if (!actionLabel || !actionHref) return null;
+
+    const button = (
+      <Link href={actionHref}>
+        <Button variant="primary">{actionLabel}</Button>
+      </Link>
+    );
+
+    return createPermission ? (
+      <Authorized permission={createPermission}>{button}</Authorized>
+    ) : (
+      button
+    );
+  };
 
   return (
     <div className="flex items-center justify-between">
@@ -29,11 +39,7 @@ export default function ListHeader({
         {title}
       </h1>
 
-      {createPermission ? (
-        <Authorized permission={createPermission}>{ActionButton}</Authorized>
-      ) : (
-        ActionButton
-      )}
+      {renderActionButton()}
     </div>
   );
 }

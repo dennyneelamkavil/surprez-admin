@@ -26,3 +26,14 @@ export type { Role, RoleBase, RoleWithPermissionKeys } from "./role";
 export type { User, UserBase } from "./user";
 export type { Customer, CustomerBase } from "./customer";
 export type { Seller, SellerBase } from "./seller";
+
+export type {
+  Order,
+  OrderBase,
+  OrderItem,
+  OrderItemPrice,
+  OrderAddressSnapshot,
+  OrderTotals,
+  OrderStatus,
+  OrderPaymentStatus,
+} from "./order";
